@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>digital decision — E-Commerce-Partner für Shops, die skalieren wollen | Salzburg</title>
+  <meta name="description" content="Wir führen dein E-Commerce-Geschäft wie unser eigenes: Shops, Ads, Content, Systeme. Kostenloser Setup-Check — wir sagen dir, wo dein Wachstum hängt.">
+  <link rel="canonical" href="https://www.digital-decision.at/">
+
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="digital decision">
+  <meta property="og:title" content="digital decision — E-Commerce-Partner für Shops, die skalieren wollen">
+  <meta property="og:description" content="Wir führen dein E-Commerce-Geschäft wie unser eigenes: Shops, Ads, Content, Systeme. Kostenloser Setup-Check.">
+  <meta property="og:url" content="https://www.digital-decision.at/">
+  <meta property="og:image" content="https://www.digital-decision.at/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="de_AT">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="preload" href="/fonts/space-grotesk-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "digital decision GmbH",
+    "url": "https://www.digital-decision.at/",
+    "logo": "https://www.digital-decision.at/assets/mark-waves-ink.svg",
+    "email": "david@digital-decision.at",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Josef-Weißkind-Straße 14/4",
+      "postalCode": "5083",
+      "addressLocality": "Grödig",
+      "addressCountry": "AT"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- Static mirror of the React form so Netlify's build bot registers it.
+       Field names MUST match src/components/sections/SetupCheck.jsx. -->
+  <form name="setup-check" data-netlify="true" netlify-honeypot="bot-field" action="/danke" hidden>
+    <input type="text" name="name">
+    <input type="email" name="email">
+    <input type="text" name="shop">
+    <textarea name="message"></textarea>
+    <input type="text" name="bot-field">
+  </form>
+
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+</html>

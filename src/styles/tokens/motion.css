@@ -1,0 +1,11 @@
+:root{
+  --ease-standard:cubic-bezier(0.2,0.7,0.2,1);
+  --ease-out:cubic-bezier(0.16,1,0.3,1);
+  --dur-fast:120ms;
+  --dur-base:200ms;
+  --dur-slow:420ms;
+  --transition-interactive:background-color var(--dur-fast) var(--ease-standard),color var(--dur-fast) var(--ease-standard),border-color var(--dur-fast) var(--ease-standard),transform var(--dur-fast) var(--ease-standard);
+  --ease-out-strong:cubic-bezier(0.23,1,0.32,1);
+  --ease-in-out-strong:cubic-bezier(0.77,0,0.175,1);
+  --press-scale:0.98;
+}

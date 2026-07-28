@@ -1,0 +1,40 @@
+/* Base palette — exactly six colours, per the Claude Design Briefing. No further colours, no gradients. */
+:root{
+  --dd-ink:#0A0A0A;
+  --dd-paper:#F6F6F2;
+  --dd-white:#FFFFFF;
+  --dd-lime:#C6F04B;
+  --dd-violet:#5936E4;
+  --dd-muted:#55554E;
+
+  /* Derived neutrals taken verbatim from the Brand Board mockups */
+  --dd-border:#E4E4DC;        /* 1px card / divider border on light surfaces */
+  --dd-border-dark:#3A3A36;   /* 1px border on Ink surfaces (ghost button) */
+  --dd-on-ink-muted:#B9B9B0;  /* secondary text on Ink */
+  --dd-on-violet-muted:#D9D0FF;
+  --dd-chrome:#ECECE6;        /* browser-bar / inset surface */
+  --dd-chrome-dot:#CFCFC6;
+
+  /* Semantic aliases */
+  --text-primary:var(--dd-ink);
+  --text-secondary:var(--dd-muted);
+  --text-on-dark:var(--dd-white);
+  --text-on-dark-secondary:var(--dd-on-ink-muted);
+  --text-link:var(--dd-violet);
+  --text-accent-on-dark:var(--dd-lime);
+
+  --surface-page:var(--dd-paper);
+  --surface-card:var(--dd-white);
+  --surface-dark:var(--dd-ink);
+  --surface-accent:var(--dd-lime);
+  --surface-secondary:var(--dd-violet);
+  --surface-inset:var(--dd-chrome);
+
+  --border-default:1px solid var(--dd-border);
+  --border-on-dark:1px solid var(--dd-border-dark);
+
+  --action-primary-bg:var(--dd-lime);
+  --action-primary-fg:var(--dd-ink);
+  --action-secondary-fg:var(--dd-ink);
+  --focus-ring:var(--dd-violet);
+}
