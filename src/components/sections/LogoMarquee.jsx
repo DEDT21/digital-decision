@@ -70,7 +70,7 @@ export function LogoMarquee({ items = [], tone = 'dark', speed = 32, logoHeight 
           const entry = typeof item === 'string' ? { name: item } : item;
           return (
             <span key={entry.name + '-' + i} aria-hidden={i >= one.length}
-              style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', height: logoHeight + 'px' }}>
+              style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', height: (entry.height || logoHeight) + 'px' }}>
               {entry.logo ? (
                 <img src={entry.logo} alt={entry.name} onLoad={remeasure} loading="lazy" decoding="async"
                      style={{ height: (entry.height || logoHeight) + 'px', width: 'auto', display: 'block',

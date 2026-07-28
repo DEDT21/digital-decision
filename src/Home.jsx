@@ -91,8 +91,10 @@ const NETWORK_FACES = [
   { name: 'Otago', logo: '/assets/network/otago.svg' },
   { name: 'Spreadfilms', logo: '/assets/network/spreadfilms.svg', dark: true },
   { name: 'WBFK', logo: '/assets/network/wbfk.svg', dark: true },
-  { name: 'WIRO', logo: '/assets/network/wiro.svg', dark: true },
-  { name: 'Partner', logo: '/assets/network/partner-1c.svg', dark: true }
+  /* tile-style logo (black square, white W) — rendered like a profile photo, not filtered to a glyph */
+  { name: 'Wipplinger', photo: '/assets/network/wipplinger.svg' },
+  { name: 'Partner', logo: '/assets/network/partner-1c.svg', dark: true },
+  { name: 'Huber', logo: '/assets/network/huber.webp' }
 ];
 
 const MANIFEST = [
@@ -125,7 +127,7 @@ function Hero({ onNavigate }) {
           Wir führen dein E-Commerce-Geschäft, als wäre es unser eigenes. Strategie und Umsetzung, ein Team, das entscheidet und dazu steht.
         </p>
         <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
-          <Button onClick={() => onNavigate('home', 'setup-check')}>Kostenlosen Setup-Check holen</Button>
+          <Button arrow onClick={() => onNavigate('home', 'setup-check')}>Kostenlosen Setup-Check holen</Button>
           <Button variant="ghostDark" href="#phasen">Wie wir arbeiten</Button>
         </div>
         <div style={{ font: 'var(--text-caption)', color: 'var(--text-on-dark-secondary)', marginTop: 'var(--space-4)' }}>

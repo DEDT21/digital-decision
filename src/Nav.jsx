@@ -14,7 +14,7 @@ export function Nav({ onNavigate }) {
           <a key={id} href={'#' + id} onClick={(e) => { e.preventDefault(); onNavigate('home', id); }}
              style={{ font: 'var(--text-copy)', fontSize: 14, color: 'var(--text-on-dark-secondary)', textDecoration: 'none' }}>{label}</a>
         ))}
-        <Button size="sm" onClick={() => onNavigate('home', 'setup-check')}>Setup-Check →</Button>
+        <Button size="sm" arrow onClick={() => onNavigate('home', 'setup-check')}>Setup-Check</Button>
       </div>
     </nav>
   );

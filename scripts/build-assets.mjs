@@ -17,8 +17,11 @@ const LOGOS = [
   { src: 'GCS-LOGO-SHOP.png', out: 'public/assets/clients/gamechangersocks.webp' },
   { src: 'BWT.png', out: 'public/assets/clients/bwt.webp' },
   { src: 'Ecosoft.png', out: 'public/assets/clients/ecosoft.webp' },
-  { src: 'BAM LOGO.png', out: 'public/assets/network/bam-creative.webp' }
+  { src: 'BAM LOGO.png', out: 'public/assets/network/bam-creative.webp' },
+  { src: 'Black_Huber_Logo.png', out: 'public/assets/network/huber.webp' }
 ];
+/* Wipplinger ships as SVG: public/assets/network/wipplinger.svg is the source
+   wipplinger-logo.svg with the viewBox cropped to the W mark (0 0 78 80). */
 
 const PHOTOS = [
   { src: 'David-Edtmayer-Profilbild.png', out: 'public/assets/team/david-edtmayer.webp' },

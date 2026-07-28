@@ -62,7 +62,7 @@ function PersonCard({ person, open, onToggle, assetBase }) {
 function NetworkFan({ hubLabel, note, nodes, faces, assetBase, stacked }) {
   const [hot, setHot] = React.useState(0);
   const count = Math.max(nodes.length, 1);
-  const shown = faces.slice(0, 6);
+  const shown = faces.slice(0, 8);
   const rest = faces.length - shown.length;
   /* Fixed geometry: the panel and the description box never resize when the selected node
      changes — a box that grows and shrinks on hover creates exactly the restlessness the
@@ -75,11 +75,12 @@ function NetworkFan({ hubLabel, note, nodes, faces, assetBase, stacked }) {
         <div style={{ font: 'var(--text-h3)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-bold)', fontSize: '25px', letterSpacing: 'var(--ls-heading)' }}>{hubLabel}</div>
 
         {shown.length ? (
-          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6, marginTop: 'var(--space-4)' }}>
-            {/* round avatars, like profile pictures — every partner the same circle */}
-            {shown.map((face) => (
+          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', marginTop: 'var(--space-4)', paddingLeft: 10 }}>
+            {/* round avatars as a fanned stack: each circle tucks 10px under its left neighbour,
+                the Ink border keeps every logo readable — left-most sits on top */}
+            {shown.map((face, fi) => (
               <span key={face.name} title={face.name}
-                    style={{ width: 44, height: 44, borderRadius: 'var(--radius-round)', overflow: 'hidden', background: face.dark ? 'var(--dd-lime)' : 'var(--dd-white)', border: '2px solid var(--surface-dark)', display: 'grid', placeItems: 'center', flex: '0 0 auto', boxSizing: 'border-box' }}>
+                    style={{ width: 44, height: 44, borderRadius: 'var(--radius-round)', overflow: 'hidden', background: face.dark ? 'var(--dd-lime)' : 'var(--dd-white)', border: '2px solid var(--surface-dark)', display: 'grid', placeItems: 'center', flex: '0 0 auto', boxSizing: 'border-box', marginLeft: -10, position: 'relative', zIndex: shown.length - fi }}>
                 {face.logo
                   ? <img src={face.logo} alt={face.name} loading="lazy" decoding="async"
                       style={{ width: '66%', height: '66%', objectFit: 'contain', display: 'block', filter: 'grayscale(1) brightness(0)' }} />
@@ -89,7 +90,7 @@ function NetworkFan({ hubLabel, note, nodes, faces, assetBase, stacked }) {
               </span>
             ))}
             {rest > 0 ? (
-              <span style={{ width: 44, height: 44, borderRadius: 'var(--radius-round)', border: '2px solid var(--surface-dark)', background: 'var(--dd-lime)', boxSizing: 'border-box', color: 'var(--dd-ink)', display: 'grid', placeItems: 'center', font: 'var(--text-caption)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-bold)', fontSize: '12px', flex: '0 0 auto' }}>+{rest}</span>
+              <span style={{ width: 44, height: 44, borderRadius: 'var(--radius-round)', border: '2px solid var(--surface-dark)', background: 'var(--dd-lime)', boxSizing: 'border-box', color: 'var(--dd-ink)', display: 'grid', placeItems: 'center', font: 'var(--text-caption)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-bold)', fontSize: '12px', flex: '0 0 auto', marginLeft: -10, position: 'relative' }}>+{rest}</span>
             ) : null}
           </div>
         ) : null}

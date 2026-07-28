@@ -84,7 +84,7 @@ export function SiteFooter({
           {kicker ? <div style={{ marginBottom: 'var(--space-5)' }}><Kicker tone="limeText">{kicker}</Kicker></div> : null}
           <h2 style={{ font: 'var(--text-h2)', letterSpacing: 'var(--ls-heading)', margin: '0 auto var(--space-5)', maxWidth: 880 }}>{headline}</h2>
           {sub ? <p style={{ font: 'var(--text-lead)', color: 'var(--text-on-dark-secondary)', maxWidth: 'var(--measure)', margin: '0 auto var(--space-8)', textWrap: 'pretty' }}>{sub}</p> : null}
-          <Button size="lg" onClick={onCta}>{ctaLabel}</Button>
+          <Button size="lg" arrow onClick={onCta}>{ctaLabel}</Button>
         </div>
 
         {/* USP band */}

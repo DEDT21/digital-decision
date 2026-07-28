@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button } from '../core/Button.jsx';
 
 /* The single full-Lime section on the page: the free setup check. Form is intentionally four
    fields — anything more reads as a lead-gen funnel.
@@ -51,7 +52,7 @@ export function SetupCheck({ id = 'setup-check', kicker = 'Kostenlos · unverbin
             {field('E-Mail', 'email', { required: true, type: 'email', autoComplete: 'email' })}
             {field('Shop-URL', 'shop', { inputMode: 'url', autoComplete: 'url' })}
             {field('Was nervt dich gerade am meisten?', 'message', { area: true })}
-            <button type="submit" style={{ width: '100%', font: 'var(--text-button)', fontFamily: 'var(--font-head)', background: 'var(--dd-lime)', color: 'var(--dd-ink)', border: 'none', borderRadius: 'var(--radius-pill)', padding: '14px 28px', cursor: 'pointer', transition: 'var(--transition-interactive)' }}>{buttonLabel}</button>
+            <Button type="submit" arrow style={{ width: '100%', background: 'var(--dd-lime)', color: 'var(--dd-ink)' }}>{buttonLabel}</Button>
             {reassurance ? <p style={{ font: 'var(--text-caption)', color: 'var(--text-on-dark-secondary)', margin: 'var(--space-4) 0 0', textAlign: 'center' }}>{reassurance}</p> : null}
           </form>
         </div>
