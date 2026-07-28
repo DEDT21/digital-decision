@@ -1,4 +1,5 @@
 import React from 'react';
+import { Kicker } from '../core/Kicker.jsx';
 
 /* "Drei Situationen, in denen wir richtig sind." as a pinned scroll scene: the page holds for
    ~300vh while the scroll wheel walks through the three use cases. List on the left, an Ink chart
@@ -268,7 +269,7 @@ export function UseCaseSteps({ cases = [], kicker, title, lead, closer, scrollLe
   const stage = (
     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: compact ? 'var(--space-6)' : 'var(--space-10)', height: pinned ? '100vh' : 'auto', padding: pinned ? (compact ? 'var(--space-6) var(--pad-page-x)' : 'var(--space-12) var(--pad-page-x)') : 'var(--pad-section-y) var(--pad-page-x)', boxSizing: 'border-box', overflow: 'hidden' }}>
       <div style={{ maxWidth: 'var(--measure-wide)', margin: '0 auto', width: '100%' }}>
-        {kicker ? <div style={{ font: 'var(--text-kicker)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-medium)', fontSize: 14, textTransform: 'uppercase', letterSpacing: 'var(--ls-kicker)', background: 'var(--surface-accent)', color: 'var(--dd-ink)', padding: '4px 12px', borderRadius: 'var(--radius-pill)', display: 'inline-block' }}>{kicker}</div> : null}
+        {kicker ? <div><Kicker tone="mark">{kicker}</Kicker></div> : null}
         {title ? <h2 style={{ font: 'var(--text-h2)', fontSize: (stacked || compact) ? 'var(--fs-h2-sm)' : 'var(--fs-h2)', letterSpacing: 'var(--ls-heading)', margin: (compact ? 'var(--space-3)' : 'var(--space-5)') + ' 0 0' }}>{title}</h2> : null}
         {lead && !compact ? <p style={{ font: 'var(--text-lead)', color: 'var(--text-secondary)', maxWidth: 'var(--measure)', margin: 'var(--space-4) 0 0', textWrap: 'pretty' }}>{lead}</p> : null}
       </div>

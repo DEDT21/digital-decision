@@ -2,8 +2,8 @@ import React from 'react';
 
 /* Production note: the wave marks and wordmarks ship as SVG (crisp at every size, tiny files). */
 const SRC = {
-  full: { ink: 'logo-wordmark-ink.svg', white: 'logo-wordmark-white.svg' },
-  wordmark: { ink: 'logo-wordmark-ink.svg', white: 'logo-wordmark-white.svg' },
+  full: { ink: 'logo-wordmark-ink.svg', white: 'logo-wordmark-white.svg', lime: 'logo-wordmark-lime.svg' },
+  wordmark: { ink: 'logo-wordmark-ink.svg', white: 'logo-wordmark-white.svg', lime: 'logo-wordmark-lime.svg' },
   mark: { ink: 'mark-waves-ink.svg', white: 'mark-waves-white.svg', lime: 'mark-waves-lime.svg' }
 };
 

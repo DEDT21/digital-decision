@@ -61,7 +61,6 @@ function PersonCard({ person, open, onToggle, assetBase }) {
 
 function NetworkFan({ hubLabel, note, nodes, faces, assetBase, stacked }) {
   const [hot, setHot] = React.useState(0);
-  const [ratios, setRatios] = React.useState({});
   const count = Math.max(nodes.length, 1);
   const shown = faces.slice(0, 6);
   const rest = faces.length - shown.length;
@@ -77,29 +76,20 @@ function NetworkFan({ hubLabel, note, nodes, faces, assetBase, stacked }) {
 
         {shown.length ? (
           <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6, marginTop: 'var(--space-4)' }}>
-            {shown.map((face) => {
-              const ar = ratios[face.name] || 1;
-              const w = Math.round(40 * Math.min(Math.max(ar, 1), 2.2));
-              return (
-                <span key={face.name} title={face.name}
-                      style={{ width: w, height: 40, borderRadius: w > 44 ? 20 : 'var(--radius-round)', overflow: 'hidden', background: face.dark ? 'var(--dd-lime)' : 'var(--dd-white)', border: '2px solid var(--surface-dark)', display: 'grid', placeItems: 'center', flex: '0 0 auto', boxSizing: 'border-box', padding: w > 44 ? '0 8px' : 0 }}>
-                  {face.logo
-                    ? <img src={face.logo} alt={face.name} loading="lazy" decoding="async"
-                        onLoad={(e) => {
-                          const img = e.target;
-                          if (!img.naturalHeight) return;
-                          const r = img.naturalWidth / img.naturalHeight;
-                          setRatios((prev) => (prev[face.name] === r ? prev : { ...prev, [face.name]: r }));
-                        }}
-                        style={{ maxWidth: '100%', maxHeight: '68%', width: 'auto', height: 'auto', objectFit: 'contain', display: 'block', filter: 'grayscale(1) brightness(0)' }} />
-                    : face.photo
-                      ? <img src={face.photo} alt={face.name} loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', filter: 'grayscale(1)' }} />
-                      : <span style={{ font: 'var(--text-caption)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-bold)', fontSize: '12px', color: 'var(--dd-muted)' }}>{face.name.trim().charAt(0).toUpperCase()}</span>}
-                </span>
-              );
-            })}
+            {/* round avatars, like profile pictures — every partner the same circle */}
+            {shown.map((face) => (
+              <span key={face.name} title={face.name}
+                    style={{ width: 44, height: 44, borderRadius: 'var(--radius-round)', overflow: 'hidden', background: face.dark ? 'var(--dd-lime)' : 'var(--dd-white)', border: '2px solid var(--surface-dark)', display: 'grid', placeItems: 'center', flex: '0 0 auto', boxSizing: 'border-box' }}>
+                {face.logo
+                  ? <img src={face.logo} alt={face.name} loading="lazy" decoding="async"
+                      style={{ width: '66%', height: '66%', objectFit: 'contain', display: 'block', filter: 'grayscale(1) brightness(0)' }} />
+                  : face.photo
+                    ? <img src={face.photo} alt={face.name} loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', filter: 'grayscale(1)' }} />
+                    : <span style={{ font: 'var(--text-caption)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-bold)', fontSize: '12px', color: 'var(--dd-muted)' }}>{face.name.trim().charAt(0).toUpperCase()}</span>}
+              </span>
+            ))}
             {rest > 0 ? (
-              <span style={{ width: 40, height: 40, borderRadius: 'var(--radius-round)', border: '2px solid var(--surface-dark)', background: 'var(--dd-lime)', boxSizing: 'border-box', color: 'var(--dd-ink)', display: 'grid', placeItems: 'center', font: 'var(--text-caption)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-bold)', fontSize: '12px', flex: '0 0 auto' }}>+{rest}</span>
+              <span style={{ width: 44, height: 44, borderRadius: 'var(--radius-round)', border: '2px solid var(--surface-dark)', background: 'var(--dd-lime)', boxSizing: 'border-box', color: 'var(--dd-ink)', display: 'grid', placeItems: 'center', font: 'var(--text-caption)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-bold)', fontSize: '12px', flex: '0 0 auto' }}>+{rest}</span>
             ) : null}
           </div>
         ) : null}

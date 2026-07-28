@@ -205,12 +205,15 @@ export function PhaseFlow({ phases = [], kicker, title, lead, scrollLength = 300
   };
 
   const stage = (
-    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: compact ? 'var(--space-4)' : 'var(--space-6)', height: pinned ? '100vh' : 'auto', paddingTop: pinned ? (compact ? 'var(--space-6)' : 'var(--space-12)') : 'var(--pad-section-y)', paddingBottom: pinned ? (compact ? 'var(--space-6)' : 'var(--space-10)') : 'var(--pad-section-y)', boxSizing: 'border-box', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: compact ? 'var(--space-4)' : 'var(--space-6)', height: pinned ? '100vh' : 'auto', paddingTop: pinned ? (compact ? 'calc(84px + var(--space-3))' : 'calc(84px + var(--space-6))') : 'var(--pad-section-y)', paddingBottom: pinned ? (compact ? 'var(--space-6)' : 'var(--space-10)') : 'var(--pad-section-y)', boxSizing: 'border-box', overflow: 'hidden' }}>
+      {/* pinned: top padding clears the 84px sticky site header so kicker and progress stay visible */}
       <header style={{ maxWidth: 'var(--measure-wide)', margin: '0 auto', padding: '0 var(--pad-page-x)', width: '100%', flex: '0 0 auto' }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 'var(--space-6)', flexWrap: 'wrap' }}>
-          {kicker ? (
-            <span style={{ font: 'var(--text-kicker)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-medium)', fontSize: '14px', textTransform: 'uppercase', letterSpacing: 'var(--ls-kicker)', color: 'var(--dd-lime)' }}>{kicker}</span>
-          ) : <span />}
+        {kicker ? (
+          <span style={{ font: 'var(--text-kicker)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-medium)', fontSize: '14px', textTransform: 'uppercase', letterSpacing: 'var(--ls-kicker)', color: 'var(--dd-lime)' }}>{kicker}</span>
+        ) : null}
+        {/* progress sits on the headline row, never under the sticky header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-6)', flexWrap: 'wrap', marginTop: compact ? 'var(--space-3)' : 'var(--space-5)' }}>
+          {title ? <h2 style={{ font: 'var(--text-h2)', fontSize: compact ? 'var(--fs-h2-sm)' : 'var(--fs-h2)', letterSpacing: 'var(--ls-heading)', color: 'var(--text-on-dark)', margin: 0, maxWidth: 'var(--measure-headline)' }}>{title}</h2> : <span />}
           <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', font: 'var(--text-caption)', textTransform: 'uppercase', letterSpacing: 'var(--ls-kicker)', color: 'var(--text-on-dark-secondary)' }}>
             {label}
             <span style={{ width: 96, height: 4, borderRadius: 'var(--radius-pill)', background: 'var(--dd-border-dark)', overflow: 'hidden', display: 'block' }}>
@@ -218,7 +221,6 @@ export function PhaseFlow({ phases = [], kicker, title, lead, scrollLength = 300
             </span>
           </span>
         </div>
-        {title ? <h2 style={{ font: 'var(--text-h2)', fontSize: compact ? 'var(--fs-h2-sm)' : 'var(--fs-h2)', letterSpacing: 'var(--ls-heading)', color: 'var(--text-on-dark)', margin: (compact ? 'var(--space-3)' : 'var(--space-5)') + ' 0 0', maxWidth: 'var(--measure-headline)' }}>{title}</h2> : null}
         {lead && !compact ? <p style={{ font: 'var(--text-copy)', color: 'var(--text-on-dark-secondary)', maxWidth: 'var(--measure)', margin: 'var(--space-4) 0 0', textWrap: 'pretty' }}>{lead}</p> : null}
       </header>
 

@@ -105,7 +105,7 @@ export function SiteFooter({
         <div className="dd-footer-reveal" ref={(el) => { revealRefs.current[1] = el; }}
           style={{ maxWidth: 'var(--measure-wide)', margin: '0 auto', padding: 'var(--space-16) var(--pad-page-x) 0', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 'var(--space-10)' }}>
           <div>
-            <Logo variant="mark" tone="lime" height={64} assetBase={assetBase} />
+            <Logo variant="wordmark" tone="lime" height={72} assetBase={assetBase} />
             {claim ? <p style={{ font: 'var(--text-copy)', color: 'var(--text-on-dark-secondary)', maxWidth: 300, margin: 'var(--space-6) 0 0', textWrap: 'pretty' }}>{claim}</p> : null}
           </div>
           {columns.map((col) => (

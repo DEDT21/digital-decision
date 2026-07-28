@@ -65,7 +65,7 @@ export function App() {
       <SiteFooter
         headline={<>Dein Shop läuft solide, aber skaliert nicht?<br />Dann triff <span style={{ color: 'var(--dd-lime)' }}>genau jetzt</span> die <span style={{ color: 'var(--dd-lime)' }}>richtige Entscheidung</span>.</>}
         kicker="Bereit?"
-        sub="Lass uns einen kostenlosen Setup-Check machen — 30 Minuten, ehrliche Einschätzung, nächste Schritte. Mehr musst du nicht entscheiden. Noch nicht."
+        sub="Lass uns einen kostenlosen Setup-Check machen: 30 Minuten, ehrliche Einschätzung, nächste Schritte. Mehr musst du nicht entscheiden. Noch nicht."
         onCta={() => onNavigate('home', 'setup-check')}
         usps={USPS}
         columns={FOOTER_COLUMNS}
