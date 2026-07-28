@@ -94,7 +94,7 @@ export function SiteFooter({
               {run.map((usp, i) => (
                 <span key={usp + '-' + i} aria-hidden={i >= usps.length} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-10)', flex: '0 0 auto' }}>
                   <span style={{ font: 'var(--text-h3)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-medium)', fontSize: '25px', letterSpacing: 'var(--ls-heading)', color: 'var(--text-on-dark)', whiteSpace: 'nowrap' }}>{usp}</span>
-                  <img src={assetBase + '/mark-waves-lime.svg'} alt="" loading="lazy" decoding="async" style={{ height: 14, width: 'auto', display: 'block', opacity: 0.9 }} />
+                  <img src={assetBase + '/dd-mark-lime.svg'} alt="" loading="lazy" decoding="async" style={{ height: 14, width: 'auto', display: 'block', opacity: 0.9 }} />
                 </span>
               ))}
             </div>

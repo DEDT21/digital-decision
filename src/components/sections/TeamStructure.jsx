@@ -15,7 +15,7 @@ function PersonCard({ person, open, onToggle, assetBase }) {
           <img src={person.photo} alt={person.name} loading="lazy" decoding="async"
                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', filter: open ? 'none' : 'grayscale(1) contrast(1.05)', transform: open ? 'scale(1.03)' : 'scale(1)', transition: 'filter var(--dur-slow) var(--ease-out), transform var(--dur-slow) var(--ease-out)' }} />
         ) : (
-          <img src={assetBase + '/mark-waves-white.svg'} alt="" loading="lazy" decoding="async" style={{ width: '34%', opacity: open ? 0.5 : 0.3, transition: 'opacity var(--dur-base) var(--ease-standard)' }} />
+          <img src={assetBase + '/dd-mark-white.svg'} alt="" loading="lazy" decoding="async" style={{ width: '34%', opacity: open ? 0.5 : 0.3, transition: 'opacity var(--dur-base) var(--ease-standard)' }} />
         )}
         {person.tag ? (
           <span style={{ position: 'absolute', left: 'var(--space-4)', bottom: 'var(--space-4)', font: 'var(--text-kicker)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-medium)', fontSize: '13px', textTransform: 'uppercase', letterSpacing: 'var(--ls-kicker)', color: 'var(--dd-lime)' }}>{person.tag}</span>
@@ -71,7 +71,7 @@ function NetworkFan({ hubLabel, note, nodes, faces, assetBase, stacked }) {
   return (
     <div style={{ background: 'var(--surface-dark)', color: 'var(--text-on-dark)', borderRadius: 'var(--radius-xl)', padding: 'var(--space-8)', display: 'grid', gridTemplateColumns: stacked ? '1fr' : 'minmax(240px, 320px) minmax(56px, 96px) 1fr', gap: 'var(--space-6)', alignItems: stacked ? 'start' : 'center', height: stacked ? 'auto' : panelHeight + 'px', boxSizing: 'border-box' }}>
       <div>
-        <img src={assetBase + '/mark-waves-lime.svg'} alt="" loading="lazy" decoding="async" style={{ width: 44, display: 'block', marginBottom: 'var(--space-4)' }} />
+        <img src={assetBase + '/dd-mark-lime.svg'} alt="" loading="lazy" decoding="async" style={{ width: 44, display: 'block', marginBottom: 'var(--space-4)' }} />
         <div style={{ font: 'var(--text-h3)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-bold)', fontSize: '25px', letterSpacing: 'var(--ls-heading)' }}>{hubLabel}</div>
 
         {shown.length ? (

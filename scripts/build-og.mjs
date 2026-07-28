@@ -13,8 +13,8 @@ const PUB = join(ROOT, 'public');
 
 const inner = (svg) => svg.replace(/<\?xml[^>]*\?>/, '').replace(/<svg[^>]*>/, '').replace('</svg>', '');
 
-const wordmarkWhite = readFileSync(join(PUB, 'assets/logo-wordmark-white.svg'), 'utf8');
-const waves = readFileSync(join(PUB, 'assets/mark-waves-lime.svg'), 'utf8');
+const wordmarkWhite = readFileSync(join(PUB, 'assets/dd-wordmark-white.svg'), 'utf8');
+const waves = readFileSync(join(PUB, 'assets/dd-mark-lime.svg'), 'utf8');
 
 /* Lime accent: the wordmark's three wave flags (its first three paths) go Lime, the type stays
    white — one accent, one statement, per the brand rules. */
