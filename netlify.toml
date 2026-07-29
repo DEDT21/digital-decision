@@ -3,6 +3,10 @@
   command = "npm run build"
   publish = "dist"
 
+# submission-created.mjs fires on every verified form submission (push via ntfy)
+[functions]
+  directory = "netlify/functions"
+
 # Security headers for every page
 [[headers]]
   for = "/*"
