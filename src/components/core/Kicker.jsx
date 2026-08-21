@@ -3,7 +3,7 @@ import React from 'react';
 export function Kicker({ tone = 'mark', children, style }) {
   const shared = {
     display: 'inline-block', font: 'var(--text-kicker)', fontFamily: 'var(--font-head)',
-    fontWeight: 'var(--fw-medium)', fontSize: '14px', textTransform: 'uppercase',
+    fontWeight: 'var(--fw-medium)', fontSize: 'var(--fs-kicker)', textTransform: 'uppercase',
     letterSpacing: 'var(--ls-kicker)'
   };
   const tones = {

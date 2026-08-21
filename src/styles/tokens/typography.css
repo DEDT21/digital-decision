@@ -35,14 +35,27 @@
   --text-lead:var(--fw-regular) var(--fs-lead)/var(--lh-body) var(--font-body);
   --text-copy:var(--fw-regular) var(--fs-body)/var(--lh-body) var(--font-body);
   --text-caption:var(--fw-regular) var(--fs-caption)/1.45 var(--font-body);
-  --text-kicker:var(--fw-medium) 14px/1 var(--font-head);
+  --fs-kicker:14px;
+  --text-kicker:var(--fw-medium) var(--fs-kicker)/1 var(--font-head);
   --text-button:var(--fw-bold) var(--fs-body)/1 var(--font-head);
 }
 
-/* Responsive headline sizes: the 61px H1 / 39px H2 are desktop values */
+/* Responsive headline sizes: the 61px H1 / 39px H2 are desktop values.
+   Mobil ist die Skala gestrafft: H1 34, H2 25, Lead 18, Kicker 12 — sonst frisst die
+   Typo auf 375px mehrere Bildschirmhöhen, ohne mehr zu sagen.
+   Body bleibt bewusst 16px/1.6 (Lesbarkeit). */
 @media (max-width: 720px){
   :root{
-    --fs-h1:var(--fs-h1-sm);
-    --fs-h2:var(--fs-h2-sm);
+    /* 31px statt der geplanten 34: erst ab hier passt das längste Rotator-Wort
+       ("dein Amazon-Business.") auf 375px in EINE Zeile. Sonst reserviert der Rotator
+       dauerhaft eine zweite, meist leere Zeile unter der Headline. */
+    --fs-h1:31px;
+    --fs-h2:var(--fs-h3);
+    --fs-h2-sm:25px;
+    --fs-lead:18px;
+    --fs-display:39px;
+    --fs-kicker:12px;
+    --lh-heading:1.12;
+    --lh-display:1.1;
   }
 }

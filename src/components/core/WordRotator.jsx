@@ -32,11 +32,15 @@ export function WordRotator({ words = [], interval = 1600, tone = 'lime', holdLa
   const colors = { lime: 'var(--dd-lime)', ink: 'var(--dd-ink)', white: 'var(--dd-white)' };
 
   return (
-    <span style={{ position: 'relative', display: 'inline-block', overflow: 'hidden', verticalAlign: 'bottom', color: colors[tone] || tone, ...style }}>
-      <span aria-hidden="true" style={{ visibility: 'hidden', whiteSpace: 'nowrap' }}>{longest}</span>
+    /* Layout-Properties (position, display, white-space, overflow) liegen in mobile.css unter
+       .dd-rotator*, damit die Media Query sie überschreiben kann: auf schmalen Screens ist das
+       längste Wort breiter als der Viewport und muss umbrechen dürfen, statt die Seite
+       horizontal aufzuziehen. */
+    <span className="dd-rotator" style={{ color: colors[tone] || tone, ...style }}>
+      <span className="dd-rotator-measure" aria-hidden="true">{longest}</span>
       {seq.map((word, i) => (
-        <span key={word + '-' + i} aria-hidden={i !== current}
-          style={{ position: 'absolute', left: 0, top: 0, whiteSpace: 'nowrap',
+        <span key={word + '-' + i} className="dd-rotator-word" aria-hidden={i !== current}
+          style={{
             transform: reduced ? 'none' : (i === current ? 'translateY(0)' : (i < current ? 'translateY(-118%)' : 'translateY(118%)')),
             opacity: i === current ? 1 : 0,
             transition: reduced ? 'none' : 'transform 520ms var(--ease-out-strong), opacity 240ms var(--ease-standard)' }}>

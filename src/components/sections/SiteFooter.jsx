@@ -79,8 +79,8 @@ export function SiteFooter({
 
       <div style={{ position: 'relative' }}>
         {/* closing CTA */}
-        <div className="dd-footer-reveal" ref={(el) => { revealRefs.current[0] = el; }}
-          style={{ padding: 'var(--pad-section-y) var(--pad-page-x) var(--space-16)', maxWidth: 'var(--measure-wide)', margin: '0 auto', textAlign: 'center' }}>
+        <div className="dd-footer-reveal dd-footer-cta" ref={(el) => { revealRefs.current[0] = el; }}
+          style={{ maxWidth: 'var(--measure-wide)', margin: '0 auto', textAlign: 'center' }}>
           {kicker ? <div style={{ marginBottom: 'var(--space-5)' }}><Kicker tone="limeText">{kicker}</Kicker></div> : null}
           <h2 style={{ font: 'var(--text-h2)', letterSpacing: 'var(--ls-heading)', margin: '0 auto var(--space-5)', maxWidth: 880 }}>{headline}</h2>
           {sub ? <p style={{ font: 'var(--text-lead)', color: 'var(--text-on-dark-secondary)', maxWidth: 'var(--measure)', margin: '0 auto var(--space-8)', textWrap: 'pretty' }}>{sub}</p> : null}
@@ -89,11 +89,11 @@ export function SiteFooter({
 
         {/* USP band */}
         {usps.length ? (
-          <div style={{ overflow: 'hidden', padding: 'var(--space-6) 0', maskImage: 'linear-gradient(to right, transparent, #000 80px, #000 calc(100% - 80px), transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, #000 80px, #000 calc(100% - 80px), transparent)' }}>
-            <div className="dd-usp-track" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-10)', paddingRight: 'var(--space-10)', width: 'max-content' }}>
+          <div className="dd-usp-band" style={{ overflow: 'hidden', maskImage: 'linear-gradient(to right, transparent, #000 80px, #000 calc(100% - 80px), transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, #000 80px, #000 calc(100% - 80px), transparent)' }}>
+            <div className="dd-usp-track" style={{ display: 'flex', alignItems: 'center', width: 'max-content' }}>
               {run.map((usp, i) => (
-                <span key={usp + '-' + i} aria-hidden={i >= usps.length} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-10)', flex: '0 0 auto' }}>
-                  <span style={{ font: 'var(--text-h3)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-medium)', fontSize: '25px', letterSpacing: 'var(--ls-heading)', color: 'var(--text-on-dark)', whiteSpace: 'nowrap' }}>{usp}</span>
+                <span key={usp + '-' + i} className="dd-usp-item" aria-hidden={i >= usps.length} style={{ display: 'flex', alignItems: 'center', flex: '0 0 auto' }}>
+                  <span className="dd-usp-text" style={{ letterSpacing: 'var(--ls-heading)', color: 'var(--text-on-dark)', whiteSpace: 'nowrap' }}>{usp}</span>
                   <img src={assetBase + '/dd-mark-lime.svg'} alt="" loading="lazy" decoding="async" style={{ height: 14, width: 'auto', display: 'block', opacity: 0.9 }} />
                 </span>
               ))}
@@ -102,16 +102,16 @@ export function SiteFooter({
         ) : null}
 
         {/* columns */}
-        <div className="dd-footer-reveal" ref={(el) => { revealRefs.current[1] = el; }}
-          style={{ maxWidth: 'var(--measure-wide)', margin: '0 auto', padding: 'var(--space-16) var(--pad-page-x) 0', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 'var(--space-10)' }}>
-          <div>
-            <Logo variant="wordmark" tone="lime" height={72} assetBase={assetBase} />
+        <div className="dd-footer-reveal dd-footer-cols" ref={(el) => { revealRefs.current[1] = el; }}
+          style={{ maxWidth: 'var(--measure-wide)', margin: '0 auto', display: 'grid' }}>
+          <div className="dd-footer-brand">
+            <span className="dd-footer-logo"><Logo variant="wordmark" tone="lime" height={72} assetBase={assetBase} /></span>
             {claim ? <p style={{ font: 'var(--text-copy)', color: 'var(--text-on-dark-secondary)', maxWidth: 300, margin: 'var(--space-6) 0 0', textWrap: 'pretty' }}>{claim}</p> : null}
           </div>
           {columns.map((col) => (
             <div key={col.title}>
-              <div style={{ marginBottom: 'var(--space-5)' }}><Kicker tone="limeText">{col.title}</Kicker></div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+              <div className="dd-footer-col-title" style={{ marginBottom: 'var(--space-5)' }}><Kicker tone="limeText">{col.title}</Kicker></div>
+              <div className="dd-footer-col-links" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                 {col.items.map((item) => (
                   item.anchor || item.href ? (
                     <a key={item.label} className="dd-footer-link" href={item.anchor ? '#' + item.anchor : item.href}
@@ -127,7 +127,7 @@ export function SiteFooter({
         </div>
 
         {/* bottom bar */}
-        <div style={{ maxWidth: 'var(--measure-wide)', margin: '0 auto', padding: 'var(--space-16) var(--pad-page-x) var(--space-10)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-6)', flexWrap: 'wrap' }}>
+        <div className="dd-footer-bottom" style={{ maxWidth: 'var(--measure-wide)', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-6)', flexWrap: 'wrap' }}>
           <span style={{ font: 'var(--text-caption)', color: 'var(--text-on-dark-secondary)' }}>{legal}</span>
           <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-5)' }}>
             <span style={{ font: 'var(--text-caption)', color: 'var(--text-on-dark-secondary)' }}>{copyright}</span>

@@ -9,39 +9,45 @@ import { Button } from '../core/Button.jsx';
    hidden — bots fill it, Netlify drops the submission. On success Netlify redirects to the
    form's action: /danke. */
 export function SetupCheck({ id = 'setup-check', kicker = 'Kostenlos · unverbindlich', headline, intro, steps = [], buttonLabel = 'Setup-Check anfragen', reassurance, style }) {
-  const inputStyle = { width: '100%', font: 'var(--text-copy)', color: 'var(--dd-ink)', background: 'var(--dd-white)', border: '1px solid rgba(10,10,10,0.18)', borderRadius: 'var(--radius-lg)', padding: '12px 14px', outlineColor: 'var(--dd-ink)', resize: 'vertical' };
+  /* Padding/Abstände der Felder liegen in mobile.css (.dd-setup-*), damit die Media Query sie
+     mobil verdichten kann — Inline-Styles ließen sich nicht überschreiben. */
+  const inputStyle = { width: '100%', font: 'var(--text-copy)', color: 'var(--dd-ink)', background: 'var(--dd-white)', border: '1px solid rgba(10,10,10,0.18)', borderRadius: 'var(--radius-lg)', outlineColor: 'var(--dd-ink)', resize: 'vertical' };
   const field = (label, name, opts = {}) => (
-    <label key={name} style={{ display: 'block', marginBottom: 'var(--space-4)' }}>
+    <label key={name} className="dd-setup-field">
       <span style={{ display: 'block', font: 'var(--text-caption)', textTransform: 'uppercase', letterSpacing: 'var(--ls-tag)', marginBottom: 'var(--space-2)' }}>
         {label}{opts.required ? ' *' : ''}
       </span>
       {opts.area
-        ? <textarea rows="3" name={name} style={inputStyle} />
-        : <input name={name} type={opts.type || 'text'} required={opts.required} autoComplete={opts.autoComplete} inputMode={opts.inputMode} style={inputStyle} />}
+        ? <textarea rows="3" name={name} className="dd-setup-input" style={inputStyle} />
+        : <input name={name} type={opts.type || 'text'} required={opts.required} autoComplete={opts.autoComplete} inputMode={opts.inputMode} className="dd-setup-input" style={inputStyle} />}
     </label>
   );
 
+  /* Reihenfolge im DOM: Intro → Formular → Steps. Mobil ist das exakt die sinnvolle Abfolge
+     (Headline und erste Felder in einem Scroll), auf Desktop stellt grid-template-areas in
+     mobile.css die gewohnte Anordnung wieder her: links Intro + Steps, rechts das Formular. */
   return (
     <section id={id} style={{ background: 'var(--surface-accent)', color: 'var(--dd-ink)', padding: 'var(--pad-section-y) var(--pad-page-x)', ...style }}>
-      <div style={{ maxWidth: 'var(--measure-wide)', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 'var(--space-16)', alignItems: 'start' }}>
-        <div>
-          <span style={{ display: 'inline-block', font: 'var(--text-kicker)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-medium)', fontSize: '14px', textTransform: 'uppercase', letterSpacing: 'var(--ls-kicker)', background: 'var(--dd-ink)', color: 'var(--dd-lime)', padding: '4px 12px', borderRadius: 'var(--radius-pill)' }}>{kicker}</span>
+      <div className="dd-setup-grid" style={{ maxWidth: 'var(--measure-wide)', margin: '0 auto' }}>
+        <div className="dd-setup-intro">
+          <span style={{ display: 'inline-block', font: 'var(--text-kicker)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-medium)', fontSize: 'var(--fs-kicker)', textTransform: 'uppercase', letterSpacing: 'var(--ls-kicker)', background: 'var(--dd-ink)', color: 'var(--dd-lime)', padding: '4px 12px', borderRadius: 'var(--radius-pill)' }}>{kicker}</span>
           <h2 style={{ font: 'var(--text-h2)', letterSpacing: 'var(--ls-heading)', margin: 'var(--space-5) 0 var(--space-5)', maxWidth: 620 }}>{headline}</h2>
           <p style={{ font: 'var(--text-lead)', margin: 0, maxWidth: 560, textWrap: 'pretty' }}>{intro}</p>
-          <ol style={{ listStyle: 'none', margin: 'var(--space-10) 0 0', padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
-            {steps.map((step, i) => (
-              <li key={step.title} style={{ display: 'grid', gridTemplateColumns: '40px 1fr', gap: 'var(--space-4)', alignItems: 'start' }}>
-                <span style={{ width: 40, height: 40, borderRadius: 'var(--radius-pill)', background: 'var(--dd-ink)', color: 'var(--dd-lime)', display: 'grid', placeItems: 'center', font: 'var(--text-copy)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-bold)' }}>{i + 1}</span>
-                <span>
-                  <span style={{ display: 'block', font: 'var(--text-copy)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-bold)', fontSize: '18px', letterSpacing: 'var(--ls-heading)' }}>{step.title}</span>
-                  <span style={{ display: 'block', font: 'var(--text-copy)', fontSize: '15px', marginTop: 'var(--space-1)' }}>{step.body}</span>
-                </span>
-              </li>
-            ))}
-          </ol>
         </div>
 
-        <div style={{ background: 'var(--dd-ink)', color: 'var(--text-on-dark)', borderRadius: 'var(--radius-xl)', padding: 'var(--space-8)' }}>
+        <ol className="dd-setup-steps">
+          {steps.map((step, i) => (
+            <li key={step.title} className="dd-setup-step">
+              <span className="dd-setup-step-num" style={{ borderRadius: 'var(--radius-pill)', background: 'var(--dd-ink)', color: 'var(--dd-lime)', display: 'grid', placeItems: 'center' }}>{i + 1}</span>
+              <span>
+                <span className="dd-setup-step-title" style={{ letterSpacing: 'var(--ls-heading)' }}>{step.title}</span>
+                <span className="dd-setup-step-body">{step.body}</span>
+              </span>
+            </li>
+          ))}
+        </ol>
+
+        <div className="dd-setup-formwrap dd-setup-form" style={{ background: 'var(--dd-ink)', color: 'var(--text-on-dark)', borderRadius: 'var(--radius-xl)' }}>
           <form name="setup-check" method="POST" action="/danke" data-netlify="true" data-netlify-honeypot="bot-field">
             <input type="hidden" name="form-name" value="setup-check" />
             {/* honeypot: invisible to humans, irresistible to bots */}

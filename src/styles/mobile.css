@@ -1,0 +1,193 @@
+/* Mobile-Layer.
+   Regel für diese Datei: Desktop (>= 900px) bleibt visuell unverändert.
+   Alles hier ist entweder ein globaler Overflow-Fix ohne Optik-Effekt oder steht
+   hinter einer Media Query (<= 720px bzw. <= 899px für die Navigation).
+   Basisregeln ohne Media Query existieren nur, weil die zugehörigen Properties aus den
+   Inline-Styles der Komponenten hierher gewandert sind — sonst könnte keine Media Query
+   sie überschreiben. Die Werte entsprechen 1:1 dem bisherigen Desktop-Stand. */
+
+/* ---------- 1. Overflow-Sicherheitsnetz ----------
+   overflow-x:clip statt hidden: clip erzeugt keinen Scroll-Container,
+   position:sticky (Header, PhaseFlow) funktioniert dadurch weiter. */
+html, body { overflow-x: clip; }
+
+/* ---------- WordRotator ---------- */
+.dd-rotator { position: relative; display: inline-block; overflow: hidden; vertical-align: bottom; max-width: 100%; }
+.dd-rotator-measure { visibility: hidden; white-space: nowrap; }
+.dd-rotator-word { position: absolute; left: 0; top: 0; white-space: nowrap; }
+
+@media (max-width: 720px) {
+  /* Das breiteste Wort ("dein Amazon-Business.") ist auf schmalen Screens breiter als der
+     Viewport. Statt die Zeile über den Rand zu schieben, darf der Rotator hier umbrechen. */
+  .dd-rotator { display: block; width: 100%; }
+  .dd-rotator-measure { white-space: normal; overflow-wrap: break-word; }
+  .dd-rotator-word { white-space: normal; width: 100%; overflow-wrap: break-word; }
+}
+
+/* ---------- 2. Navigation ---------- */
+.dd-nav-links { display: flex; align-items: center; gap: var(--space-6); flex-wrap: wrap; justify-content: flex-end; }
+.dd-nav-burger { display: none; }
+.dd-nav-overlay { display: none; }
+.dd-nav-mobile { display: none; }
+
+@media (max-width: 899px) {
+  .dd-nav-links { display: none; }
+  .dd-nav-mobile { display: flex; align-items: center; gap: var(--space-2); }
+
+  .dd-nav-burger {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px; flex: 0 0 auto;
+    background: transparent; border: none; padding: 0; cursor: pointer;
+  }
+  .dd-burger-box { position: relative; display: block; width: 22px; height: 14px; }
+  .dd-burger-line {
+    position: absolute; left: 0; width: 100%; height: 2px; border-radius: 2px;
+    background: var(--dd-white);
+    transition: transform 200ms var(--ease-out-strong), opacity 160ms var(--ease-standard);
+  }
+  .dd-burger-line:nth-child(1) { top: 0; }
+  .dd-burger-line:nth-child(2) { top: 6px; }
+  .dd-burger-line:nth-child(3) { top: 12px; }
+  .dd-nav-burger[aria-expanded="true"] .dd-burger-line:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  .dd-nav-burger[aria-expanded="true"] .dd-burger-line:nth-child(2) { opacity: 0; }
+  .dd-nav-burger[aria-expanded="true"] .dd-burger-line:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+  .dd-nav-overlay {
+    position: fixed; inset: 0; z-index: 40;
+    display: flex; flex-direction: column;
+    background: var(--surface-dark); color: var(--text-on-dark);
+    padding: 20px var(--pad-page-x) var(--space-10);
+    opacity: 0; visibility: hidden; transform: translateY(-10px);
+    transition: opacity 220ms var(--ease-out-strong), transform 220ms var(--ease-out-strong), visibility 220ms linear;
+  }
+  .dd-nav-overlay[data-open="1"] { opacity: 1; visibility: visible; transform: none; }
+  .dd-nav-overlay-links { display: flex; flex-direction: column; gap: var(--space-2); margin-top: var(--space-10); }
+  .dd-nav-overlay-link {
+    display: flex; align-items: center; min-height: 44px;
+    font: var(--fw-bold) 31px/1.15 var(--font-head);
+    letter-spacing: var(--ls-heading);
+    color: var(--text-on-dark); text-decoration: none;
+    background: none; border: none; padding: var(--space-2) 0; cursor: pointer; text-align: left;
+  }
+  .dd-nav-overlay-link:active { color: var(--dd-lime); }
+  .dd-nav-overlay-foot { margin-top: auto; padding-top: var(--space-8); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dd-burger-line { transition: none; }
+  .dd-nav-overlay { transition: none; }
+}
+
+/* ---------- 3. Hero ---------- */
+.dd-hero { padding: var(--space-16) var(--pad-page-x) var(--space-24); }
+@media (max-width: 720px) {
+  .dd-hero { padding: var(--space-10) var(--pad-page-x) var(--space-14); }
+}
+
+/* ---------- 4. PhaseFlow ---------- */
+.dd-phase-step {
+  text-align: left; background: transparent; border: none; border-radius: 0;
+  padding: var(--space-4) 0 0; font: var(--text-copy);
+}
+@media (max-width: 720px) {
+  /* Kompakte Schritt-Marker: nur Nummer + Linie, der Text steht darunter im Aktiv-Block. */
+  .dd-phase-step { padding: var(--space-3) 0 0; }
+}
+
+/* ---------- 5. Setup-Check ---------- */
+.dd-setup-grid { display: grid; grid-template-columns: 1fr; gap: var(--space-8); align-items: start; }
+.dd-setup-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-5); }
+.dd-setup-step { display: grid; grid-template-columns: 40px 1fr; gap: var(--space-4); align-items: start; }
+.dd-setup-step-num { width: 40px; height: 40px; font: var(--fw-bold) var(--fs-body)/var(--lh-body) var(--font-head); }
+.dd-setup-step-title { display: block; font: var(--fw-bold) 18px/var(--lh-body) var(--font-head); }
+.dd-setup-step-body { display: block; font: var(--fw-regular) 15px/var(--lh-body) var(--font-body); margin-top: var(--space-1); }
+.dd-setup-form { padding: var(--space-8); }
+.dd-setup-field { display: block; margin-bottom: var(--space-4); }
+.dd-setup-input { padding: 12px 14px; }
+
+@media (min-width: 900px) {
+  /* Desktop-Anordnung wie bisher: links Text + Steps, rechts das Formular. */
+  .dd-setup-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: "intro form" "steps form";
+    gap: var(--space-10) var(--space-16);
+  }
+  .dd-setup-intro { grid-area: intro; }
+  .dd-setup-steps { grid-area: steps; }
+  .dd-setup-formwrap { grid-area: form; }
+}
+
+@media (max-width: 720px) {
+  /* Reihenfolge mobil: Headline + Intro → Formular → Erklär-Steps.
+     So sind Headline und die ersten Felder in einem Scroll sichtbar. */
+  .dd-setup-formwrap { order: 1; }
+  .dd-setup-steps { order: 2; gap: var(--space-3); }
+  .dd-setup-grid { gap: var(--space-6); }
+  .dd-setup-step { grid-template-columns: 26px 1fr; gap: var(--space-3); align-items: baseline; }
+  .dd-setup-step-num { width: 26px; height: 26px; font: var(--fw-bold) 13px/1 var(--font-head); }
+  .dd-setup-step-title { display: inline; font: var(--fw-bold) 15px/1.5 var(--font-head); }
+  .dd-setup-step-body { display: inline; font: var(--fw-regular) 15px/1.5 var(--font-body); margin-top: 0; opacity: 0.75; }
+  .dd-setup-step-title::after { content: " "; }
+  .dd-setup-form { padding: var(--space-5); }
+  .dd-setup-field { margin-bottom: var(--space-3); }
+  .dd-setup-input { padding: 10px 14px; }
+  .dd-setup-form textarea.dd-setup-input { height: 76px; }
+}
+
+/* ---------- 6. Team ---------- */
+.dd-person {
+  background: var(--surface-card); border: var(--border-default); border-radius: var(--radius-xl);
+  overflow: hidden; display: flex; flex-direction: column;
+}
+.dd-person-media { position: relative; aspect-ratio: 4 / 5; background: var(--surface-dark); display: grid; place-items: center; overflow: hidden; }
+.dd-person-body { padding: var(--space-6); display: flex; flex-direction: column; gap: var(--space-2); flex: 1; }
+.dd-person-name { font: var(--fw-bold) 25px/var(--lh-title) var(--font-head); }
+.dd-person-toggle { padding: var(--space-5) 0 0; }
+.dd-network { padding: var(--space-8); }
+.dd-network-hub { font: var(--fw-bold) 25px/var(--lh-title) var(--font-head); }
+.dd-network-node { height: 40px; }
+
+@media (max-width: 720px) {
+  /* Kompakte Querformat-Card: Bild links, Text rechts. Bio erst beim Aufklappen. */
+  .dd-person { display: grid; grid-template-columns: 104px 1fr; align-items: stretch; }
+  .dd-person-media { aspect-ratio: auto; height: 100%; min-height: 100%; }
+  .dd-person-body { padding: var(--space-4); gap: var(--space-1); }
+  .dd-person-name { font: var(--fw-bold) 20px/var(--lh-title) var(--font-head); }
+  .dd-person-bio { display: none; }
+  .dd-person[data-open="1"] .dd-person-bio { display: block; }
+  .dd-person-toggle { padding: var(--space-3) 0 0; }
+  .dd-team-stack { gap: var(--space-8) !important; }
+  .dd-team-grid { gap: var(--space-2) !important; }
+  .dd-network { padding: var(--space-5); gap: var(--space-4) !important; }
+  .dd-network-hub { font: var(--fw-bold) 20px/var(--lh-title) var(--font-head); }
+  .dd-network-node { height: 44px; }
+}
+
+/* ---------- 7. Glaubenssätze ---------- */
+.dd-manifest-line { padding: var(--space-6) 0; font: var(--fw-medium) var(--fs-h2-sm)/1.2 var(--font-head); }
+@media (max-width: 720px) {
+  .dd-manifest-line { padding: var(--space-4) 0; font: var(--fw-medium) 20px/1.25 var(--font-head); }
+}
+
+/* ---------- 8. Schluss-CTA + Footer ---------- */
+.dd-footer-cta { padding: var(--pad-section-y) var(--pad-page-x) var(--space-16); }
+.dd-usp-band { padding: var(--space-6) 0; }
+.dd-usp-track { gap: var(--space-10); padding-right: var(--space-10); }
+.dd-usp-item { gap: var(--space-10); }
+.dd-usp-text { font: var(--fw-medium) 25px/var(--lh-title) var(--font-head); }
+.dd-footer-cols { padding: var(--space-16) var(--pad-page-x) 0; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: var(--space-10); }
+.dd-footer-bottom { padding: var(--space-16) var(--pad-page-x) var(--space-10); }
+
+@media (max-width: 720px) {
+  .dd-footer-cta { padding: var(--space-12) var(--pad-page-x) var(--space-8); }
+  .dd-footer-col-title { margin-bottom: var(--space-3) !important; }
+  .dd-footer-col-links { gap: var(--space-2) !important; }
+  .dd-usp-band { padding: var(--space-4) 0; }
+  .dd-usp-track { gap: var(--space-6); padding-right: var(--space-6); }
+  .dd-usp-item { gap: var(--space-6); }
+  .dd-usp-text { font: var(--fw-medium) 18px/var(--lh-title) var(--font-head); }
+  .dd-footer-cols { padding: var(--space-10) var(--pad-page-x) 0; grid-template-columns: repeat(2, 1fr); gap: var(--space-6) var(--space-5); }
+  .dd-footer-brand { grid-column: 1 / -1; }
+  .dd-footer-logo img { height: 48px !important; }
+  .dd-footer-bottom { padding: var(--space-10) var(--pad-page-x) var(--space-8); }
+}

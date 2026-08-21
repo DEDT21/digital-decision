@@ -4,6 +4,7 @@
 @import "./tokens/spacing.css";
 @import "./tokens/shape.css";
 @import "./tokens/motion.css";
+@import "./mobile.css";
 
 *{box-sizing:border-box}
 body{margin:0;background:var(--surface-page);color:var(--text-primary);font:var(--text-copy);-webkit-font-smoothing:antialiased}

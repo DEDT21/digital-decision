@@ -9,8 +9,10 @@ import React from 'react';
 
 function PersonCard({ person, open, onToggle, assetBase }) {
   return (
-    <div style={{ background: 'var(--surface-card)', border: 'var(--border-default)', borderRadius: 'var(--radius-xl)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ position: 'relative', aspectRatio: '4 / 5', background: 'var(--surface-dark)', display: 'grid', placeItems: 'center', overflow: 'hidden' }}>
+    /* Kartenlayout liegt in mobile.css (.dd-person*): mobil wird aus der hohen Portrait-Card
+       eine kompakte Querformat-Card (Bild links, Text rechts), die Bio klappt erst mit auf. */
+    <div className="dd-person" data-open={open ? '1' : '0'}>
+      <div className="dd-person-media">
         {person.photo ? (
           <img src={person.photo} alt={person.name} loading="lazy" decoding="async"
                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', filter: open ? 'none' : 'grayscale(1) contrast(1.05)', transform: open ? 'scale(1.03)' : 'scale(1)', transition: 'filter var(--dur-slow) var(--ease-out), transform var(--dur-slow) var(--ease-out)' }} />
@@ -22,13 +24,13 @@ function PersonCard({ person, open, onToggle, assetBase }) {
         ) : null}
       </div>
 
-      <div style={{ padding: 'var(--space-6)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', flex: 1 }}>
-        <div style={{ font: 'var(--text-h3)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-bold)', fontSize: '25px', letterSpacing: 'var(--ls-heading)' }}>
+      <div className="dd-person-body">
+        <div className="dd-person-name" style={{ letterSpacing: 'var(--ls-heading)' }}>
           <span style={{ background: open ? 'var(--highlight-mark)' : 'none', transition: 'background var(--dur-base) var(--ease-standard)' }}>{person.name}</span>
         </div>
         <div style={{ font: 'var(--text-copy)', fontSize: '14px', color: 'var(--text-secondary)' }}>{person.role}</div>
         {person.line ? <p style={{ font: 'var(--text-copy)', margin: 'var(--space-2) 0 0', textWrap: 'pretty' }}>„{person.line}“</p> : null}
-        {person.bio ? <p style={{ font: 'var(--text-copy)', fontSize: '14px', color: 'var(--text-secondary)', margin: 'var(--space-3) 0 0', textWrap: 'pretty' }}>{person.bio}</p> : null}
+        {person.bio ? <p className="dd-person-bio" style={{ font: 'var(--text-copy)', fontSize: '14px', color: 'var(--text-secondary)', margin: 'var(--space-3) 0 0', textWrap: 'pretty' }}>{person.bio}</p> : null}
 
 
         <div style={{ display: 'grid', gridTemplateRows: open ? '1fr' : '0fr', opacity: open ? 1 : 0, transition: 'grid-template-rows var(--dur-slow) var(--ease-out), opacity var(--dur-base) var(--ease-standard)' }}>
@@ -49,8 +51,8 @@ function PersonCard({ person, open, onToggle, assetBase }) {
           </div>
         </div>
 
-        <button onClick={onToggle} aria-expanded={open}
-                style={{ marginTop: 'auto', alignSelf: 'flex-start', background: 'none', border: 'none', padding: 'var(--space-5) 0 0', cursor: 'pointer', font: 'var(--text-copy)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-medium)', fontSize: '14px', textTransform: 'uppercase', letterSpacing: 'var(--ls-kicker)', color: 'var(--dd-ink)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+        <button onClick={onToggle} aria-expanded={open} className="dd-person-toggle"
+                style={{ marginTop: 'auto', alignSelf: 'flex-start', background: 'none', border: 'none', cursor: 'pointer', font: 'var(--text-copy)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-medium)', fontSize: '14px', textTransform: 'uppercase', letterSpacing: 'var(--ls-kicker)', color: 'var(--dd-ink)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
           {open ? 'Weniger' : 'Mehr über ' + person.name.split(' ')[0]}
           <span aria-hidden="true" style={{ display: 'inline-grid', placeItems: 'center', width: 24, height: 24, borderRadius: 'var(--radius-pill)', border: 'var(--border-default)', transition: 'var(--transition-interactive)' }}>{open ? '–' : '+'}</span>
         </button>
@@ -69,10 +71,10 @@ function NetworkFan({ hubLabel, note, nodes, faces, assetBase, stacked }) {
      brand avoids. */
   const panelHeight = Math.max(count * 48 + 64, note ? 500 : 380);
   return (
-    <div style={{ background: 'var(--surface-dark)', color: 'var(--text-on-dark)', borderRadius: 'var(--radius-xl)', padding: 'var(--space-8)', display: 'grid', gridTemplateColumns: stacked ? '1fr' : 'minmax(240px, 320px) minmax(56px, 96px) 1fr', gap: 'var(--space-6)', alignItems: stacked ? 'start' : 'center', height: stacked ? 'auto' : panelHeight + 'px', boxSizing: 'border-box' }}>
+    <div className="dd-network" style={{ background: 'var(--surface-dark)', color: 'var(--text-on-dark)', borderRadius: 'var(--radius-xl)', display: 'grid', gridTemplateColumns: stacked ? '1fr' : 'minmax(240px, 320px) minmax(56px, 96px) 1fr', gap: 'var(--space-6)', alignItems: stacked ? 'start' : 'center', height: stacked ? 'auto' : panelHeight + 'px', boxSizing: 'border-box' }}>
       <div>
         <img src={assetBase + '/dd-mark-lime.svg'} alt="" loading="lazy" decoding="async" style={{ width: 44, display: 'block', marginBottom: 'var(--space-4)' }} />
-        <div style={{ font: 'var(--text-h3)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-bold)', fontSize: '25px', letterSpacing: 'var(--ls-heading)' }}>{hubLabel}</div>
+        <div className="dd-network-hub" style={{ letterSpacing: 'var(--ls-heading)' }}>{hubLabel}</div>
 
         {shown.length ? (
           <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', marginTop: 'var(--space-4)', paddingLeft: 10 }}>
@@ -116,7 +118,8 @@ function NetworkFan({ hubLabel, note, nodes, faces, assetBase, stacked }) {
           const on = i === hot;
           return (
             <button key={node.name} onMouseEnter={() => setHot(i)} onFocus={() => setHot(i)} onClick={() => setHot(i)}
-                    style={{ height: 40, display: 'flex', alignItems: 'center', gap: 'var(--space-3)', textAlign: 'left', cursor: 'pointer', background: on ? 'var(--dd-lime)' : 'transparent', color: on ? 'var(--dd-ink)' : 'var(--text-on-dark)', border: on ? '1px solid var(--dd-lime)' : 'var(--border-on-dark)', borderRadius: 'var(--radius-pill)', padding: '0 var(--space-5)', font: 'var(--text-copy)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-medium)', fontSize: '15px', transition: 'var(--transition-interactive)' }}>
+                    className="dd-network-node"
+                    style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', textAlign: 'left', cursor: 'pointer', background: on ? 'var(--dd-lime)' : 'transparent', color: on ? 'var(--dd-ink)' : 'var(--text-on-dark)', border: on ? '1px solid var(--dd-lime)' : 'var(--border-on-dark)', borderRadius: 'var(--radius-pill)', padding: '0 var(--space-5)', font: 'var(--text-copy)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-medium)', fontSize: '15px', transition: 'var(--transition-interactive)' }}>
               {node.name}
             </button>
           );
@@ -140,8 +143,8 @@ export function TeamStructure({ people = [], network = [], networkFaces = [], hu
   }, []);
 
   return (
-    <div ref={ref} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-12)', ...style }}>
-      <div style={{ display: 'grid', gridTemplateColumns: stacked ? '1fr' : 'repeat(auto-fit, minmax(260px, 1fr))', gap: 'var(--gap-grid)' }}>
+    <div ref={ref} className="dd-team-stack" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-12)', ...style }}>
+      <div className="dd-team-grid" style={{ display: 'grid', gridTemplateColumns: stacked ? '1fr' : 'repeat(auto-fit, minmax(260px, 1fr))', gap: 'var(--gap-grid)' }}>
         {people.map((p, i) => (
           <PersonCard key={p.name} person={p} open={open === i} onToggle={() => setOpen(open === i ? -1 : i)} assetBase={assetBase} />
         ))}

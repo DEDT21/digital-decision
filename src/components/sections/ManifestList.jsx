@@ -36,9 +36,11 @@ export function ManifestList({ lines = [], tone = 'light', style }) {
       {lines.map((line, i) => {
         const on = i === current;
         return (
-          <div key={line} ref={(el) => { refs.current[i] = el; }}
+          /* Padding, Schriftgröße und Zeilenhöhe kommen aus mobile.css (.dd-manifest-line),
+             damit die Liste mobil auf eine Bildschirmhöhe zusammengeht. */
+          <div key={line} ref={(el) => { refs.current[i] = el; }} className="dd-manifest-line"
             onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(-1)}
-            style={{ padding: 'var(--space-6) 0', borderTop: i === 0 ? 'none' : (dark ? 'var(--border-on-dark)' : 'var(--border-default)'), font: 'var(--text-h2)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-medium)', fontSize: 'var(--fs-h2-sm)', lineHeight: 1.2, letterSpacing: 'var(--ls-heading)', color: on ? (dark ? 'var(--dd-lime)' : 'var(--dd-ink)') : (dark ? 'var(--text-on-dark-secondary)' : 'var(--text-secondary)'), transition: 'color var(--dur-base) var(--ease-standard)' }}>
+            style={{ borderTop: i === 0 ? 'none' : (dark ? 'var(--border-on-dark)' : 'var(--border-default)'), letterSpacing: 'var(--ls-heading)', color: on ? (dark ? 'var(--dd-lime)' : 'var(--dd-ink)') : (dark ? 'var(--text-on-dark-secondary)' : 'var(--text-secondary)'), transition: 'color var(--dur-base) var(--ease-standard)' }}>
             {dark || !on ? line : <span style={{ background: 'var(--highlight-mark)' }}>{line}</span>}
           </div>
         );

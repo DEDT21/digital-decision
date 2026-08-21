@@ -26,7 +26,8 @@
 
 @media (max-width: 720px){
   :root{
-    --pad-section-y:64px;
+    --pad-section-y:56px;
     --pad-page-x:20px;
+    --pad-card:20px;
   }
 }

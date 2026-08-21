@@ -68,9 +68,15 @@ const FINE_POINTER = typeof window !== 'undefined' && typeof window.matchMedia =
   ? window.matchMedia('(hover: hover) and (pointer: fine)').matches : false;
 
 function readMode() {
-  if (typeof window === 'undefined') return { pinned: true, compact: false };
+  if (typeof window === 'undefined') return { pinned: true, compact: false, narrow: false };
   const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  return { pinned: !reduce && window.innerHeight >= 480, compact: window.innerHeight < 720 };
+  return {
+    pinned: !reduce && window.innerHeight >= 480,
+    compact: window.innerHeight < 720,
+    /* narrow = Handy-Breite: vier nebeneinander liegende Karten passen nicht mehr,
+       stattdessen Schritt-Marker plus der Text des aktiven Schritts. */
+    narrow: window.innerWidth < 720
+  };
 }
 
 export function PhaseFlow({ phases = [], kicker, title, lead, scrollLength = 300, id = 'phasen', style }) {
@@ -83,6 +89,7 @@ export function PhaseFlow({ phases = [], kicker, title, lead, scrollLength = 300
   const [fallback, setFallback] = React.useState(false);
   const [pinned, setPinned] = React.useState(initial.pinned);
   const [compact, setCompact] = React.useState(initial.compact);
+  const [narrow, setNarrow] = React.useState(initial.narrow);
   const [pressed, setPressed] = React.useState(-1);
   const [hovered, setHovered] = React.useState(-1);
 
@@ -94,6 +101,7 @@ export function PhaseFlow({ phases = [], kicker, title, lead, scrollLength = 300
       setPinned(mode.pinned);
       /* short viewports drop the lead and tighten the rhythm so the whole scene still fits one screen */
       setCompact(mode.compact);
+      setNarrow(mode.narrow);
       if (!mode.pinned) { progressRef.current = 1; setProgress(1); }
     };
     decide();
@@ -113,6 +121,21 @@ export function PhaseFlow({ phases = [], kicker, title, lead, scrollLength = 300
       const travel = Math.max(1, r.height - window.innerHeight);
       return Math.min(1, Math.max(0, -r.top / travel));
     };
+
+    /* Mobil ohne rAF-Smoothing: der Fortschritt ist eine reine Funktion der Scroll-Position
+       und wird bei jedem Event direkt gesetzt. Der Smoothing-Pfad unten hält sich über die
+       Variable `frame` einen rAF-Handle; feuert dieser einmal nicht (verstecktes Tab, gedrosselte
+       Frames), bleibt `frame` gesetzt, der Guard `if (!frame)` schluckt danach jedes weitere
+       Scroll-Event und die Anzeige friert auf dem letzten Wert ein. Touch-Scroll braucht die
+       Glättung ohnehin nicht — die Events kommen fein genug. */
+    if (narrow) {
+      const onScroll = () => { const v = measure(); progressRef.current = v; setProgress(v); };
+      onScroll();
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll);
+      return () => { window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll); };
+    }
+
     const tick = (now) => {
       frame = 0;
       const dt = Math.min(48, now - (last || now));
@@ -128,7 +151,7 @@ export function PhaseFlow({ phases = [], kicker, title, lead, scrollLength = 300
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
     return () => { if (frame) cancelAnimationFrame(frame); window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll); };
-  }, [pinned]);
+  }, [pinned, narrow]);
 
   /* WebGL render loop */
   React.useEffect(() => {
@@ -205,11 +228,11 @@ export function PhaseFlow({ phases = [], kicker, title, lead, scrollLength = 300
   };
 
   const stage = (
-    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: compact ? 'var(--space-4)' : 'var(--space-6)', height: pinned ? '100vh' : 'auto', paddingTop: pinned ? (compact ? 'calc(84px + var(--space-3))' : 'calc(84px + var(--space-6))') : 'var(--pad-section-y)', paddingBottom: pinned ? (compact ? 'var(--space-6)' : 'var(--space-10)') : 'var(--pad-section-y)', boxSizing: 'border-box', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: compact ? 'var(--space-4)' : 'var(--space-6)', height: pinned ? (narrow ? '100svh' : '100vh') : 'auto', paddingTop: pinned ? (compact ? 'calc(84px + var(--space-3))' : 'calc(84px + var(--space-6))') : 'var(--pad-section-y)', paddingBottom: pinned ? (compact ? 'var(--space-6)' : 'var(--space-10)') : 'var(--pad-section-y)', boxSizing: 'border-box', overflow: 'hidden' }}>
       {/* pinned: top padding clears the 84px sticky site header so kicker and progress stay visible */}
       <header style={{ maxWidth: 'var(--measure-wide)', margin: '0 auto', padding: '0 var(--pad-page-x)', width: '100%', flex: '0 0 auto' }}>
         {kicker ? (
-          <span style={{ font: 'var(--text-kicker)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-medium)', fontSize: '14px', textTransform: 'uppercase', letterSpacing: 'var(--ls-kicker)', color: 'var(--dd-lime)' }}>{kicker}</span>
+          <span style={{ font: 'var(--text-kicker)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-medium)', fontSize: 'var(--fs-kicker)', textTransform: 'uppercase', letterSpacing: 'var(--ls-kicker)', color: 'var(--dd-lime)' }}>{kicker}</span>
         ) : null}
         {/* progress sits on the headline row, never under the sticky header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-6)', flexWrap: 'wrap', marginTop: compact ? 'var(--space-3)' : 'var(--space-5)' }}>
@@ -238,6 +261,35 @@ export function PhaseFlow({ phases = [], kicker, title, lead, scrollLength = 300
       </div>
 
       <div style={{ maxWidth: 'var(--measure-wide)', margin: '0 auto', padding: '0 var(--pad-page-x)', width: '100%', flex: '0 0 auto' }}>
+        {narrow ? (
+          /* Mobil: vier Karten nebeneinander wären entweder unlesbar oder würden aus der
+             gepinnten Bühne herauslaufen — man sah bisher nur den obersten grauen Punkt.
+             Stattdessen eine Marker-Reihe (aktiv = Lime, erledigt = hell, offen = gedimmt)
+             und darunter Titel + Text genau des Schritts, auf dem der Scroll-Progress steht. */
+          <div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(' + count + ', 1fr)', gap: 'var(--space-2)' }}>
+              {phases.map((p, i) => {
+                const active = i === current;
+                const past = i < current;
+                return (
+                  <button key={p.title} onClick={() => jumpTo(i)} className="dd-phase-step"
+                    aria-current={active ? 'step' : undefined} aria-label={'Phase ' + (i + 1) + ': ' + p.title}
+                    style={{ cursor: pinned ? 'pointer' : 'default', color: active ? 'var(--dd-lime)' : 'var(--text-on-dark-secondary)', borderTop: active ? '2px solid var(--dd-lime)' : (past ? '2px solid var(--dd-on-ink-muted)' : '2px solid var(--dd-border-dark)'), opacity: active ? 1 : 0.55, minHeight: 44, transition: 'opacity 200ms var(--ease-out-strong), color 200ms var(--ease-out-strong), border-color 200ms var(--ease-out-strong)' }}>
+                    <span style={{ font: 'var(--text-kicker)', fontFamily: 'var(--font-head)', textTransform: 'uppercase', letterSpacing: 'var(--ls-kicker)', fontSize: '11px' }}>{i + 1}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <div style={{ marginTop: 'var(--space-4)' }}>
+              <div style={{ font: 'var(--fw-bold) 20px/var(--lh-title) var(--font-head)', letterSpacing: 'var(--ls-heading)', color: 'var(--text-on-dark)', marginBottom: 'var(--space-2)' }}>
+                {phases[current] ? phases[current].title : ''}
+              </div>
+              <div style={{ fontSize: '14px', lineHeight: 1.5, color: 'var(--text-on-dark-secondary)', textWrap: 'pretty' }}>
+                {phases[current] ? phases[current].body : ''}
+              </div>
+            </div>
+          </div>
+        ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 'var(--gap-grid)' }}>
           {phases.map((p, i) => {
             const active = i === current;
@@ -255,15 +307,18 @@ export function PhaseFlow({ phases = [], kicker, title, lead, scrollLength = 300
             );
           })}
         </div>
+        )}
       </div>
     </div>
   );
 
+  /* Mobil ist die Scroll-Strecke kürzer: 200svh Wrapper = die Szene belegt insgesamt zwei
+     Bildschirmhöhen (eine gepinnte Bühne + eine Bildschirmhöhe Scrub-Weg). */
   return (
     <section id={id} style={{ background: 'var(--surface-dark)', color: 'var(--text-on-dark)', ...style }}>
       {pinned ? (
-        <div ref={wrapRef} style={{ height: scrollLength + 'vh', position: 'relative' }}>
-          <div style={{ position: 'sticky', top: 0, height: '100vh' }}>{stage}</div>
+        <div ref={wrapRef} style={{ height: narrow ? '200svh' : scrollLength + 'vh', position: 'relative' }}>
+          <div style={{ position: 'sticky', top: 0, height: narrow ? '100svh' : '100vh' }}>{stage}</div>
         </div>
       ) : stage}
     </section>

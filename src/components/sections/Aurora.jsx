@@ -53,7 +53,7 @@ export function Aurora({ color = '#C6F04B', background = '#0A0A0A', origin = 'to
   const mask = 'radial-gradient(' + (ORIGIN[origin] || ORIGIN['top-right']) + ', #000 8%, rgba(0,0,0,0.32) 36%, transparent 58%)';
 
   return (
-    <div aria-hidden="true" style={{ position: 'absolute', left: 0, right: 0, bottom: 0, top: -bleed + 'px', overflow: 'hidden', background, ...style }}>
+    <div aria-hidden="true" style={{ position: 'absolute', left: 0, right: 0, bottom: 0, top: -bleed + 'px', overflow: 'clip', background, ...style }}>
       {/* The clipping box itself extends above the parent, so the only straight cut sits behind the
           opaque sticky header and off-screen — never on a visible boundary. */}
       <div style={{ position: 'absolute', inset: 0, maskImage: mask, WebkitMaskImage: mask, opacity: intensity, '--dd-aurora-speed': speed + 's' }}>

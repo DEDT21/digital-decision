@@ -111,7 +111,7 @@ const FAQS = [
 
 function Hero({ onNavigate }) {
   return (
-    <div style={{ position: 'relative', padding: 'var(--space-16) var(--pad-page-x) var(--space-24)' }}>
+    <div className="dd-hero" style={{ position: 'relative' }}>
       <div style={{ maxWidth: 'var(--measure-wide)', margin: '0 auto' }}>
         <div style={{ marginBottom: 'var(--space-5)' }}><Kicker tone="limeText">digital decision · E-Commerce-Partner</Kicker></div>
         <h1 style={{ font: 'var(--text-h1)', fontSize: 'var(--fs-h1)', letterSpacing: 'var(--ls-heading)', margin: 0, maxWidth: 'var(--measure-headline)' }}>
