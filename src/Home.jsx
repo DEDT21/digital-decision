@@ -6,7 +6,7 @@ import { Kicker } from './components/core/Kicker.jsx';
 import { WordRotator } from './components/core/WordRotator.jsx';
 import { Aurora } from './components/sections/Aurora.jsx';
 import { CaseGrid } from './components/sections/CaseGrid.jsx';
-import { UseCaseSteps } from './components/sections/UseCaseSteps.jsx';
+import { ServiceBadges } from './components/sections/ServiceBadges.jsx';
 import { ManifestList } from './components/sections/ManifestList.jsx';
 import { SetupCheck } from './components/sections/SetupCheck.jsx';
 import { FaqChat } from './components/sections/FaqChat.jsx';
@@ -22,12 +22,6 @@ const TRUST = [
   { name: 'Gamechangersocks', logo: '/assets/clients/gamechangersocks.webp' },
   { name: 'BWT', logo: '/assets/clients/bwt.webp', height: 34 },
   { name: 'Ecosoft', logo: '/assets/clients/ecosoft.webp' }
-];
-
-const TARGETS = [
-  ['Solide, aber es skaliert nicht.', 'Gutes Produkt, ein eingespieltes Team, der Shop läuft. Aber seit zwei Jahren steht dieselbe Umsatzzahl im Report. Und keiner kann dir sagen, warum.'],
-  ['Stationär stark, online blind.', 'Im Laden brummt es. Online: ein Shop, der nebenherläuft, Werbung ohne Plan, keine Zahlen, denen du traust. Du weißt, da liegt Umsatz. Du kommst nur nicht ran.'],
-  ['Von Agenturen verbrannt.', 'Mehrere Agenturen, Tools, schöne Präsentationen. Und am Ende triffst du die Entscheidungen trotzdem allein? Diesmal soll jemand mitdenken. Und liefern.']
 ];
 
 const DIFFERENCE = [
@@ -153,11 +147,7 @@ export function Home({ onNavigate }) {
         </div>
       </div>
 
-      <UseCaseSteps id="leistungen"
-        kicker="Kommt dir bekannt vor?"
-        title="Drei Situationen, in denen wir richtig sind."
-        closer="In allen drei Fällen ist das Problem selten fehlender Einsatz. Es ist fehlende Struktur. Und niemand, der entscheidet."
-        cases={TARGETS.map(([title, body]) => ({ title, body }))} />
+      <ServiceBadges id="leistungen" />
 
       <Section tone="white">
         <SectionHeading kicker="Was uns anders macht" title="Substanz statt Show." lead="Klassische Agenturen verkaufen Stunden und Präsentationen. Wir haben das Modell an drei Stellen umgedreht:" />
