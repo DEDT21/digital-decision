@@ -75,6 +75,28 @@
 .page-footer a{color:var(--text-secondary);text-decoration:none}
 .page-footer a:hover{color:var(--dd-ink)}
 
+/* Regionen-Block: gleiche Keyword-Links wie im React-Footer, im Stil der Meta-Links */
+.page-footer .inner.regions{
+  display:block;
+  padding-bottom:0;
+}
+.page-footer .regions-title{
+  display:block;
+  font-family:var(--font-head);
+  font-weight:var(--fw-medium);
+  text-transform:uppercase;
+  letter-spacing:var(--ls-kicker);
+  margin-bottom:var(--space-4);
+}
+.page-footer .regions-links{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:var(--space-3) var(--space-6);
+}
+@media (max-width:720px){
+  .page-footer .regions-links{grid-template-columns:repeat(2,1fr);gap:var(--space-2) var(--space-4)}
+}
+
 /* Full-height Ink scenes: Danke + 404 */
 .ink-scene{
   min-height:100dvh;

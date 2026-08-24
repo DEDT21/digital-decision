@@ -7,11 +7,11 @@ import React from 'react';
    connectors into named specialists. No faces there, because they aren't employees — that
    honesty is the point. Hover/tap a node to light its connector and read what it covers. */
 
-function PersonCard({ person, open, onToggle, assetBase }) {
+function PersonCard({ person, open, onToggle, assetBase, index = 0 }) {
   return (
     /* Kartenlayout liegt in mobile.css (.dd-person*): mobil wird aus der hohen Portrait-Card
        eine kompakte Querformat-Card (Bild links, Text rechts), die Bio klappt erst mit auf. */
-    <div className="dd-person" data-open={open ? '1' : '0'}>
+    <div className="dd-person" data-open={open ? '1' : '0'} data-reveal data-reveal-delay={index * 80}>
       <div className="dd-person-media">
         {person.photo ? (
           <img src={person.photo} alt={person.name} loading="lazy" decoding="async"
@@ -33,8 +33,10 @@ function PersonCard({ person, open, onToggle, assetBase }) {
         {person.bio ? <p className="dd-person-bio" style={{ font: 'var(--text-copy)', fontSize: '14px', color: 'var(--text-secondary)', margin: 'var(--space-3) 0 0', textWrap: 'pretty' }}>{person.bio}</p> : null}
 
 
+        {/* 1fr → 0fr klappt nur zusammen, wenn das Grid-Item auch wirklich unter seine
+            Inhaltshöhe schrumpfen darf — daher min-height:0 zusätzlich zu overflow:hidden. */}
         <div style={{ display: 'grid', gridTemplateRows: open ? '1fr' : '0fr', opacity: open ? 1 : 0, transition: 'grid-template-rows var(--dur-slow) var(--ease-out), opacity var(--dur-base) var(--ease-standard)' }}>
-          <div style={{ overflow: 'hidden' }}>
+          <div style={{ overflow: 'hidden', minHeight: 0 }}>
             <div style={{ paddingTop: 'var(--space-4)' }}>
               {person.callFor && person.callFor.length ? (
                 <>
@@ -71,7 +73,7 @@ function NetworkFan({ hubLabel, note, nodes, faces, assetBase, stacked }) {
      brand avoids. */
   const panelHeight = Math.max(count * 48 + 64, note ? 500 : 380);
   return (
-    <div className="dd-network" style={{ background: 'var(--surface-dark)', color: 'var(--text-on-dark)', borderRadius: 'var(--radius-xl)', display: 'grid', gridTemplateColumns: stacked ? '1fr' : 'minmax(240px, 320px) minmax(56px, 96px) 1fr', gap: 'var(--space-6)', alignItems: stacked ? 'start' : 'center', height: stacked ? 'auto' : panelHeight + 'px', boxSizing: 'border-box' }}>
+    <div className="dd-network" data-reveal style={{ background: 'var(--surface-dark)', color: 'var(--text-on-dark)', borderRadius: 'var(--radius-xl)', display: 'grid', gridTemplateColumns: stacked ? '1fr' : 'minmax(240px, 320px) minmax(56px, 96px) 1fr', gap: 'var(--space-6)', alignItems: stacked ? 'start' : 'center', height: stacked ? 'auto' : panelHeight + 'px', boxSizing: 'border-box' }}>
       <div>
         <img src={assetBase + '/dd-mark-lime.svg'} alt="" loading="lazy" decoding="async" style={{ width: 44, display: 'block', marginBottom: 'var(--space-4)' }} />
         <div className="dd-network-hub" style={{ letterSpacing: 'var(--ls-heading)' }}>{hubLabel}</div>
@@ -144,9 +146,14 @@ export function TeamStructure({ people = [], network = [], networkFaces = [], hu
 
   return (
     <div ref={ref} className="dd-team-stack" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-12)', ...style }}>
-      <div className="dd-team-grid" style={{ display: 'grid', gridTemplateColumns: stacked ? '1fr' : 'repeat(auto-fit, minmax(260px, 1fr))', gap: 'var(--gap-grid)' }}>
+      {/* Spaltenmaß hängt an der Personenzahl: bei zwei Karten würde 1fr sie auf halbe
+          Containerbreite aufblasen (Portrait 4:5 = über 600px hoch). 380px deckelt das. */}
+      <div className="dd-team-grid" style={{ display: 'grid', gridTemplateColumns: stacked ? '1fr' : (people.length < 3 ? 'repeat(auto-fit, minmax(260px, 380px))' : 'repeat(auto-fit, minmax(260px, 1fr))'), gap: 'var(--gap-grid)' }}>
         {people.map((p, i) => (
-          <PersonCard key={p.name} person={p} open={open === i} onToggle={() => setOpen(open === i ? -1 : i)} assetBase={assetBase} />
+          /* Funktionales setState: Auf Touch feuern touchend und der nachgelagerte Click
+             gelegentlich beide im selben React-Batch. Mit `open` aus der Render-Closure liest
+             der zweite Aufruf den alten Wert — auf/zu/auf, die Karte bliebe offen. */
+          <PersonCard key={p.name} person={p} open={open === i} onToggle={() => setOpen((prev) => (prev === i ? -1 : i))} assetBase={assetBase} index={i} />
         ))}
       </div>
       {network.length ? <NetworkFan hubLabel={hubLabel} note={networkNote} nodes={network} faces={networkFaces} assetBase={assetBase} stacked={stacked} /> : null}

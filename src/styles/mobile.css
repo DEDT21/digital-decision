@@ -52,15 +52,26 @@ html, body { overflow-x: clip; }
   .dd-nav-burger[aria-expanded="true"] .dd-burger-line:nth-child(2) { opacity: 0; }
   .dd-nav-burger[aria-expanded="true"] .dd-burger-line:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 
+  /* Deterministischer Übergang: Das Overlay ist IMMER gemountet und wechselt ausschließlich
+     opacity + transform. visibility wird nicht mitanimiert, sondern per transition-delay
+     geschaltet (0s beim Öffnen, 220ms beim Schließen). Dadurch ist der Ablauf in beide
+     Richtungen identisch lang, und schnelle Doppelklicks kehren die laufende Animation
+     einfach um, statt sie neu zu starten. Kein display-Toggle, kein Conditional-Mount. */
   .dd-nav-overlay {
     position: fixed; inset: 0; z-index: 40;
     display: flex; flex-direction: column;
     background: var(--surface-dark); color: var(--text-on-dark);
     padding: 20px var(--pad-page-x) var(--space-10);
-    opacity: 0; visibility: hidden; transform: translateY(-10px);
-    transition: opacity 220ms var(--ease-out-strong), transform 220ms var(--ease-out-strong), visibility 220ms linear;
+    opacity: 0; transform: translateY(-10px);
+    visibility: hidden; pointer-events: none;
+    will-change: opacity, transform;
+    transition: opacity 220ms var(--ease-out), transform 220ms var(--ease-out), visibility 0s linear 220ms;
   }
-  .dd-nav-overlay[data-open="1"] { opacity: 1; visibility: visible; transform: none; }
+  .dd-nav-overlay[data-open="1"] {
+    opacity: 1; transform: none;
+    visibility: visible; pointer-events: auto;
+    transition: opacity 220ms var(--ease-out), transform 220ms var(--ease-out), visibility 0s linear 0s;
+  }
   .dd-nav-overlay-links { display: flex; flex-direction: column; gap: var(--space-2); margin-top: var(--space-10); }
   .dd-nav-overlay-link {
     display: flex; align-items: center; min-height: 44px;
@@ -75,7 +86,8 @@ html, body { overflow-x: clip; }
 
 @media (prefers-reduced-motion: reduce) {
   .dd-burger-line { transition: none; }
-  .dd-nav-overlay { transition: none; }
+  .dd-nav-overlay,
+  .dd-nav-overlay[data-open="1"] { transition: none; }
 }
 
 /* ---------- 3. Hero ---------- */
@@ -176,6 +188,9 @@ html, body { overflow-x: clip; }
 .dd-usp-item { gap: var(--space-10); }
 .dd-usp-text { font: var(--fw-medium) 25px/var(--lh-title) var(--font-head); }
 .dd-footer-cols { padding: var(--space-16) var(--pad-page-x) 0; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: var(--space-10); }
+.dd-footer-regions { padding: var(--space-12) var(--pad-page-x) 0; }
+.dd-footer-regions-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-3) var(--space-6); }
+.dd-footer-regions-links .dd-footer-link { font: var(--fw-regular) 14px/1.5 var(--font-body); }
 .dd-footer-bottom { padding: var(--space-16) var(--pad-page-x) var(--space-10); }
 
 @media (max-width: 720px) {
@@ -189,5 +204,10 @@ html, body { overflow-x: clip; }
   .dd-footer-cols { padding: var(--space-10) var(--pad-page-x) 0; grid-template-columns: repeat(2, 1fr); gap: var(--space-6) var(--space-5); }
   .dd-footer-brand { grid-column: 1 / -1; }
   .dd-footer-logo img { height: 48px !important; }
-  .dd-footer-bottom { padding: var(--space-10) var(--pad-page-x) var(--space-8); }
+  /* Regionen mobil zweispaltig und in Caption-Größe, sonst wächst der Footer um eine
+     halbe Bildschirmhöhe. Zeilenabstand bleibt auf Höhe der übrigen Footer-Links. */
+  .dd-footer-regions { padding: var(--space-8) var(--pad-page-x) 0; }
+  .dd-footer-regions-links { grid-template-columns: repeat(2, 1fr); gap: var(--space-2) var(--space-4); }
+  .dd-footer-regions-links .dd-footer-link { font: var(--fw-regular) 13px/1.45 var(--font-body); }
+  .dd-footer-bottom { padding: var(--space-8) var(--pad-page-x) var(--space-8); }
 }

@@ -143,6 +143,5 @@ Beide sind **Einmal-Pipelines**, ihre Outputs sind eingecheckt. Sie laufen **nic
 ## Offene Punkte (Stand README)
 
 - Aqmos-Case "+50 % Monatsumsatz" braucht Kundenfreigabe
-- Linas E-Mail fehlt im `TEAM`-Array in `src/Home.jsx`
 - Impressum/Datenschutz mit WKO-Generator gegenchecken (kein Rechtsrat)
 - Netlify: Custom Domain + Forms-Notification einrichten

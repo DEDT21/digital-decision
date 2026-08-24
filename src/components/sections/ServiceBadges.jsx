@@ -191,7 +191,7 @@ export function ServiceBadges({
 
   return (
     <Section id={id} tone="paper" style={style}>
-      <div className="dd-sb-head"><h2>{headline}</h2></div>
+      <div className="dd-sb-head" data-reveal><h2>{headline}</h2></div>
 
       <div className="dd-sb-cloud" ref={cloudRef}>
         {items.map((item) => (
@@ -211,7 +211,7 @@ export function ServiceBadges({
       {/* Backdrop gehört zum Bottom-Sheet und ist per CSS nur unter 720px sichtbar */}
       {active ? <div className="dd-sb-backdrop" onClick={close} /> : null}
 
-      <p className="dd-sb-closer">{closer}</p>
+      <p className="dd-sb-closer" data-reveal>{closer}</p>
     </Section>
   );
 }

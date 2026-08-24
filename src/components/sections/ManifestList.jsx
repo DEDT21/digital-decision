@@ -39,6 +39,7 @@ export function ManifestList({ lines = [], tone = 'light', style }) {
           /* Padding, Schriftgröße und Zeilenhöhe kommen aus mobile.css (.dd-manifest-line),
              damit die Liste mobil auf eine Bildschirmhöhe zusammengeht. */
           <div key={line} ref={(el) => { refs.current[i] = el; }} className="dd-manifest-line"
+            data-reveal data-reveal-delay={i * 60}
             onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(-1)}
             style={{ borderTop: i === 0 ? 'none' : (dark ? 'var(--border-on-dark)' : 'var(--border-default)'), letterSpacing: 'var(--ls-heading)', color: on ? (dark ? 'var(--dd-lime)' : 'var(--dd-ink)') : (dark ? 'var(--text-on-dark-secondary)' : 'var(--text-secondary)'), transition: 'color var(--dur-base) var(--ease-standard)' }}>
             {dark || !on ? line : <span style={{ background: 'var(--highlight-mark)' }}>{line}</span>}

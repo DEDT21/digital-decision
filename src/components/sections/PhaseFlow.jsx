@@ -67,6 +67,9 @@ void main() { gl_Position = vec4(a_pos, 0.0, 1.0); }`;
 const FINE_POINTER = typeof window !== 'undefined' && typeof window.matchMedia === 'function'
   ? window.matchMedia('(hover: hover) and (pointer: fine)').matches : false;
 
+const REDUCED_MOTION = typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+  ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false;
+
 function readMode() {
   if (typeof window === 'undefined') return { pinned: true, compact: false, narrow: false };
   const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -247,8 +250,10 @@ export function PhaseFlow({ phases = [], kicker, title, lead, scrollLength = 300
         {lead && !compact ? <p style={{ font: 'var(--text-copy)', color: 'var(--text-on-dark-secondary)', maxWidth: 'var(--measure)', margin: 'var(--space-4) 0 0', textWrap: 'pretty' }}>{lead}</p> : null}
       </header>
 
-      {/* full-bleed animation: no container, no background, edge to edge */}
-      <div style={{ flex: '1 1 auto', minHeight: 140, display: 'flex', alignItems: 'center' }}>
+      {/* Full-bleed animation: no container, no background, edge to edge.
+          Mobil darf der Chart-Anteil kleiner werden — der Textblock hat Vorrang, damit auf
+          schmalen Screens (mehr Zeilenumbrüche) nie etwas abgeschnitten wird. */}
+      <div style={{ flex: '1 1 auto', minHeight: narrow ? 96 : 140, display: 'flex', alignItems: 'center' }}>
         {fallback ? (
           <svg viewBox="0 0 1000 220" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true" style={{ display: 'block' }}>
             {[-40, 0, 40].map((dy) => (
@@ -256,7 +261,7 @@ export function PhaseFlow({ phases = [], kicker, title, lead, scrollLength = 300
             ))}
           </svg>
         ) : (
-          <canvas ref={canvasRef} aria-hidden="true" style={{ display: 'block', width: '100%', height: '100%', minHeight: 140 }} />
+          <canvas ref={canvasRef} aria-hidden="true" style={{ display: 'block', width: '100%', height: '100%', minHeight: narrow ? 96 : 140 }} />
         )}
       </div>
 
@@ -280,13 +285,20 @@ export function PhaseFlow({ phases = [], kicker, title, lead, scrollLength = 300
                 );
               })}
             </div>
-            <div style={{ marginTop: 'var(--space-4)' }}>
-              <div style={{ font: 'var(--fw-bold) 20px/var(--lh-title) var(--font-head)', letterSpacing: 'var(--ls-heading)', color: 'var(--text-on-dark)', marginBottom: 'var(--space-2)' }}>
-                {phases[current] ? phases[current].title : ''}
-              </div>
-              <div style={{ fontSize: '14px', lineHeight: 1.5, color: 'var(--text-on-dark-secondary)', textWrap: 'pretty' }}>
-                {phases[current] ? phases[current].body : ''}
-              </div>
+            {/* Alle vier Texte liegen in DERSELBEN Grid-Zelle übereinander. Damit ist die
+                Höhe des Blocks automatisch die des längsten Textes — bei jeder Breite, ohne
+                gerechnete Mindesthöhe — und nichts kann unten abgeschnitten werden.
+                Der Wechsel ist ein Crossfade mit leichtem translateY statt hartem Swap. */}
+            <div style={{ display: 'grid', marginTop: 'var(--space-4)' }}>
+              {phases.map((p, i) => {
+                const active = i === current;
+                return (
+                  <div key={p.title} aria-hidden={!active} style={{ gridArea: '1 / 1', opacity: active ? 1 : 0, transform: REDUCED_MOTION || active ? 'none' : 'translateY(10px)', transition: REDUCED_MOTION ? 'none' : 'opacity 260ms var(--ease-out), transform 300ms var(--ease-out)', pointerEvents: 'none' }}>
+                    <div style={{ font: 'var(--fw-bold) 20px/var(--lh-title) var(--font-head)', letterSpacing: 'var(--ls-heading)', color: 'var(--text-on-dark)', marginBottom: 'var(--space-2)' }}>{p.title}</div>
+                    <div style={{ fontSize: '14px', lineHeight: 1.5, color: 'var(--text-on-dark-secondary)', textWrap: 'pretty' }}>{p.body}</div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         ) : (

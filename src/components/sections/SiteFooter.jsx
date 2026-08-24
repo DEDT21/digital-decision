@@ -38,6 +38,8 @@ export function SiteFooter({
   onCta,
   usps = [],
   columns = [],
+  regions = [],
+  regionsTitle = 'Regionen',
   legal,
   copyright,
   claim,
@@ -125,6 +127,18 @@ export function SiteFooter({
             </div>
           ))}
         </div>
+
+        {/* Regionen: SEO-Keyword-Links, dezent im Footer-Stil wie die übrigen Meta-Links */}
+        {regions.length ? (
+          <div className="dd-footer-regions" style={{ maxWidth: 'var(--measure-wide)', margin: '0 auto' }}>
+            <div className="dd-footer-col-title" style={{ marginBottom: 'var(--space-4)' }}><Kicker tone="limeText">{regionsTitle}</Kicker></div>
+            <div className="dd-footer-regions-links">
+              {regions.map((region) => (
+                <a key={region.label} className="dd-footer-link" href={region.href}>{region.label}</a>
+              ))}
+            </div>
+          </div>
+        ) : null}
 
         {/* bottom bar */}
         <div className="dd-footer-bottom" style={{ maxWidth: 'var(--measure-wide)', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-6)', flexWrap: 'wrap' }}>

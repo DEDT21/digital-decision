@@ -29,28 +29,59 @@ export function LogoMarquee({ items = [], tone = 'dark', speed = 32, logoHeight 
   const wrapRef = React.useRef(null);
   const trackRef = React.useRef(null);
   const [repeats, setRepeats] = React.useState(1);
+  const repeatsRef = React.useRef(1);
   const measureRef = React.useRef(null);
+
+  /* Messung, drei Schutzschichten gegen die Endlosschleife, die hier möglich ist
+     (setRepeats → Re-Render → Effekt neu → Messung → setRepeats → …):
+
+     1. Die Messung liest den aktuellen Stand aus `repeatsRef`, nicht aus der Closure. Vorher
+        hing `passW = unit / repeats` an dem `repeats`, das beim Anlegen der Funktion galt.
+        `measureRef` überlebt den Render aber (Bilder rufen es im onLoad auf), sodass eine
+        alte Zahl auf ein bereits neu aufgebautes DOM traf — das Ergebnis pendelte.
+        Dazu `getBoundingClientRect().width` statt `scrollWidth`: letzteres rundet auf ganze
+        Pixel und kann `Math.ceil` an der Grenze zusätzlich kippen lassen.
+     2. Nur wachsen, nie schrumpfen. Ein Durchlauf zu viel ist unsichtbar (die Bedingung
+        lautet „mindestens so breit wie der Container"), ein Pendeln wäre fatal. Damit ist
+        die Folge monoton und endet zwangsläufig — zusätzlich bei MAX_REPEATS hart gedeckelt.
+     3. Der Effekt hängt nicht mehr an `repeats`, und der ResizeObserver beobachtet nur noch
+        den Wrapper, nicht den Track. Vorher änderte jede Änderung von `repeats` die
+        Track-Breite, was den Observer erneut feuern ließ — die Rückkopplung selbst.
+     Der aktuelle Wert liegt in einer Ref, damit `measure` ihn ohne Neuaufbau des Effekts liest. */
+  const MAX_REPEATS = 12;
 
   React.useLayoutEffect(() => {
     const measure = () => {
       const wrap = wrapRef.current;
       const track = trackRef.current;
       if (!wrap || !track) return;
-      const unit = track.scrollWidth / 2;           /* the track always holds two identical units */
-      if (!unit) return;
-      const passW = unit / repeats;                  /* width of one pass through the list */
-      const needed = Math.max(1, Math.ceil(wrap.clientWidth / passW));
-      if (needed !== repeats) setRepeats(needed);
+      /* Erst messen, wenn alle Logos geladen sind: vorher sind die <img> nahezu breitenlos,
+         eine Passage wirkt viel zu schmal und es würden unnötig viele Durchläufe angelegt —
+         die wegen der Monotonie oben nie wieder verschwinden. `complete` wird auch bei einem
+         Ladefehler true, ein fehlendes Logo blockiert die Messung also nicht dauerhaft.
+         Den Nachschlag übernimmt `remeasure` am onLoad jedes Bildes. */
+      const imgs = track.querySelectorAll('img');
+      for (let i = 0; i < imgs.length; i++) if (!imgs[i].complete) return;
+
+      const current = repeatsRef.current;
+      const unit = track.getBoundingClientRect().width / 2;  /* the track always holds two identical units */
+      if (unit < 1) return;
+      const passW = unit / current;                  /* width of one pass through the list */
+      const wrapW = wrap.clientWidth;
+      if (passW < 1 || !wrapW) return;
+      /* 1px Toleranz, damit Sub-Pixel-Differenzen keinen weiteren Durchlauf erzwingen */
+      const needed = Math.max(1, Math.ceil((wrapW - 1) / passW));
+      if (needed > current) {
+        repeatsRef.current = Math.min(needed, MAX_REPEATS);
+        if (repeatsRef.current !== current) setRepeats(repeatsRef.current);
+      }
     };
     measureRef.current = measure;
     measure();
     const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null;
-    if (ro) {
-      if (wrapRef.current) ro.observe(wrapRef.current);
-      if (trackRef.current) ro.observe(trackRef.current);
-    }
+    if (ro && wrapRef.current) ro.observe(wrapRef.current);
     return () => { if (ro) ro.disconnect(); };
-  }, [repeats, items.length]);
+  }, [items.length]);
 
   const remeasure = () => { if (measureRef.current) measureRef.current(); };
 

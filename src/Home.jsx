@@ -66,11 +66,7 @@ const TEAM = [
   { name: 'David Edtmayer', role: 'Geschäftsführer · Co-Founder', mail: 'david@digital-decision.at', photo: '/assets/team/david-edtmayer.webp',
     line: 'Ich schaue mir zuerst die Zahlen an. Dann suche ich den Weg, den noch keiner geht.',
     bio: 'Baut seit seinem 15. Lebensjahr E-Commerce. Heute baut er die Systeme dahinter: AI-first, immer auf der Suche nach der besseren Lösung statt der gewohnten.',
-    callFor: ['Wachstumsentscheidungen', 'Performance & Funnels', 'AI-gestützte Prozesse & neue Wege'] },
-  { name: 'Lina Höpflinger', role: 'Marketing & Projektsteuerung', mail: 'lina@digital-decision.at', photo: '/assets/team/lina-hoepflinger.webp',
-    line: 'Content, der nicht an der Oberfläche stehen bleibt.',
-    bio: 'Kreation mit BWL-Fundament: Lina denkt von der Idee bis zur fertigen Kampagne und prüft selbst nach, ob die Zahlen halten.',
-    callFor: ['Kampagnen und Content', 'CMS und Umsetzung', 'Planung und Koordination', 'SEO, Reporting, Erfolgskontrolle'] }
+    callFor: ['Wachstumsentscheidungen', 'Performance & Funnels', 'AI-gestützte Prozesse & neue Wege'] }
 ];
 
 const NETWORK = [
@@ -153,7 +149,7 @@ export function Home({ onNavigate }) {
         <SectionHeading kicker="Was uns anders macht" title="Substanz statt Show." lead="Klassische Agenturen verkaufen Stunden und Präsentationen. Wir haben das Modell an drei Stellen umgedreht:" />
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 'var(--space-10)' }}>
           {DIFFERENCE.map(([t, b], i) => (
-            <div key={t}>
+            <div key={t} data-reveal data-reveal-delay={i * 80}>
               <div style={{ font: 'var(--text-h2)', fontSize: 'var(--fs-h2)', letterSpacing: 'var(--ls-heading)', marginBottom: 'var(--space-3)', color: i === 2 ? 'var(--dd-lime)' : 'var(--dd-ink)' }}>{'0' + (i + 1)}</div>
               <div style={{ font: 'var(--text-h3)', fontWeight: 'var(--fw-bold)', fontSize: 20, letterSpacing: 'var(--ls-heading)', marginBottom: 'var(--space-2)' }}>{t}</div>
               <p style={{ font: 'var(--text-copy)', color: 'var(--text-secondary)', margin: 0, textWrap: 'pretty' }}>{b}</p>

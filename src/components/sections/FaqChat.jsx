@@ -17,7 +17,7 @@ export function FaqChat({ items = [], timestamp, defaultOpenId, columnsGap, styl
         const id = String(item.id != null ? item.id : i);
         const isOpen = open === id;
         return (
-          <div key={id}>
+          <div key={id} data-reveal data-reveal-delay={i * 60}>
             <button
               onClick={() => setOpen(isOpen ? null : id)}
               aria-expanded={isOpen}

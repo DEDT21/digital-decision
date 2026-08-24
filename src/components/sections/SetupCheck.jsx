@@ -29,13 +29,13 @@ export function SetupCheck({ id = 'setup-check', kicker = 'Kostenlos · unverbin
   return (
     <section id={id} style={{ background: 'var(--surface-accent)', color: 'var(--dd-ink)', padding: 'var(--pad-section-y) var(--pad-page-x)', ...style }}>
       <div className="dd-setup-grid" style={{ maxWidth: 'var(--measure-wide)', margin: '0 auto' }}>
-        <div className="dd-setup-intro">
+        <div className="dd-setup-intro" data-reveal>
           <span style={{ display: 'inline-block', font: 'var(--text-kicker)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-medium)', fontSize: 'var(--fs-kicker)', textTransform: 'uppercase', letterSpacing: 'var(--ls-kicker)', background: 'var(--dd-ink)', color: 'var(--dd-lime)', padding: '4px 12px', borderRadius: 'var(--radius-pill)' }}>{kicker}</span>
           <h2 style={{ font: 'var(--text-h2)', letterSpacing: 'var(--ls-heading)', margin: 'var(--space-5) 0 var(--space-5)', maxWidth: 620 }}>{headline}</h2>
           <p style={{ font: 'var(--text-lead)', margin: 0, maxWidth: 560, textWrap: 'pretty' }}>{intro}</p>
         </div>
 
-        <ol className="dd-setup-steps">
+        <ol className="dd-setup-steps" data-reveal data-reveal-delay={120}>
           {steps.map((step, i) => (
             <li key={step.title} className="dd-setup-step">
               <span className="dd-setup-step-num" style={{ borderRadius: 'var(--radius-pill)', background: 'var(--dd-ink)', color: 'var(--dd-lime)', display: 'grid', placeItems: 'center' }}>{i + 1}</span>
@@ -47,7 +47,7 @@ export function SetupCheck({ id = 'setup-check', kicker = 'Kostenlos · unverbin
           ))}
         </ol>
 
-        <div className="dd-setup-formwrap dd-setup-form" style={{ background: 'var(--dd-ink)', color: 'var(--text-on-dark)', borderRadius: 'var(--radius-xl)' }}>
+        <div className="dd-setup-formwrap dd-setup-form" data-reveal data-reveal-delay={80} style={{ background: 'var(--dd-ink)', color: 'var(--text-on-dark)', borderRadius: 'var(--radius-xl)' }}>
           <form name="setup-check" method="POST" action="/danke" data-netlify="true" data-netlify-honeypot="bot-field">
             <input type="hidden" name="form-name" value="setup-check" />
             {/* honeypot: invisible to humans, irresistible to bots */}

@@ -119,7 +119,7 @@ export function CaseGrid({ cases = [], style }) {
           <span ref={(el) => { lightRefs.current[i] = el; }} className="dd-case-light" aria-hidden="true"
             style={{ position: 'absolute', top: 0, left: 0, width: 440, height: 440, borderRadius: '50%', opacity: 0, pointerEvents: 'none', background: 'radial-gradient(circle, var(--dd-lime) 0%, rgba(198,240,75,0.35) 38%, rgba(198,240,75,0) 68%)', willChange: 'transform, opacity' }} />
 
-          <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', background: 'var(--surface-dark)', borderRadius: 15, padding: stacked ? 'var(--pad-card)' : 'var(--space-6)' }}>
+          <div data-reveal data-reveal-delay={i * 80} style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', background: 'var(--surface-dark)', borderRadius: 15, padding: stacked ? 'var(--pad-card)' : 'var(--space-6)' }}>
             <header style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 'var(--space-4)' }}>
               <span style={{ font: 'var(--text-h3)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-bold)', fontSize: '20px', letterSpacing: 'var(--ls-heading)', color: 'var(--text-on-dark)' }}>{c.client}</span>
               <span style={{ font: 'var(--text-caption)', color: 'var(--text-on-dark-secondary)', textAlign: 'right' }}>{c.industry}</span>

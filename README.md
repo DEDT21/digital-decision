@@ -50,6 +50,5 @@ Outputs sind eingecheckt — die Skripte müssen im CI **nicht** laufen.
 ## Offene Punkte vor Livegang
 
 - [ ] Aqmos-Case „+50 % Monatsumsatz" braucht Freigabe des Kunden
-- [ ] Linas E-Mail-Adresse ergänzen (`src/Home.jsx`, TEAM-Array — aktuell ohne mail)
 - [ ] Impressum/Datenschutz mit WKO-Generator gegenchecken (kein Rechtsrat)
 - [ ] Netlify: Custom Domain + Forms-Notification einrichten (siehe Launch-Plan im Vault)
