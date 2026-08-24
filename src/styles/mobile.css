@@ -154,6 +154,13 @@ html, body { overflow-x: clip; }
 .dd-person-media { position: relative; aspect-ratio: 4 / 5; background: var(--surface-dark); display: grid; place-items: center; overflow: hidden; }
 .dd-person-body { padding: var(--space-6); display: flex; flex-direction: column; gap: var(--space-2); flex: 1; }
 .dd-person-name { font: var(--fw-bold) 25px/var(--lh-title) var(--font-head); }
+/* Ausklappbarer Teil: die max-height setzt der Layout-Effect in TeamStructure.jsx,
+   hier steht nur der Ruhezustand. overflow:hidden blendet den Inhalt währenddessen aus. */
+.dd-person-panel {
+  overflow: hidden; max-height: 0; opacity: 0;
+  transition: max-height var(--dur-slow) var(--ease-out), opacity var(--dur-base) var(--ease-standard);
+}
+.dd-person[data-open="1"] .dd-person-panel { opacity: 1; }
 .dd-person-toggle { padding: var(--space-5) 0 0; }
 .dd-network { padding: var(--space-8); }
 .dd-network-hub { font: var(--fw-bold) 25px/var(--lh-title) var(--font-head); }
@@ -162,8 +169,12 @@ html, body { overflow-x: clip; }
 @media (max-width: 720px) {
   /* Kompakte Querformat-Card: Bild links, Text rechts. Bio erst beim Aufklappen. */
   .dd-person { display: grid; grid-template-columns: 104px 1fr; align-items: stretch; }
-  .dd-person-media { aspect-ratio: auto; height: 100%; min-height: 100%; }
-  .dd-person-body { padding: var(--space-4); gap: var(--space-1); }
+  /* Die Bildspalte füllt die Zeilenhöhe über align-items:stretch. Ein zusätzliches
+     height/min-height:100% wäre zirkulär (Zeilenhöhe kommt aus dem Textinhalt) und hielt
+     die Karte in WebKit auf der aufgeklappten Höhe fest. min-height:0 erlaubt das
+     Zurückschrumpfen. */
+  .dd-person-media { aspect-ratio: auto; min-height: 0; }
+  .dd-person-body { padding: var(--space-4); gap: var(--space-1); min-height: 0; }
   .dd-person-name { font: var(--fw-bold) 20px/var(--lh-title) var(--font-head); }
   .dd-person-bio { display: none; }
   .dd-person[data-open="1"] .dd-person-bio { display: block; }

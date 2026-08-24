@@ -7,7 +7,45 @@ import React from 'react';
    connectors into named specialists. No faces there, because they aren't employees — that
    honesty is the point. Hover/tap a node to light its connector and read what it covers. */
 
+const REDUCED_MOTION = typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+  ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false;
+
 function PersonCard({ person, open, onToggle, assetBase, index = 0 }) {
+  const panelRef = React.useRef(null);
+  const firstRun = React.useRef(true);
+
+  /* Auf- und Zuklappen über max-height statt über grid-template-rows 1fr ↔ 0fr:
+     WebKit (Safari und damit auch Chrome auf iOS) wendet den Endzustand beim Zurück-
+     Interpolieren auf 0fr nicht an — die Zeile behält die Inhaltshöhe, die Karte blieb
+     aufgeklappt stehen. max-height ist eine gewöhnliche Längen-Interpolation und in allen
+     Engines verlässlich.
+     Aufgeklappt wird nach der Transition auf 'none' zurückgestellt, damit späteres
+     Umbrechen (Resize, größere Schrift) den Inhalt nicht abschneidet; zum Schließen wird
+     der gemessene Wert kurz zurückgeschrieben, weil eine Transition von 'none' aus keinen
+     Startwert hätte. */
+  React.useLayoutEffect(() => {
+    const el = panelRef.current;
+    if (!el) return undefined;
+
+    if (firstRun.current || REDUCED_MOTION) {
+      firstRun.current = false;
+      el.style.maxHeight = open ? 'none' : '0px';
+      return undefined;
+    }
+
+    if (open) {
+      el.style.maxHeight = el.scrollHeight + 'px';
+      const release = (e) => { if (e.target === el && e.propertyName === 'max-height') el.style.maxHeight = 'none'; };
+      el.addEventListener('transitionend', release);
+      return () => el.removeEventListener('transitionend', release);
+    }
+
+    el.style.maxHeight = el.scrollHeight + 'px';
+    void el.offsetHeight; /* Reflow erzwingen, sonst fasst der Browser beide Werte zusammen */
+    el.style.maxHeight = '0px';
+    return undefined;
+  }, [open]);
+
   return (
     /* Kartenlayout liegt in mobile.css (.dd-person*): mobil wird aus der hohen Portrait-Card
        eine kompakte Querformat-Card (Bild links, Text rechts), die Bio klappt erst mit auf. */
@@ -33,10 +71,9 @@ function PersonCard({ person, open, onToggle, assetBase, index = 0 }) {
         {person.bio ? <p className="dd-person-bio" style={{ font: 'var(--text-copy)', fontSize: '14px', color: 'var(--text-secondary)', margin: 'var(--space-3) 0 0', textWrap: 'pretty' }}>{person.bio}</p> : null}
 
 
-        {/* 1fr → 0fr klappt nur zusammen, wenn das Grid-Item auch wirklich unter seine
-            Inhaltshöhe schrumpfen darf — daher min-height:0 zusätzlich zu overflow:hidden. */}
-        <div style={{ display: 'grid', gridTemplateRows: open ? '1fr' : '0fr', opacity: open ? 1 : 0, transition: 'grid-template-rows var(--dur-slow) var(--ease-out), opacity var(--dur-base) var(--ease-standard)' }}>
-          <div style={{ overflow: 'hidden', minHeight: 0 }}>
+        {/* Höhe steuert der Layout-Effect oben; Optik und Transition stehen in mobile.css */}
+        <div ref={panelRef} className="dd-person-panel">
+          <div>
             <div style={{ paddingTop: 'var(--space-4)' }}>
               {person.callFor && person.callFor.length ? (
                 <>
