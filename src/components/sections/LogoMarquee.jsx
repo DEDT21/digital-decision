@@ -1,75 +1,46 @@
 import React from 'react';
+import './LogoMarquee.css';
 
-/* Continuously scrolling client band. Ready for real logo files: pass `logo` on an item and the
-   image replaces the type — nothing else changes. Until then the client name is set in Space
-   Grotesk, which is how the brand handles a missing mark.
-   The motion is a CSS keyframe animation (runs off the main thread, unlike a rAF loop), linear
-   because constant motion must not accelerate, and it pauses on hover so names stay readable.
-   Seamlessness rule: the animated unit is half the track, so ONE pass must be at least as wide as
-   the container — otherwise a gap opens on the right before the loop resets. The list is therefore
-   repeated as often as the measured widths require, and the duration scales with it so the band
-   always moves at the same speed. */
+/* Endlos laufendes Kundenband. Ein Item ist ein String oder { name, logo?, height?, w?, h? }:
+   mit `logo` ersetzt das Bild den Namen; `height` ist die Anzeigehöhe (optische Angleichung),
+   `w`/`h` die Pixelmaße der Datei, daraus entstehen width/height-Attribute (kein CLS, und die
+   Breite steht schon vor dem Laden fest).
 
-const STYLE_ID = 'dd-logo-marquee-keyframes';
+   A11y: Die laufende Spur ist rein visuell (aria-hidden, Bilder mit alt=""). Screenreader
+   bekommen genau EINE Liste der Marken (sr-only). Bewegung: hält an bei `paused` (Pause-Button
+   der Seite), außerhalb des Viewports, bei Hover und Fokus; bei prefers-reduced-motion zeigt
+   das CSS eine statische, zentrierte Reihe ohne Duplikate.
 
-function ensureKeyframes() {
-  if (typeof document === 'undefined' || document.getElementById(STYLE_ID)) return;
-  const el = document.createElement('style');
-  el.id = STYLE_ID;
-  el.textContent = '@keyframes dd-marquee{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}'
-    + '.dd-marquee-track{animation:dd-marquee var(--dd-marquee-duration,32s) linear infinite;will-change:transform}'
-    + '.dd-marquee:hover .dd-marquee-track{animation-play-state:paused}'
-    + '@media (prefers-reduced-motion: reduce){.dd-marquee-track{animation:none}}';
-  document.head.appendChild(el);
-}
+   Nahtlosigkeit: Die animierte Einheit ist die halbe Spur, ein Durchlauf muss also mindestens
+   so breit sein wie der Container. Die Liste wird dafür so oft wiederholt wie nötig, die Dauer
+   wächst mit, das Tempo bleibt gleich. Gemessen wird nur wachsend (nie schrumpfend) und mit
+   Deckel, damit Messung → Re-Render → Messung nicht pendeln kann. */
 
-export function LogoMarquee({ items = [], tone = 'dark', speed = 32, logoHeight = 30, gap = 'var(--space-14)', fade = 72, style }) {
-  React.useEffect(ensureKeyframes, []);
-  const dark = tone === 'dark';
+const useIsoLayoutEffect = typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect;
+const MAX_REPEATS = 12;
+
+export function LogoMarquee({ items = [], tone = 'dark', speed = 32, logoHeight = 30, gap = 'var(--space-14)', fade = 72, paused = false, id, style }) {
   const wrapRef = React.useRef(null);
   const trackRef = React.useRef(null);
   const [repeats, setRepeats] = React.useState(1);
   const repeatsRef = React.useRef(1);
   const measureRef = React.useRef(null);
 
-  /* Messung, drei Schutzschichten gegen die Endlosschleife, die hier möglich ist
-     (setRepeats → Re-Render → Effekt neu → Messung → setRepeats → …):
-
-     1. Die Messung liest den aktuellen Stand aus `repeatsRef`, nicht aus der Closure. Vorher
-        hing `passW = unit / repeats` an dem `repeats`, das beim Anlegen der Funktion galt.
-        `measureRef` überlebt den Render aber (Bilder rufen es im onLoad auf), sodass eine
-        alte Zahl auf ein bereits neu aufgebautes DOM traf — das Ergebnis pendelte.
-        Dazu `getBoundingClientRect().width` statt `scrollWidth`: letzteres rundet auf ganze
-        Pixel und kann `Math.ceil` an der Grenze zusätzlich kippen lassen.
-     2. Nur wachsen, nie schrumpfen. Ein Durchlauf zu viel ist unsichtbar (die Bedingung
-        lautet „mindestens so breit wie der Container"), ein Pendeln wäre fatal. Damit ist
-        die Folge monoton und endet zwangsläufig — zusätzlich bei MAX_REPEATS hart gedeckelt.
-     3. Der Effekt hängt nicht mehr an `repeats`, und der ResizeObserver beobachtet nur noch
-        den Wrapper, nicht den Track. Vorher änderte jede Änderung von `repeats` die
-        Track-Breite, was den Observer erneut feuern ließ — die Rückkopplung selbst.
-     Der aktuelle Wert liegt in einer Ref, damit `measure` ihn ohne Neuaufbau des Effekts liest. */
-  const MAX_REPEATS = 12;
-
-  React.useLayoutEffect(() => {
+  useIsoLayoutEffect(() => {
     const measure = () => {
       const wrap = wrapRef.current;
       const track = trackRef.current;
       if (!wrap || !track) return;
-      /* Erst messen, wenn alle Logos geladen sind: vorher sind die <img> nahezu breitenlos,
-         eine Passage wirkt viel zu schmal und es würden unnötig viele Durchläufe angelegt —
-         die wegen der Monotonie oben nie wieder verschwinden. `complete` wird auch bei einem
-         Ladefehler true, ein fehlendes Logo blockiert die Messung also nicht dauerhaft.
-         Den Nachschlag übernimmt `remeasure` am onLoad jedes Bildes. */
-      const imgs = track.querySelectorAll('img');
+      /* Bilder ohne width-Attribut sind vor dem Laden breitenlos: dann erst nach onLoad messen. */
+      const imgs = track.querySelectorAll('img:not([width])');
       for (let i = 0; i < imgs.length; i++) if (!imgs[i].complete) return;
 
       const current = repeatsRef.current;
-      const unit = track.getBoundingClientRect().width / 2;  /* the track always holds two identical units */
+      const unit = track.getBoundingClientRect().width / 2;
       if (unit < 1) return;
-      const passW = unit / current;                  /* width of one pass through the list */
+      const passW = unit / current;
       const wrapW = wrap.clientWidth;
       if (passW < 1 || !wrapW) return;
-      /* 1px Toleranz, damit Sub-Pixel-Differenzen keinen weiteren Durchlauf erzwingen */
       const needed = Math.max(1, Math.ceil((wrapW - 1) / passW));
       if (needed > current) {
         repeatsRef.current = Math.min(needed, MAX_REPEATS);
@@ -83,34 +54,46 @@ export function LogoMarquee({ items = [], tone = 'dark', speed = 32, logoHeight 
     return () => { if (ro) ro.disconnect(); };
   }, [items.length]);
 
+  /* Außerhalb des Viewports anhalten */
+  React.useEffect(() => {
+    const el = wrapRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return undefined;
+    const io = new IntersectionObserver((entries) => {
+      if (entries[entries.length - 1].isIntersecting) el.removeAttribute('data-offscreen');
+      else el.setAttribute('data-offscreen', '');
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   const remeasure = () => { if (measureRef.current) measureRef.current(); };
 
+  const entries = items.map((item) => (typeof item === 'string' ? { name: item } : item));
   const one = [];
-  for (let i = 0; i < repeats; i++) one.push(...items);
+  for (let i = 0; i < repeats; i++) one.push(...entries);
   const run = one.concat(one);
 
   return (
-    <div ref={wrapRef} className="dd-marquee" style={{ position: 'relative', overflow: 'hidden',
-      maskImage: 'linear-gradient(to right, transparent, #000 ' + fade + 'px, #000 calc(100% - ' + fade + 'px), transparent)',
-      WebkitMaskImage: 'linear-gradient(to right, transparent, #000 ' + fade + 'px, #000 calc(100% - ' + fade + 'px), transparent)',
-      ...style }}>
-      {/* padding-right = one gap so the track is exactly two equal passes and the −50%
-          keyframe lands on the duplicate boundary — without it the loop jumps half a gap */}
-      <div ref={trackRef} className="dd-marquee-track" style={{ display: 'flex', alignItems: 'center', gap, paddingRight: gap, width: 'max-content', '--dd-marquee-duration': (speed * repeats) + 's' }}>
-        {run.map((item, i) => {
-          const entry = typeof item === 'string' ? { name: item } : item;
+    <div ref={wrapRef} id={id} className={'dd-marquee dd-marquee--' + (tone === 'dark' ? 'dark' : 'light')}
+         data-paused={paused ? '' : undefined}
+         style={{ '--dd-marquee-fade': fade + 'px', '--dd-marquee-gap': gap, ...style }}>
+      <ul className="dd-sr-only">
+        {entries.map((entry) => <li key={entry.name}>{entry.name}</li>)}
+      </ul>
+      <div ref={trackRef} className="dd-marquee-track" aria-hidden="true"
+           style={{ '--dd-marquee-duration': (speed * repeats) + 's' }}>
+        {run.map((entry, i) => {
+          const h = entry.height || logoHeight;
           return (
-            <span key={entry.name + '-' + i} aria-hidden={i >= one.length}
-              style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', height: (entry.height || logoHeight) + 'px' }}>
+            <span key={entry.name + '-' + i} className={'dd-marquee-item' + (i >= entries.length ? ' dd-marquee-dup' : '')}>
               {entry.logo ? (
-                <img src={entry.logo} alt={entry.name} onLoad={remeasure} loading="lazy" decoding="async"
-                     style={{ height: (entry.height || logoHeight) + 'px', width: 'auto', display: 'block',
-                       filter: dark ? 'grayscale(1) brightness(0) invert(1)' : 'grayscale(1) brightness(0)',
-                       opacity: dark ? 0.8 : 0.65 }} />
+                <img className="dd-marquee-logo" src={entry.logo} alt="" onLoad={remeasure}
+                     loading="lazy" decoding="async" draggable="false"
+                     width={entry.w && entry.h ? Math.round(h * entry.w / entry.h) : undefined}
+                     height={entry.w && entry.h ? h : undefined}
+                     style={{ '--dd-logo-h': h + 'px' }} />
               ) : (
-                <span style={{ font: 'var(--text-h3)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-medium)', fontSize: '25px', letterSpacing: 'var(--ls-heading)', whiteSpace: 'nowrap', color: dark ? 'var(--text-on-dark-secondary)' : 'var(--text-secondary)' }}>
-                  {entry.name}
-                </span>
+                <span className="dd-marquee-name">{entry.name}</span>
               )}
             </span>
           );

@@ -13,35 +13,60 @@ import { FaqChat } from './components/sections/FaqChat.jsx';
 import { PhaseFlow } from './components/sections/PhaseFlow.jsx';
 import { LogoMarquee } from './components/sections/LogoMarquee.jsx';
 import { TeamStructure } from './components/sections/TeamStructure.jsx';
+import { HeroOffer, HeroFaces } from './components/sections/HeroOffer.jsx';
+import './Home.css';
 
-const ROTATOR = ['deinen Online Shop.', 'deine Website.', 'deine Ads.', 'deine Marke.', 'deinen Relaunch.', 'dein Amazon-Business.', 'dein Wachstum.'];
+const ROTATOR = ['deinen Onlineshop.', 'deine Website.', 'deine Ads.', 'deine Marke.', 'deinen Relaunch.', 'dein Amazon-Business.', 'dein Wachstum.'];
 
+/* Was Screenreader und Suchmaschinen als H1 lesen: der Kernclaim, unabhängig vom Rotator. */
+const H1_TEXT = 'Die richtige Entscheidung für dein Wachstum.';
+
+/* Setup-Check-Karte im Hero: was du nach den 30 Minuten weißt (aus SETUP_STEPS[1]). */
+const HERO_OFFER = {
+  title: 'Der Setup-Check',
+  meta: ['Kostenlos', '30 Minuten'],
+  outcomesLabel: 'Danach weißt du:',
+  outcomes: ['Wo dein Wachstum hängt.', 'Was zuerst dran ist.', 'Was du dir sparen kannst.'],
+  people: 'David & Thomas',
+  peopleRole: 'Geschäftsführer',
+  reply: 'Antwort innerhalb von 24 Stunden. Von David oder Thomas persönlich.',
+  link: 'Zum Formular'
+};
+
+/* Fotos für Karte und mobilen Streifen: quadratische Gesichts-Crops (160×160, Graustufen) */
+const HERO_FACES = ['/assets/team/david-edtmayer-avatar.webp', '/assets/team/thomas-jud-avatar.webp'];
+
+/* height: Anzeigehöhe zur optischen Angleichung (breite Wortmarke kleiner, Hagleitner-Oval
+   mit kleiner Schrift größer), w/h: Pixelmaße der Datei für width/height-Attribute. */
 const TRUST = [
-  { name: 'Aqmos', logo: '/assets/clients/aqmos.webp' },
-  { name: 'Hagleitner', logo: '/assets/clients/hagleitner.webp', height: 38 },
-  { name: 'Gamechangersocks', logo: '/assets/clients/gamechangersocks.webp' },
-  { name: 'BWT', logo: '/assets/clients/bwt.webp', height: 34 },
-  { name: 'Ecosoft', logo: '/assets/clients/ecosoft.webp' }
+  { name: 'Aqmos', logo: '/assets/clients/aqmos.webp', height: 25, w: 450, h: 96 },
+  { name: 'Hagleitner', logo: '/assets/clients/hagleitner.webp', height: 44, w: 165, h: 96 },
+  { name: 'Gamechangersocks', logo: '/assets/clients/gamechangersocks.webp', height: 40, w: 150, h: 96 },
+  { name: 'BWT', logo: '/assets/clients/bwt.webp', height: 32, w: 255, h: 96 },
+  { name: 'Ecosoft', logo: '/assets/clients/ecosoft.webp', height: 30, w: 311, h: 96 }
 ];
 
+/* mark: Teil des Titels, der den Lime-Textmarker bekommt (Brand-Signature, sparsam). */
 const DIFFERENCE = [
-  ['Wir arbeiten in deinem Geschäft, nicht daneben.', 'Wir tauchen in Produkt, Zahlen und Abläufe ein und übernehmen auf Wunsch operative Rollen, vom Ads-Konto bis zur Shop-Migration. Nicht beraten und verschwinden, sondern machen und dableiben.'],
-  ['Wir bauen auf, was funktioniert.', 'Dein Team, deine Systeme, deine bisherige Arbeit haben Wert. Wir reißen nichts ein, um uns wichtig zu machen. Wir verbessern gezielt das, was Wachstum blockiert.'],
-  ['Wir gehen mit ins Risiko.', 'Wenn es zum Projekt passt, koppeln wir einen Teil unseres Honorars an dein Ergebnis. Erfolg wird geteilt: im Risiko wie im Gewinn. Frag uns danach.']
+  { title: 'Wir arbeiten in deinem Geschäft, nicht daneben.', body: 'Wir arbeiten uns in Produkt, Zahlen und Abläufe ein und übernehmen auf Wunsch operative Rollen, vom Ads-Konto bis zur Shop-Migration. Beraten und dann verschwinden ist nicht unser Modell.' },
+  { title: 'Wir bauen auf, was funktioniert.', body: 'Dein Team, deine Systeme, deine bisherige Arbeit haben Wert. Wir reißen nichts ein, um uns wichtig zu machen. Wir verbessern gezielt das, was Wachstum blockiert.' },
+  { title: 'Wir gehen mit ins Risiko.', mark: 'mit ins Risiko', body: 'Wenn es zum Projekt passt, koppeln wir einen Teil unseres Honorars an dein Ergebnis. Läuft es gut, verdienen wir mit. Läuft es schlecht, verdienen wir weniger. Frag uns im Setup-Check danach.' }
 ];
 
+/* stat/statLabel: optionale Kennzahl für die hervorgehobene Case-Karte. Nur freigegebene Zahlen. */
 const CASES = [
-  { client: 'Aqmos', industry: 'Wasseraufbereitung · D2C + Marktplätze',
-    result: '+50 % Monatsumsatz. Durch Struktur, nicht durch Budget.',
-    body: 'Wir haben Aqmos neu gebrandet und der Marke ein Gesicht gegeben. Seitdem steuern wir das operative E-Commerce-Geschäft über vier Kanäle. Die Monatsumsätze liegen im Jahresvergleich stabil bei +50 %, gewachsen durch Struktur im Marketing und im technischen E-Commerce.',
+  { client: 'Aqmos', logo: '/assets/clients/aqmos.webp', industry: 'Wasseraufbereitung · D2C + Marktplätze',
+    stat: '+50 %', statLabel: 'Monatsumsatz im Jahresvergleich',
+    result: 'Gewachsen durch Struktur, nicht durch Budget.',
+    body: 'Wir haben Aqmos neu gebrandet und der Marke ein Gesicht gegeben. Seitdem steuern wir das operative E-Commerce-Geschäft über vier Kanäle. Im Jahresvergleich liegen die Monatsumsätze stabil bei +50 %. Gewachsen ist das über Struktur im Marketing und im technischen E-Commerce.',
     tags: ['Rebranding', 'E-Commerce-Steuerung', '4+ Kanäle'] },
-  { client: 'Hagi (Hagleitner)', industry: 'Hygiene · B2B-Konzern',
-    result: 'Vom B2B-Marktführer zur D2C-Marke.',
-    body: 'Hagleitner ist seit 50 Jahren Profi-Hygiene im B2B. Der erste Schritt zum Endkunden blieb unter den Möglichkeiten. Jetzt bauen wir ihn neu: Shopify-Migration, neues Creative-Konzept, Relaunch von Google & Meta Ads. Aus einem B2B-Player wird eine D2C-Plattform.',
+  { client: 'Hagi · Hagleitner', logo: '/assets/clients/hagleitner.webp', industry: 'Hygiene · B2B-Konzern',
+    result: 'Vom B2B-Hygieneprofi zur D2C-Marke.',
+    body: 'Hagleitner macht seit über 50 Jahren Profi-Hygiene im B2B. Der erste Schritt zum Endkunden blieb unter seinen Möglichkeiten. Jetzt bauen wir ihn neu auf: Shopify-Migration, neues Creative-Konzept, Relaunch von Google und Meta Ads.',
     tags: ['Shop-Migration', 'Ads-Relaunch', 'D2C-Strategie'] },
-  { client: 'Gamechangersocks', industry: 'Fashion · D2C',
+  { client: 'Gamechangersocks', logo: '/assets/clients/gamechangersocks.webp', industry: 'Fashion · D2C',
     result: 'Technischer E-Commerce, der Conversion bringt.',
-    body: 'Hier arbeiten wir dort, wo Umsatz technisch entsteht: Conversion-Optimierung, Shop-Strategie und Planung. Weniger laut, dafür messbar. Jede Änderung muss sich in der Conversion Rate zeigen.',
+    body: 'Bei Gamechangersocks arbeiten wir dort, wo Umsatz technisch entsteht: Conversion-Optimierung, Shop-Strategie und Planung. Jede Änderung muss sich in der Conversion Rate zeigen.',
     tags: ['CRO', 'Shop-Strategie', 'Planung'] }
 ];
 
@@ -65,12 +90,12 @@ const TEAM = [
     callFor: ['Shop- & Systemarchitektur', 'Prozesse im operativen Geschäft', 'Agentur-Landschaften aufräumen'] },
   { name: 'David Edtmayer', role: 'Geschäftsführer · Co-Founder', mail: 'david@digital-decision.at', photo: '/assets/team/david-edtmayer.webp',
     line: 'Ich schaue mir zuerst die Zahlen an. Dann suche ich den Weg, den noch keiner geht.',
-    bio: 'Baut seit seinem 15. Lebensjahr E-Commerce. Heute baut er die Systeme dahinter: AI-first, immer auf der Suche nach der besseren Lösung statt der gewohnten.',
+    bio: 'Baut seit seinem 15. Lebensjahr E-Commerce. Heute baut er die Systeme dahinter: AI-first und immer auf der Suche nach der besseren Lösung statt der gewohnten.',
     callFor: ['Wachstumsentscheidungen', 'Performance & Funnels', 'AI-gestützte Prozesse & neue Wege'] }
 ];
 
 const NETWORK = [
-  { name: 'Paid', what: 'Paid Search, Paid Social, Feeds. Geführt von uns, nicht blind ausgelagert.' },
+  { name: 'Paid', what: 'Paid Search, Paid Social, Produkt-Feeds.' },
   { name: 'Tech', what: 'Entwicklung an bestehenden Systemen, Schnittstellen, Migrationen.' },
   { name: 'Logistik', what: 'Fulfillment, Versandkosten, Retourenprozesse.' },
   { name: 'Creative', what: 'Foto, Video, Ads-Assets. Nach unserem Briefing, mit euren Produkten.' }
@@ -81,7 +106,7 @@ const NETWORK_FACES = [
   { name: 'Otago', logo: '/assets/network/otago.svg' },
   { name: 'Spreadfilms', logo: '/assets/network/spreadfilms.svg', dark: true },
   { name: 'WBFK', logo: '/assets/network/wbfk.svg', dark: true },
-  /* tile-style logo (black square, white W) — rendered like a profile photo, not filtered to a glyph */
+  /* tile-style logo (black square, white W): rendered like a profile photo, not filtered to a glyph */
   { name: 'Wipplinger', photo: '/assets/network/wipplinger.svg' },
   { name: 'Partner', logo: '/assets/network/partner-1c.svg', dark: true },
   { name: 'Huber', logo: '/assets/network/huber.webp' }
@@ -96,63 +121,126 @@ const MANIFEST = [
   'Partnerschaft. Auch finanziell.'
 ];
 
-const FAQS = [
-  ['Wir haben schon schlechte Erfahrungen mit Agenturen gemacht. Warum sollte es mit euch anders laufen?', 'Verstehen wir. Ein Teil unserer Kunden kam genau so zu uns. Der Unterschied: Wir verkaufen keine Stunden, sondern übernehmen Verantwortung für Ergebnisse. Deshalb starten wir mit einem kostenlosen Setup-Check statt einem Pitch, arbeiten in deinem operativen Geschäft statt daneben und koppeln unser Honorar auf Wunsch an dein Ergebnis. Wenn wir nicht überzeugt sind, dass wir dir helfen können, sagen wir das im Check. Dann hast du eine ehrliche Einschätzung. Gratis.'],
-  ['Bietet ihr erfolgsbasierte Vergütung an?', 'Ja, wenn es zum Projekt passt. Wir sind bereit, unser Honorar teilweise an unternehmerische Ergebnisse zu koppeln. Erfolg wird geteilt: im Risiko wie im Gewinn.'],
-  ['Entwickelt ihr alles komplett neu?', 'Nur wenn es sinnvoll ist. Wir nutzen, was bereits funktioniert: bestehende Systeme, Prozesse, Teams. Und verbessern gezielt das, was blockiert.'],
-  ['Was passiert, wenn schon ein Team oder andere Agenturen beteiligt sind?', 'Wir sortieren sensibel, nicht brachial. Wir schauen respektvoll, was funktioniert, und bringen Struktur rein. Ohne Chaos, ohne Politik.'],
-  ['Übernehmt ihr auch operative Verantwortung?', 'Ja. Von strategischer Steuerung bis zur Umsetzung im Tagesgeschäft. Immer mit klarem Ziel: Wachstum, Effizienz, messbare Ergebnisse.'],
+/* Wird zusätzlich als FAQPage-JSON-LD in index.html gespiegelt. Bei Änderungen beide Stellen pflegen. */
+export const FAQS = [
+  ['Wir haben schon schlechte Erfahrungen mit Agenturen gemacht. Warum sollte es mit euch anders laufen?', 'Verstehen wir. Ein Teil unserer Kunden kam genau so zu uns. Wir verkaufen keine Stunden, wir übernehmen Verantwortung für Ergebnisse. Deshalb startet alles mit einem kostenlosen Setup-Check statt mit einem Pitch. Danach arbeiten wir in deinem Tagesgeschäft mit und koppeln unser Honorar auf Wunsch an dein Ergebnis. Wenn wir nicht überzeugt sind, dass wir dir helfen können, sagen wir dir das im Check. Dann hast du zumindest eine ehrliche Einschätzung, und die kostet dich nichts.'],
+  ['Bietet ihr erfolgsbasierte Vergütung an?', 'Ja, wenn es zum Projekt passt. Dann koppeln wir einen Teil unseres Honorars an dein unternehmerisches Ergebnis. Wie das konkret aussieht, legen wir gemeinsam fest.'],
+  ['Entwickelt ihr alles komplett neu?', 'Nur wenn es sinnvoll ist. Wir nutzen, was schon funktioniert, also bestehende Systeme, Prozesse und Teams, und verbessern gezielt das, was blockiert.'],
+  ['Was passiert, wenn schon ein Team oder andere Agenturen beteiligt sind?', 'Wir schauen uns an, was funktioniert, und bringen Struktur rein. Sensibel, ohne Politik und ohne alles umzuwerfen.'],
+  ['Übernehmt ihr auch operative Verantwortung?', 'Ja. Wir steuern strategisch und setzen im Tagesgeschäft um, zum Beispiel im Ads-Konto, im Shop oder bei einer Migration. Das Ziel ist immer messbares Wachstum.'],
   ['Passt ihr zu jedem Unternehmen?', 'Nein. Wir passen zu Unternehmen, die echte Zusammenarbeit und klare Entscheidungen wollen. Kein weiteres Agenturfeuerwerk.']
 ];
 
+/* Sichtbarer, fester Teil der H1. Die H1 liest für Screenreader und Crawler exakt H1_TEXT:
+   Der feste Teil steht als normaler Text darin, der Rest von H1_TEXT als sr-only-Text, und der
+   Rotator ist aria-hidden (seine Wörter sind CSS-Content, also auch nicht im Textinhalt).
+   Passt H1_TEXT irgendwann nicht mehr zum festen Teil, wird die ganze sichtbare Zeile
+   versteckt und H1_TEXT komplett als sr-only gelesen. */
+const H1_VISIBLE = 'Die richtige Entscheidung für';
+
 function Hero({ onNavigate }) {
+  const split = H1_TEXT.startsWith(H1_VISIBLE);
+  const toForm = (e) => { if (e) e.preventDefault(); onNavigate('home', 'setup-check'); };
   return (
-    <div className="dd-hero" style={{ position: 'relative' }}>
-      <div style={{ maxWidth: 'var(--measure-wide)', margin: '0 auto' }}>
-        <div style={{ marginBottom: 'var(--space-5)' }}><Kicker tone="limeText">digital decision · E-Commerce-Partner</Kicker></div>
-        <h1 style={{ font: 'var(--text-h1)', fontSize: 'var(--fs-h1)', letterSpacing: 'var(--ls-heading)', margin: 0, maxWidth: 'var(--measure-headline)' }}>
-          Die richtige Entscheidung für <WordRotator words={ROTATOR} />
+    <div className="dd-hero">
+      <div className="dd-hero-inner">
+        <div className="dd-hero-eyebrow"><Kicker tone="limeText">E-Commerce-Partner · Salzburg</Kicker></div>
+        <h1 className="dd-hero-title">
+          {split
+            ? <>{H1_VISIBLE}<span className="dd-sr-only">{H1_TEXT.slice(H1_VISIBLE.length)}</span></>
+            : <><span aria-hidden="true">{H1_VISIBLE}</span><span className="dd-sr-only">{H1_TEXT}</span></>}
+          <WordRotator words={ROTATOR} loops={1} className="dd-hero-rotator" />
         </h1>
-        <p style={{ font: 'var(--text-lead)', color: 'var(--text-on-dark-secondary)', maxWidth: 560, margin: 'var(--space-6) 0 var(--space-8)', textWrap: 'pretty' }}>
-          Wir führen dein E-Commerce-Geschäft, als wäre es unser eigenes. Strategie und Umsetzung, ein Team, das entscheidet und dazu steht.
-        </p>
-        <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
-          <Button arrow onClick={() => onNavigate('home', 'setup-check')}>Kostenlosen Setup-Check holen</Button>
-          <Button variant="ghostDark" href="#phasen">Wie wir arbeiten</Button>
-        </div>
-        <div style={{ font: 'var(--text-caption)', color: 'var(--text-on-dark-secondary)', marginTop: 'var(--space-4)' }}>
-          30 Minuten · ehrliche Einschätzung · kein Pitch
+
+        <div className="dd-hero-grid">
+          <div className="dd-hero-copy">
+            <p className="dd-hero-lead">
+              Wir führen dein E-Commerce-Geschäft, als wäre es unser eigenes. Strategie und Umsetzung, ein Team, das entscheidet und dazu steht.
+            </p>
+            <div className="dd-hero-ctas">
+              <Button arrow onClick={toForm}>Kostenlosen Setup-Check holen</Button>
+              <Button variant="ghostDark" href="#phasen" onClick={(e) => { e.preventDefault(); onNavigate('home', 'phasen'); }}>Wie wir arbeiten</Button>
+            </div>
+            <p className="dd-hero-micro">30 Minuten · ehrliche Einschätzung · kein Pitch</p>
+            <div className="dd-hero-strip">
+              <HeroFaces faces={HERO_FACES} />
+              <p className="dd-hero-strip-text">{HERO_OFFER.reply}</p>
+            </div>
+          </div>
+          <HeroOffer offer={HERO_OFFER} faces={HERO_FACES} onNavigate={onNavigate} className="dd-hero-offer" />
         </div>
       </div>
     </div>
   );
 }
 
+function PauseIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+      <rect x="3.5" y="2.5" width="3" height="11" rx="1" fill="currentColor" />
+      <rect x="9.5" y="2.5" width="3" height="11" rx="1" fill="currentColor" />
+    </svg>
+  );
+}
+
+function PlayIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+      <path d="M5 2.9v10.2a.8.8 0 0 0 1.2.7l8-5.1a.8.8 0 0 0 0-1.4l-8-5.1A.8.8 0 0 0 5 2.9z" fill="currentColor" />
+    </svg>
+  );
+}
+
+/* Logo-Band am Fuß des Hero: Zeile mit Einordnung und Pause-Button, darunter das Laufband.
+   Der Button ist ein Toggle (aria-pressed) mit gleichbleibendem Namen; das Icon zeigt den
+   Zustand. Bei reduzierter Bewegung steht das Band still, der Button entfällt (CSS). */
+function TrustBand() {
+  const [paused, setPaused] = React.useState(false);
+  return (
+    <div className="dd-trust">
+      <div className="dd-trust-bar">
+        <div className="dd-trust-head">
+          <p className="dd-trust-copy">
+            <span className="dd-trust-title">Von D2C-Brand bis Konzern.</span>{' '}
+            <span className="dd-trust-sub">Marken, die uns zu dem machen, was wir sind.</span>
+          </p>
+          <button type="button" className="dd-trust-toggle" aria-controls="dd-trust-marquee"
+                  aria-pressed={paused} aria-label="Logo-Laufband pausieren"
+                  onClick={() => setPaused((v) => !v)}>
+            {paused ? <PlayIcon /> : <PauseIcon />}
+          </button>
+        </div>
+      </div>
+      <LogoMarquee id="dd-trust-marquee" tone="dark" items={TRUST} speed={34} paused={paused} />
+    </div>
+  );
+}
+
+/* Titel mit optionalem Lime-Textmarker auf genau dem Teilstring `mark` */
+function MarkedTitle({ title, mark }) {
+  const at = mark ? title.indexOf(mark) : -1;
+  if (at < 0) return title;
+  return <>{title.slice(0, at)}<span className="dd-diff-mark">{mark}</span>{title.slice(at + mark.length)}</>;
+}
+
 export function Home({ onNavigate }) {
   return (
     <div>
-      <div id="hero" style={{ position: 'relative', background: 'var(--surface-dark)', color: 'var(--text-on-dark)' }}>
-        <Aurora origin="top-right" />
+      <div id="hero" className="dd-hero-wrap dd-on-dark">
+        <Aurora origin="right" intensity={0.28} speed={64} />
         <Hero onNavigate={onNavigate} />
-        <div style={{ position: 'relative', padding: 'var(--space-10) 0 var(--space-12)' }}>
-          <div style={{ maxWidth: 'var(--measure)', margin: '0 auto var(--space-8)', padding: '0 var(--pad-page-x)', textAlign: 'center' }}>
-            <div style={{ font: 'var(--text-lead)', color: 'var(--text-on-dark)', textWrap: 'pretty' }}>Von D2C-Brand bis Konzern.</div>
-            <div style={{ font: 'var(--text-copy)', color: 'var(--text-on-dark-secondary)', marginTop: 'var(--space-2)', textWrap: 'pretty' }}>Marken, die uns zu dem machen, was wir sind.</div>
-          </div>
-          <LogoMarquee tone="dark" items={TRUST} speed={34} />
-        </div>
+        <TrustBand />
       </div>
 
       <ServiceBadges id="leistungen" />
 
       <Section tone="white">
         <SectionHeading kicker="Was uns anders macht" title="Substanz statt Show." lead="Klassische Agenturen verkaufen Stunden und Präsentationen. Wir haben das Modell an drei Stellen umgedreht:" />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 'var(--space-10)' }}>
-          {DIFFERENCE.map(([t, b], i) => (
-            <div key={t} data-reveal data-reveal-delay={i * 80}>
-              <div style={{ font: 'var(--text-h2)', fontSize: 'var(--fs-h2)', letterSpacing: 'var(--ls-heading)', marginBottom: 'var(--space-3)', color: i === 2 ? 'var(--dd-lime)' : 'var(--dd-ink)' }}>{'0' + (i + 1)}</div>
-              <div style={{ font: 'var(--text-h3)', fontWeight: 'var(--fw-bold)', fontSize: 20, letterSpacing: 'var(--ls-heading)', marginBottom: 'var(--space-2)' }}>{t}</div>
-              <p style={{ font: 'var(--text-copy)', color: 'var(--text-secondary)', margin: 0, textWrap: 'pretty' }}>{b}</p>
+        <div className="dd-diff">
+          {DIFFERENCE.map((d, i) => (
+            <div key={d.title} className="dd-diff-row" data-reveal data-reveal-delay={i * 80}>
+              <h3 className="dd-diff-title"><MarkedTitle title={d.title} mark={d.mark} /></h3>
+              <p className="dd-diff-body">{d.body}</p>
             </div>
           ))}
         </div>
@@ -175,10 +263,10 @@ export function Home({ onNavigate }) {
         reassurance="Antwort innerhalb von 24 Stunden. Von David oder Thomas persönlich." />
 
       <Section id="team" tone="white">
-        <SectionHeading kicker="Wer entscheidet" title="Du redest mit denen, die entscheiden." lead="Alles andere holen wir gezielt dazu. Benannt, nicht anonym." />
+        <SectionHeading kicker="Wer entscheidet" title="Du redest mit denen, die entscheiden." lead="Alles andere holen wir gezielt dazu." />
         <TeamStructure people={TEAM} network={NETWORK} networkFaces={NETWORK_FACES}
           hubLabel="Netzwerk aus Spezialisten"
-          networkNote="Benannt, nicht anonym: Für Paid, Tech, Logistik und Creative holen wir Spezialisten dazu, die wir seit Jahren kennen. Geführt von uns, nicht blind ausgelagert."
+          networkNote="Für Paid, Tech, Logistik und Creative holen wir Spezialisten dazu, die wir seit Jahren kennen. Benannt, nicht anonym, und geführt von uns."
           assetBase="/assets" />
       </Section>
 

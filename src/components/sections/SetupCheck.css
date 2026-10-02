@@ -1,0 +1,100 @@
+/* Setup-Check: die einzige volle Lime-Sektion, Formular in einer Ink-Karte.
+   Reihenfolge im DOM: Intro, Formular, Steps. Mobil ist das genau die sinnvolle Abfolge
+   (Headline und erste Felder in einem Scroll), auf Desktop stellt grid-template-areas die
+   gewohnte Anordnung her: links Intro + Steps, rechts das Formular. */
+
+.dd-setup { background: var(--surface-accent); color: var(--dd-ink); padding: var(--pad-section-y) var(--pad-page-x); }
+.dd-setup-grid { max-width: var(--measure-wide); margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: var(--space-8); align-items: start; }
+
+.dd-setup-kicker {
+  display: inline-block; padding: 4px 12px; border-radius: var(--radius-pill);
+  background: var(--dd-ink); color: var(--dd-lime);
+  font: var(--fw-medium) var(--fs-kicker)/1 var(--font-head); text-transform: uppercase; letter-spacing: var(--ls-kicker);
+}
+.dd-setup-headline { font: var(--text-h2); letter-spacing: var(--ls-heading); margin: var(--space-5) 0; max-width: 620px; text-wrap: balance; }
+.dd-setup-lead { font: var(--text-lead); margin: 0; max-width: 560px; text-wrap: pretty; }
+
+.dd-setup-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-5); }
+.dd-setup-step { display: grid; grid-template-columns: 40px 1fr; gap: var(--space-4); align-items: start; }
+.dd-setup-step-num {
+  display: grid; place-items: center; width: 40px; height: 40px; border-radius: var(--radius-pill);
+  background: var(--dd-ink); color: var(--dd-lime); font: var(--fw-bold) var(--fs-body)/var(--lh-body) var(--font-head);
+}
+.dd-setup-step-title { display: block; font: var(--fw-bold) 18px/var(--lh-body) var(--font-head); letter-spacing: var(--ls-heading); }
+.dd-setup-step-body { display: block; font: var(--fw-regular) 15px/var(--lh-body) var(--font-body); margin-top: var(--space-1); }
+
+/* ---------- Formular-Karte ---------- */
+.dd-setup-form { background: var(--surface-dark); color: var(--text-on-dark); border-radius: var(--radius-xl); padding: var(--space-8); }
+.dd-setup-form form { position: relative; margin: 0; }
+
+/* Honeypot: für Menschen unsichtbar, für Bots unwiderstehlich */
+.dd-setup-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; margin: 0; }
+
+.dd-setup-field { margin-bottom: var(--space-5); }
+.dd-setup-label {
+  display: block; margin-bottom: var(--space-2);
+  font: var(--fw-semibold) 15px/1.4 var(--font-body); color: var(--text-on-dark);
+}
+.dd-setup-req { color: var(--dd-lime); margin-left: 2px; }
+.dd-setup-input {
+  display: block; width: 100%; min-height: 48px; box-sizing: border-box; margin: 0;
+  padding: 12px 14px; resize: vertical;
+  font: var(--text-copy); color: var(--dd-ink); background: var(--dd-white);
+  border: 1px solid var(--dd-border); border-radius: var(--radius-lg);
+  -webkit-appearance: none; appearance: none;
+}
+textarea.dd-setup-input { min-height: 104px; }
+/* Klarer Lime-Ring auf Ink, außerhalb des weißen Felds (16:1 auf Ink) */
+.dd-setup-input:focus-visible { outline: 3px solid var(--dd-lime); outline-offset: 2px; }
+/* Fehler: violetter Innenrand im weißen Feld (6,6:1) plus Text und Icon darunter,
+   damit der Zustand nicht nur an der Farbe hängt */
+.dd-setup-input[aria-invalid="true"] { border-color: var(--dd-violet); box-shadow: inset 0 0 0 1px var(--dd-violet); }
+
+.dd-setup-error {
+  display: flex; align-items: flex-start; gap: var(--space-2); margin: var(--space-2) 0 0;
+  font: var(--fw-medium) 14px/1.45 var(--font-body); color: var(--text-on-dark);
+}
+.dd-setup-error svg { flex: 0 0 auto; width: 16px; height: 16px; margin-top: 2px; }
+
+.dd-setup-submit { margin-top: var(--space-6); }
+
+/* Vertrauen: die zwei Menschen, die antworten, direkt unter dem Button */
+.dd-setup-reassure { display: flex; align-items: center; justify-content: center; gap: var(--space-3); margin-top: var(--space-5); }
+.dd-setup-avatars { display: flex; flex: 0 0 auto; }
+.dd-setup-avatar {
+  display: block; width: 36px; height: 36px; box-sizing: border-box; overflow: hidden;
+  border-radius: var(--radius-round); border: 2px solid var(--surface-dark); background: var(--dd-border-dark);
+}
+.dd-setup-avatar img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+.dd-setup-avatar + .dd-setup-avatar { margin-left: -10px; }
+.dd-setup-avatar:first-child { position: relative; z-index: 1; }
+.dd-setup-reassure p { margin: 0; font: var(--text-caption); color: var(--text-on-dark-secondary); text-wrap: pretty; }
+
+@media (min-width: 900px) {
+  .dd-setup-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: "intro form" "steps form";
+    gap: var(--space-10) var(--space-16);
+  }
+  .dd-setup-intro { grid-area: intro; }
+  .dd-setup-steps { grid-area: steps; }
+  .dd-setup-formwrap { grid-area: form; }
+}
+
+@media (max-width: 720px) {
+  /* Reihenfolge mobil: Headline + Intro, Formular, Erklär-Steps */
+  .dd-setup-formwrap { order: 1; }
+  .dd-setup-steps { order: 2; gap: var(--space-3); }
+  .dd-setup-grid { gap: var(--space-6); }
+  .dd-setup-step { grid-template-columns: 26px 1fr; gap: var(--space-3); align-items: baseline; }
+  .dd-setup-step-num { width: 26px; height: 26px; font: var(--fw-bold) 13px/1 var(--font-head); }
+  .dd-setup-step-title { display: inline; font: var(--fw-bold) 15px/1.5 var(--font-head); }
+  .dd-setup-step-body { display: inline; font: var(--fw-regular) 15px/1.5 var(--font-body); margin-top: 0; opacity: 0.75; }
+  .dd-setup-step-title::after { content: " "; }
+  .dd-setup-form { padding: var(--space-5); }
+  .dd-setup-field { margin-bottom: var(--space-4); }
+  .dd-setup-input { padding: 11px 14px; }
+  textarea.dd-setup-input { min-height: 88px; }
+  .dd-setup-submit { margin-top: var(--space-5); }
+  .dd-setup-reassure { justify-content: flex-start; }
+}

@@ -1,0 +1,17 @@
+/* SectionHeading: Kicker + H2 + Lead. Rhythmus: Der Kicker hängt eng an der Überschrift
+   (er gehört zu ihr), der Lead etwas weiter, der Abstand zum Inhalt darunter ist deutlich
+   kleiner als der Abstand über dem Block (Section-Padding) — mehr Luft über als unter. */
+.dd-section-heading { margin-bottom: var(--space-12); }
+.dd-section-heading--center { text-align: center; }
+.dd-section-heading-kicker { margin-bottom: var(--space-4); }
+.dd-section-heading-title { font: var(--text-h2); letter-spacing: var(--ls-heading); margin: 0; color: var(--text-primary); }
+.dd-section-heading-lead { font: var(--text-lead); color: var(--text-secondary); max-width: var(--measure); margin: var(--space-5) 0 0; text-wrap: pretty; }
+.dd-section-heading--center .dd-section-heading-lead { margin-inline: auto; }
+.dd-section-heading--dark .dd-section-heading-title { color: var(--text-on-dark); }
+.dd-section-heading--dark .dd-section-heading-lead { color: var(--text-on-dark-secondary); }
+
+@media (max-width: 720px) {
+  .dd-section-heading { margin-bottom: var(--space-8); }
+  .dd-section-heading-kicker { margin-bottom: var(--space-3); }
+  .dd-section-heading-lead { margin-top: var(--space-4); }
+}

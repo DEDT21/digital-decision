@@ -1,0 +1,167 @@
+/* PhaseFlow: "Vom Chaos zu klaren Entscheidungen".
+   Das Layout hängt komplett an Media Queries, nicht an JS. Damit ist der erste Render (auch
+   vorgerendert) deterministisch, und JS steuert nur noch Fortschritt und Canvas.
+
+   Zwei Modi:
+   - Gepinnt (Standard, sobald Bewegung erlaubt ist und der Viewport mindestens 480px hoch ist):
+     ein hoher Wrapper mit einer sticky Bühne, das Scrollen scrubbt die Szene.
+   - Ruhig (prefers-reduced-motion oder sehr niedrige Viewports): nicht gepinnt, statischer
+     Endzustand, alle vier Phasen gleichzeitig lesbar. Das ist auch der Basiszustand dieser Datei;
+     der gepinnte Modus legt sich per Media Query darüber. */
+
+.dd-phase { background: var(--surface-dark); color: var(--text-on-dark); }
+
+/* ---------- Basis = ruhiger Modus ---------- */
+.dd-phase-stage {
+  display: flex; flex-direction: column; gap: var(--space-8);
+  padding: var(--pad-section-y) 0;
+  box-sizing: border-box;
+}
+.dd-phase-inner {
+  /* Padding liegt innerhalb der Box: max-width um das Padding erweitert, damit der Inhalt
+     exakt auf der Containerkante der übrigen Sektionen steht (1080px, bei 1440 auf x=180) */
+  width: 100%; max-width: calc(var(--measure-wide) + 2 * var(--pad-page-x)); margin: 0 auto;
+  padding: 0 var(--pad-page-x); box-sizing: border-box; flex: 0 0 auto;
+}
+.dd-phase-kicker {
+  font: var(--fw-medium) var(--fs-kicker)/1 var(--font-head);
+  text-transform: uppercase; letter-spacing: var(--ls-kicker); color: var(--dd-lime);
+}
+.dd-phase-titlerow {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--space-6); flex-wrap: wrap; margin-top: var(--space-5);
+}
+.dd-phase-title {
+  font: var(--text-h2); letter-spacing: var(--ls-heading);
+  color: var(--text-on-dark); margin: 0; max-width: var(--measure-headline); text-wrap: balance;
+}
+.dd-phase-lead {
+  font: var(--text-copy); color: var(--text-on-dark-secondary);
+  max-width: var(--measure); margin: var(--space-4) 0 0; text-wrap: pretty;
+}
+
+/* Fortschrittsanzeige gibt es nur im gepinnten Modus */
+.dd-phase-status {
+  display: none; align-items: center; gap: var(--space-3);
+  font: var(--text-caption); text-transform: uppercase; letter-spacing: var(--ls-kicker);
+  color: var(--text-on-dark-secondary);
+}
+.dd-phase-meter {
+  display: block; width: 96px; height: 4px; overflow: hidden;
+  border-radius: var(--radius-pill); background: var(--dd-border-dark);
+}
+.dd-phase-meter-fill {
+  display: block; width: 100%; height: 100%;
+  transform-origin: left center; transform: scaleX(0);
+  background: var(--dd-lime);
+}
+
+/* Canvas: randlos, ohne Karte. Im ruhigen Modus ein fester Streifen. */
+.dd-phase-canvas-wrap { display: flex; align-items: center; height: 200px; }
+.dd-phase-canvas, .dd-phase-fallback { display: block; width: 100%; height: 100%; }
+
+/* Phasen-Karten: im ruhigen Modus ist jede Phase voll lesbar */
+.dd-phase-cards {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: var(--gap-grid);
+}
+.dd-phase-card {
+  display: block; width: 100%; box-sizing: border-box;
+  text-align: left; background: transparent; color: var(--text-on-dark-secondary);
+  border: 0; border-top: 2px solid var(--dd-on-ink-muted); border-radius: 0;
+  padding: var(--space-4) 0 0; font: var(--text-copy);
+}
+.dd-phase-card-label {
+  display: block; margin-bottom: var(--space-2);
+  font: var(--fw-medium) 12px/1 var(--font-head); text-transform: uppercase; letter-spacing: var(--ls-kicker);
+}
+.dd-phase-card-title {
+  display: block; margin-bottom: var(--space-2); color: var(--text-on-dark);
+  font: var(--fw-bold) 20px/var(--lh-title) var(--font-head); letter-spacing: var(--ls-heading);
+  text-decoration-color: var(--dd-lime); text-underline-offset: 4px;
+}
+.dd-phase-card-body { display: block; font-size: 14px; line-height: 1.5; text-wrap: pretty; }
+
+/* Mobile Schritt-Marker + Text des aktiven Schritts: nur gepinnt auf schmalen Screens */
+.dd-phase-steps, .dd-phase-now { display: none; }
+
+@media (max-width: 720px) {
+  .dd-phase-canvas-wrap { height: 120px; }
+  .dd-phase-cards { grid-template-columns: 1fr; gap: var(--space-6); }
+}
+
+/* ---------- Gepinnter Modus ---------- */
+@media (prefers-reduced-motion: no-preference) and (min-height: 480px) {
+  .dd-phase-track { position: relative; height: var(--dd-phase-length, 220vh); }
+  .dd-phase-pin { position: sticky; top: 0; height: 100vh; }
+  .dd-phase-stage {
+    height: 100%; overflow: hidden; justify-content: space-between; gap: var(--space-6);
+    /* oben 84px Platz für den sticky Site-Header, damit Kicker und Fortschritt sichtbar bleiben */
+    padding: calc(84px + var(--space-6)) 0 var(--space-10);
+  }
+  .dd-phase-status { display: flex; }
+  .dd-phase-canvas-wrap { flex: 1 1 auto; height: auto; min-height: 140px; }
+
+  /* Zustände: offen = gedimmt, erledigt = hellere Linie, aktiv = Lime-Linie + weißer Text.
+     Gedimmt heißt hier Farb-Token statt Opacity: --text-on-dark-secondary liegt bei rund 10:1. */
+  .dd-phase-card {
+    cursor: pointer; border-top-color: var(--dd-border-dark);
+    transition: color 200ms var(--ease-out-strong), border-color 200ms var(--ease-out-strong), transform 160ms var(--ease-out-strong);
+  }
+  .dd-phase-card-title { color: inherit; }
+  .dd-phase-card[data-state="past"] { border-top-color: var(--dd-on-ink-muted); }
+  .dd-phase-card[aria-current="step"] { color: var(--text-on-dark); border-top-color: var(--dd-lime); }
+  .dd-phase-card[aria-current="step"] .dd-phase-card-label { color: var(--dd-lime); }
+  .dd-phase-card:active { transform: scale(var(--press-scale)); }
+}
+@media (prefers-reduced-motion: no-preference) and (min-height: 480px) and (hover: hover) and (pointer: fine) {
+  .dd-phase-card:not([aria-current]):hover .dd-phase-card-title { text-decoration-line: underline; }
+}
+
+/* Niedrige Viewports: Lead weg, engerer Rhythmus, Text nur beim aktiven Schritt,
+   damit die ganze Szene auf einen Bildschirm passt. */
+@media (prefers-reduced-motion: no-preference) and (min-height: 480px) and (max-height: 719px) {
+  .dd-phase-stage { gap: var(--space-4); padding: calc(84px + var(--space-3)) 0 var(--space-6); }
+  .dd-phase-title { font-size: var(--fs-h2-sm); }
+  .dd-phase-titlerow { margin-top: var(--space-3); }
+  .dd-phase-lead { display: none; }
+  .dd-phase-card:not([aria-current]) .dd-phase-card-body { display: none; }
+}
+
+/* Gepinnt auf dem Handy: kürzere Scroll-Strecke, Schritt-Marker statt vier Karten.
+   Vier Karten nebeneinander wären unlesbar oder liefen aus der Bühne. */
+@media (prefers-reduced-motion: no-preference) and (min-height: 480px) and (max-width: 720px) {
+  .dd-phase-track { height: 180vh; height: 180svh; }
+  .dd-phase-pin { height: 100vh; height: 100svh; }
+  .dd-phase-canvas-wrap { min-height: 96px; }
+  .dd-phase-cards { display: none; }
+
+  .dd-phase-steps {
+    display: grid; grid-template-columns: repeat(var(--dd-phase-count, 4), 1fr); gap: var(--space-2);
+    list-style: none; margin: 0; padding: 0;
+  }
+  .dd-phase-step {
+    display: block; width: 100%; min-height: 44px; box-sizing: border-box; cursor: pointer;
+    text-align: left; background: transparent; color: var(--text-on-dark-secondary);
+    border: 0; border-top: 2px solid var(--dd-border-dark); border-radius: 0;
+    padding: var(--space-3) 0 0;
+    font: var(--fw-medium) 12px/1 var(--font-head); text-transform: uppercase; letter-spacing: var(--ls-kicker);
+    transition: color 200ms var(--ease-out-strong), border-color 200ms var(--ease-out-strong);
+  }
+  .dd-phase-step[data-state="past"] { border-top-color: var(--dd-on-ink-muted); }
+  .dd-phase-step[aria-current="step"] { color: var(--dd-lime); border-top-color: var(--dd-lime); }
+
+  /* Alle Texte liegen in derselben Grid-Zelle übereinander: Die Höhe ist automatisch die
+     des längsten Textes, nichts wird abgeschnitten, und der Wechsel ist ein Crossfade. */
+  .dd-phase-now { display: grid; margin-top: var(--space-4); }
+  .dd-phase-now-item {
+    grid-area: 1 / 1; opacity: 0; transform: translateY(10px); pointer-events: none;
+    transition: opacity 260ms var(--ease-out), transform 300ms var(--ease-out);
+  }
+  .dd-phase-now-item[data-active="1"] { opacity: 1; transform: none; }
+  .dd-phase-now-title {
+    margin: 0 0 var(--space-2); color: var(--text-on-dark);
+    font: var(--fw-bold) 20px/var(--lh-title) var(--font-head); letter-spacing: var(--ls-heading);
+  }
+  .dd-phase-now-body { margin: 0; font-size: 14px; line-height: 1.5; color: var(--text-on-dark-secondary); text-wrap: pretty; }
+}

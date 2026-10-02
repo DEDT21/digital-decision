@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de-AT">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Seite nicht gefunden — digital decision</title>
+  <title>Seite nicht gefunden | digital decision</title>
   <meta name="description" content="Diese Seite gibt es nicht (mehr).">
+  <!-- Kein canonical: Netlify liefert diese Seite unter jeder unbekannten URL mit Status 404 aus. -->
   <meta name="robots" content="noindex">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
@@ -12,14 +13,16 @@
   <script type="module" src="/src/static.js"></script>
 </head>
 <body>
-  <div class="ink-scene">
+  <a class="dd-skip" href="#main">Zum Inhalt springen</a>
+
+  <div class="ink-scene dd-on-dark">
     <header class="page-header">
       <div class="inner">
-        <a href="/" aria-label="digital decision — Startseite"><img src="/assets/dd-mark-lime.svg" alt="digital decision"></a>
+        <a class="logo" href="/" aria-label="digital decision, zur Startseite"><img src="/assets/dd-mark-lime.svg" alt="digital decision" width="42" height="44"></a>
       </div>
     </header>
-    <main class="content">
-      <div class="kicker">404</div>
+    <main id="main" class="content" tabindex="-1">
+      <p class="kicker">404</p>
       <h1>Falsche Entscheidung.<br><span class="lime">Passiert.</span></h1>
       <p class="lead">Diese Seite gibt es nicht. Oder nicht mehr. Die gute Nachricht: Die nächste Entscheidung ist nur einen Klick entfernt.</p>
       <div class="actions">
@@ -27,7 +30,13 @@
         <a class="btn-ghost" href="/#setup-check">Setup-Check anfragen</a>
       </div>
     </main>
-    <div class="legal-line">digital decision GmbH · FN 461176a · ATU71568207</div>
+    <footer class="legal-line">
+      <span>digital decision GmbH · FN 461176a · ATU71568207</span>
+      <nav aria-label="Rechtliches">
+        <a href="/impressum/">Impressum</a>
+        <a href="/datenschutz/">Datenschutz</a>
+      </nav>
+    </footer>
   </div>
 </body>
 </html>

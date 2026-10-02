@@ -1,0 +1,37 @@
+/* WordRotator: alle Wörter liegen gestapelt in EINER Grid-Zelle. Das Grid wird so breit und
+   hoch wie das größte Wort, die Zeile springt also nie, und es braucht kein Mess-Element.
+   Die Wörter stehen als CSS-Content (data-word) im DOM: Der Rotator ist rein visuell
+   (aria-hidden), Screenreader und Crawler lesen den Satz aus dem sr-only-Text der H1. */
+.dd-rotator {
+  display: inline-grid;
+  vertical-align: bottom;
+  max-width: 100%;
+  overflow: hidden;
+}
+.dd-rotator-word {
+  grid-area: 1 / 1;
+  white-space: nowrap;
+  transition: transform 520ms var(--ease-out-strong), opacity 240ms var(--ease-standard);
+}
+.dd-rotator-word::before { content: attr(data-word); }
+
+.dd-rotator-word[data-pos="current"] { transform: none; opacity: 1; }
+.dd-rotator-word[data-pos="before"] { transform: translateY(-118%); opacity: 0; }
+.dd-rotator-word[data-pos="after"] { transform: translateY(118%); opacity: 0; }
+
+.dd-rotator--lime { color: var(--dd-lime); }
+.dd-rotator--ink { color: var(--dd-ink); }
+.dd-rotator--white { color: var(--dd-white); }
+
+/* Ohne Bewegung: statisch das letzte Wort, ab dem ersten Frame (kein JS nötig). */
+@media (prefers-reduced-motion: reduce) {
+  .dd-rotator-word,
+  .dd-rotator-word[data-pos] { transition: none; transform: none; opacity: 0; }
+  .dd-rotator-word:last-child { opacity: 1; }
+}
+
+@media (max-width: 720px) {
+  /* Auf schmalen Screens darf ein Wort, das breiter als der Viewport ist, umbrechen,
+     statt die Seite horizontal aufzuziehen. */
+  .dd-rotator-word { white-space: normal; overflow-wrap: break-word; }
+}

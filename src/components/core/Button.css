@@ -1,0 +1,72 @@
+/* Button: Pill in drei Varianten (primary / secondary / ghostDark) und vier Größen.
+   Statisch statt zur Laufzeit injiziert, damit der erste Frame (und das Prerendering)
+   die finalen Maße kennt. Größen: sm 40px, nav 44px (Touch-Target), md 48px, lg 56px. */
+
+.dd-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  font: var(--text-button); text-decoration: none; white-space: nowrap;
+  border-radius: var(--radius-pill); border: 1px solid transparent;
+  cursor: pointer; transition: var(--transition-interactive);
+  -webkit-tap-highlight-color: transparent;
+}
+.dd-btn:active { transform: scale(var(--press-scale)); }
+.dd-btn[disabled], .dd-btn[aria-disabled="true"] { opacity: 0.4; pointer-events: none; }
+
+/* Varianten. Die Farben werden auch für a:hover festgehalten, sonst greift die globale
+   Link-Regel (a:hover → Ink) und färbt die Beschriftung von Link-Buttons um. */
+.dd-btn--primary, .dd-btn--primary:hover { background: var(--action-primary-bg); color: var(--action-primary-fg); }
+.dd-btn--secondary, .dd-btn--secondary:hover { background: transparent; color: var(--action-secondary-fg); border-color: var(--dd-ink); font-weight: var(--fw-medium); }
+.dd-btn--ghostDark, .dd-btn--ghostDark:hover { background: transparent; color: var(--dd-white); border-color: var(--dd-border-dark); font-weight: var(--fw-medium); }
+
+@media (hover: hover) {
+  .dd-btn--secondary:hover { background: var(--dd-ink); color: var(--dd-white); }
+  .dd-btn--ghostDark:hover { border-color: var(--text-on-dark-secondary); }
+}
+
+/* Größen ohne Pfeil */
+.dd-btn--sm { padding: 10px 20px; font-size: 14px; }
+.dd-btn--nav { padding: 0 20px; min-height: 44px; font-size: 14px; }
+.dd-btn--md { padding: 14px 28px; font-size: var(--fs-body); }
+.dd-btn--lg { padding: 18px 36px; font-size: var(--fs-lead); }
+
+/* Arrow-CTA: Pill mit rundem Ink-Badge, das beim Hover von rechts nach links wandert,
+   während der Pfeil sich um 45° dreht (↗ wird →). Die Seitenabstände des Labels tauschen
+   in denselben 500ms, die Breite bleibt also stabil. Geometrie je Größe:
+   Badge = Höhe − 8 (4px Inset rundum), ferne Seite = Badge + Inset + Textabstand. */
+.dd-btn-arrow {
+  position: relative; overflow: hidden;
+  height: var(--btn-h); padding: 0 var(--btn-pe) 0 var(--btn-ps);
+  transition: padding 500ms var(--ease-out-strong), background-color 160ms var(--ease-out-strong),
+              color 160ms var(--ease-out-strong), transform var(--dur-fast) var(--ease-standard);
+}
+.dd-btn-arrow.dd-btn--sm  { --btn-h: 40px; --btn-circle: 32px; --btn-ps: 18px; --btn-pe: 46px; }
+.dd-btn-arrow.dd-btn--nav { --btn-h: 44px; --btn-circle: 36px; --btn-ps: 20px; --btn-pe: 50px; }
+.dd-btn-arrow.dd-btn--md  { --btn-h: 48px; --btn-circle: 40px; --btn-ps: 24px; --btn-pe: 56px; }
+.dd-btn-arrow.dd-btn--lg  { --btn-h: 56px; --btn-circle: 48px; --btn-ps: 28px; --btn-pe: 66px; }
+
+.dd-btn-arrow-label { position: relative; z-index: 1; }
+.dd-btn-arrow-circle {
+  position: absolute; z-index: 0; right: 4px; top: 50%;
+  width: var(--btn-circle); height: var(--btn-circle); margin-top: calc(var(--btn-circle) / -2);
+  border-radius: var(--radius-round); background: var(--dd-ink); color: var(--dd-lime);
+  display: grid; place-items: center;
+  transition: right 500ms var(--ease-out-strong), transform 500ms var(--ease-out-strong);
+}
+.dd-btn-arrow-circle svg { display: block; }
+
+/* Hover nur auf Geräten mit echtem Hover (sonst bleibt der Zustand nach einem Tap kleben),
+   Tastaturfokus bekommt dieselbe Bewegung. */
+@media (hover: hover) {
+  .dd-btn-arrow:hover { padding: 0 var(--btn-ps) 0 var(--btn-pe); }
+  .dd-btn-arrow:hover .dd-btn-arrow-circle { right: calc(100% - var(--btn-circle) - 4px); transform: rotate(45deg); }
+}
+.dd-btn-arrow:focus-visible { padding: 0 var(--btn-ps) 0 var(--btn-pe); }
+.dd-btn-arrow:focus-visible .dd-btn-arrow-circle { right: calc(100% - var(--btn-circle) - 4px); transform: rotate(45deg); }
+
+@media (prefers-reduced-motion: reduce) {
+  .dd-btn, .dd-btn-arrow, .dd-btn-arrow-circle { transition: none; }
+  .dd-btn:active { transform: none; }
+  .dd-btn-arrow:hover, .dd-btn-arrow:focus-visible { padding: 0 var(--btn-pe) 0 var(--btn-ps); }
+  .dd-btn-arrow:hover .dd-btn-arrow-circle,
+  .dd-btn-arrow:focus-visible .dd-btn-arrow-circle { right: 4px; transform: none; }
+}

@@ -1,0 +1,22 @@
+/* Shell: Sticky-Header, Hauptbereich, Sprungziele. */
+
+/* Sprungmarken und Fokus-Scrolling landen unter dem Sticky-Header, nicht dahinter. */
+html { scroll-padding-top: 84px; }
+
+/* Transparent, solange der Hero darunter liegt, danach Ink (Umschaltung per
+   IntersectionObserver in App.jsx). Auf dem Hero liegt hinter dem Header die Aurora-Fläche. */
+.dd-header {
+  position: sticky; top: 0; z-index: 10;
+  background-color: transparent;
+  transition: background-color 200ms var(--ease-out-strong);
+}
+.dd-header[data-solid] { background-color: var(--surface-dark); }
+
+/* main und programmatisch fokussierte Sprungziele (Sektionen) bekommen den Fokus nur, damit
+   der nächste Tab-Schritt dort weitergeht. Sie sind keine Bedienelemente: kein Ring. */
+#main:focus,
+[data-dd-focus-target]:focus { outline: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .dd-header { transition: none; }
+}

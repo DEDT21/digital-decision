@@ -1,0 +1,201 @@
+/* CaseGrid: Referenzen auf Ink.
+   ≥1024px: Feature-Karte (Case mit Kennzahl) über die volle Breite, zweispaltig innen; darunter
+   die übrigen Cases nebeneinander. 721–1023px: Feature-Karte einspaltig, Rest zweispaltig.
+   ≤720px: alles gestapelt. Karten ohne Schatten, 1px-Rand, Radius 16px. */
+
+.dd-cases {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--gap-grid);
+  align-items: stretch;
+}
+
+/* Ohne Feature-Case: so viele gleich breite Spalten, wie sinnvoll Platz haben */
+.dd-cases--plain { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+
+.dd-case {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-8);
+  background: var(--surface-dark);
+  color: var(--text-on-dark);
+  border: var(--border-on-dark);
+  border-radius: var(--radius-xl);
+}
+
+/* ---------- Kopf: Logo links, Name + Branche rechts ---------- */
+
+.dd-case-head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    "logo name"
+    "logo industry";
+  align-items: center;
+  column-gap: var(--space-6);
+  row-gap: 2px;
+  padding-bottom: var(--space-5);
+  border-bottom: var(--border-on-dark);
+}
+
+.dd-case-logo {
+  grid-area: logo;
+  display: block;
+  width: auto;
+  height: var(--logo-h, 28px);
+  max-width: 160px;
+  object-fit: contain;
+  object-position: left center;
+  /* Logos sind transparent hinterlegt und werden wie in der Logo-Marquee weiß gerendert */
+  filter: brightness(0) invert(1);
+}
+
+.dd-case-name {
+  grid-area: name;
+  align-self: end;
+  margin: 0;
+  text-align: right;
+  font-family: var(--font-head);
+  font-weight: var(--fw-medium);
+  font-size: var(--fs-body);
+  line-height: var(--lh-title);
+  letter-spacing: var(--ls-heading);
+  color: var(--text-on-dark);
+}
+
+.dd-case-industry {
+  grid-area: industry;
+  align-self: start;
+  margin: 0;
+  text-align: right;
+  font: var(--text-caption);
+  color: var(--text-on-dark-secondary);
+  text-wrap: pretty;
+}
+
+/* ---------- Inhalt ---------- */
+
+.dd-case-result {
+  margin: var(--space-6) 0 0;
+  font-family: var(--font-head);
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-h3);
+  line-height: 1.2;
+  letter-spacing: var(--ls-heading);
+  color: var(--text-on-dark);
+  text-wrap: balance;
+}
+
+.dd-case-body {
+  max-width: 62ch;
+  margin: var(--space-3) 0 0;
+  font: var(--text-copy);
+  color: var(--text-on-dark-secondary);
+  text-wrap: pretty;
+}
+
+.dd-case-tags {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: auto 0 0;
+  padding: var(--space-6) 0 0;
+}
+
+.dd-case-tag {
+  padding: 4px 12px;
+  font: var(--text-caption);
+  color: var(--text-on-dark-secondary);
+  border: var(--border-on-dark);
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+/* ---------- Feature-Karte ---------- */
+
+.dd-case--feature {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  padding: 0;
+}
+
+.dd-case-stat {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-10);
+  border-right: var(--border-on-dark);
+}
+
+.dd-case-statnum {
+  display: block;
+  font-family: var(--font-head);
+  font-weight: var(--fw-bold);
+  font-size: clamp(64px, 7.2vw, 96px);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  color: var(--text-accent-on-dark);
+  white-space: nowrap;
+  /* optischer Randausgleich: das "+" hat breite Vorbreite und stünde sonst eingerückt */
+  margin-left: -0.05em;
+}
+
+.dd-case-statlabel {
+  display: block;
+  max-width: 22ch;
+  font: var(--text-copy);
+  color: var(--text-on-dark-secondary);
+  text-wrap: balance;
+}
+
+.dd-case-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-10);
+}
+
+.dd-case--feature .dd-case-result { font-size: var(--fs-h2-sm); }
+
+/* ---------- Tablet ---------- */
+
+@media (max-width: 1023px) {
+  .dd-case--feature { grid-template-columns: minmax(0, 1fr); }
+  .dd-case-stat {
+    padding: var(--space-8) var(--space-8) var(--space-6);
+    border-right: 0;
+    border-bottom: var(--border-on-dark);
+  }
+  .dd-case-main { padding: var(--space-6) var(--space-8) var(--space-8); }
+  .dd-case--feature .dd-case-result { font-size: var(--fs-h3); }
+}
+
+/* ---------- Mobil ---------- */
+
+@media (max-width: 720px) {
+  .dd-cases,
+  .dd-cases--plain { grid-template-columns: minmax(0, 1fr); }
+  .dd-case { padding: var(--pad-card); }
+  .dd-case--feature { padding: 0; }
+  .dd-case-stat { padding: var(--pad-card) var(--pad-card) var(--space-5); }
+  .dd-case-main { padding: var(--space-5) var(--pad-card) var(--pad-card); }
+  .dd-case-statnum { font-size: clamp(56px, 17vw, 72px); }
+  /* Kopf mobil: Logo und Name in einer Zeile, Branche darunter linksbündig über die volle
+     Breite, statt rechts in einer schmalen Spalte umzubrechen */
+  .dd-case-head {
+    grid-template-areas:
+      "logo name"
+      "industry industry";
+    column-gap: var(--space-4);
+    row-gap: var(--space-3);
+  }
+  .dd-case-name { align-self: center; }
+  .dd-case-industry { text-align: left; }
+  .dd-case-result,
+  .dd-case--feature .dd-case-result { font-size: calc(var(--fs-body) * 1.25); line-height: 1.25; }
+}

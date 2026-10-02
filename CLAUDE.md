@@ -14,6 +14,7 @@ Digital Decision ist eine E-Commerce-Agentur: Shops & Relaunches, Performance Ma
 - **Kein Tailwind, kein CSS-Framework** — eigenes CSS mit Custom Properties (Design Tokens), Komponenten stylen inline über `style={{ ... }}` mit CSS-Variablen
 - **Fonts**: Space Grotesk (Headlines) + Inter (Body). Bezogen über `@fontsource` (nur devDependency), aber **self-hosted als woff2 in `public/fonts/`** — kein Google-Fonts-CDN (DSGVO). Kein Tracking, keine Cookies, kein Cookie-Banner.
 - **Deploy**: Netlify, Build `npm run build`, Publish `dist/` (siehe `netlify.toml`)
+- **Prerendering**: `npm run build` baut zusätzlich ein SSR-Bundle (`src/entry-server.jsx` → `dist-ssr/`) und füllt mit `scripts/prerender.mjs` das `#root` in `dist/index.html` mit fertigem HTML. Der Browser hydriert nur noch (`hydrateRoot` in `src/main.jsx`). Crawler und KI-Bots sehen damit den kompletten Seitentext.
 
 ```bash
 npm install
@@ -45,14 +46,14 @@ Das Netlify-Formular `setup-check` liegt an **zwei** Stellen:
 
 | Datei | Rolle |
 |---|---|
-| `src/components/sections/SetupCheck.jsx` | die echte React-Version, die der Nutzer sieht |
-| `index.html` | versteckter statischer Spiegel (`<form ... hidden>`), damit der Netlify-Build-Bot das Formular überhaupt registriert |
+| `src/components/sections/SetupCheck.jsx` | die echte React-Version, die der Nutzer sieht. **Ohne** `data-netlify`-Attribute (sie wird vorgerendert; Netlify würde das HTML sonst umschreiben und die Hydration stören) |
+| `index.html` | versteckter statischer Spiegel (`<form ... hidden>` mit `data-netlify` + `netlify-honeypot`): **die** Registrierung des Formulars bei Netlify |
 
-**Feldnamen müssen in BEIDEN Dateien identisch bleiben:** `name`, `email`, `shop`, `message` sowie der Honeypot `bot-field`. Ebenso Formularname `setup-check` und `action="/danke"`.
+**Feldnamen müssen in BEIDEN Dateien identisch bleiben:** `name`, `email`, `shop`, `message` sowie der Honeypot `bot-field`. Ebenso Formularname `setup-check` und `action="/danke/"` (mit Slash, sonst 301).
 
 Wenn du ein Feld hinzufügst, umbenennst oder entfernst: **beide Dateien ändern.** Sonst kommen Submissions unvollständig oder gar nicht an — und das fällt erst live auf.
 
-Dazu gehört die Netlify Function **`netlify/functions/submission-created.mjs`**: sie feuert automatisch bei jeder *verifizierten* Submission und schickt eine Push-Notification über **ntfy.sh**. Der Topic-Name ist das Geheimnis und liegt in der Env-Variable `NTFY_TOPIC` (Netlify UI → Environment variables), nicht im Repo. Ohne die Variable ist die Function ein stiller No-Op, die Submission wird trotzdem gespeichert. Die Function liest genau die Felder `name`, `email`, `shop`, `message` — also **auch hier nachziehen**, wenn Feldnamen sich ändern. Functions-Verzeichnis ist in `netlify.toml` gesetzt.
+Dazu gehört die Netlify Function **`netlify/functions/submission-created.mjs`**: sie feuert automatisch bei jeder *verifizierten* Submission und schickt eine Push-Notification über **ntfy.sh**. Der Topic-Name ist das Geheimnis und liegt in der Env-Variable `NTFY_TOPIC` (Netlify UI → Environment variables), nicht im Repo. Ohne die Variable ist die Function ein stiller No-Op, die Submission wird trotzdem gespeichert. **Die Push enthält bewusst keine Personendaten** (ntfy.sh ist ein öffentlicher Dienst und steht nicht in der Datenschutzerklärung), nur den Hinweis auf eine neue Anfrage. Details stehen im Netlify-Dashboard unter Forms. Functions-Verzeichnis ist in `netlify.toml` gesetzt.
 
 ---
 
@@ -96,7 +97,9 @@ netlify/functions/          submission-created.mjs
 public/                     fonts/, assets/, Favicons, og-image.png, robots.txt, sitemap.xml
 ```
 
-**`src/Home.jsx`** ist die Hauptseite. Die komplette Copy liegt als Daten-Arrays am **Dateianfang** (`ROTATOR`, `TRUST`, `TARGETS`, `DIFFERENCE`, `CASES`, `PHASES`, `SETUP_STEPS`, `TEAM`, `NETWORK`, `NETWORK_FACES`, `MANIFEST`, `FAQS`). Textänderungen passieren dort, nicht im JSX.
+**`src/Home.jsx`** ist die Hauptseite. Die komplette Copy liegt als Daten-Arrays am **Dateianfang** (`ROTATOR`, `HERO_OFFER`, `HERO_FACES`, `TRUST`, `DIFFERENCE`, `CASES`, `PHASES`, `SETUP_STEPS`, `TEAM`, `NETWORK`, `NETWORK_FACES`, `MANIFEST`, `FAQS`). Textänderungen passieren dort, nicht im JSX.
+
+**`FAQS` ist zusätzlich wörtlich als FAQPage-JSON-LD in `index.html` gespiegelt.** `scripts/prerender.mjs` bricht den Build ab, wenn beide nicht übereinstimmen. FAQ-Text also immer an beiden Stellen ändern.
 
 **Sektionen in `src/components/sections/`:**
 
@@ -104,10 +107,12 @@ public/                     fonts/, assets/, Favicons, og-image.png, robots.txt,
 |---|---|
 | `Section.jsx` | **Basis-Baustein**: Wrapper mit Padding + Maxwidth, Tones `paper` / `white` / `ink` |
 | `SectionHeading.jsx` | **Basis-Baustein**: Kicker + H2 + Lead, Tones `light` / `dark` |
-| `Aurora.jsx` | Hintergrund-Effekt im Hero |
+| `HeroOffer.jsx` | Setup-Check-Karte rechts im Hero (mobil: kompakter Avatar-Streifen) |
+| `Aurora.jsx` | Hintergrund-Effekt im Hero und Footer (pausiert außerhalb des Viewports) |
 | `LogoMarquee.jsx` | laufende Kundenlogos |
 | `CaseGrid.jsx` | Case Studies |
-| `UseCaseSteps.jsx` | Leistungen / Use Cases |
+| `ServiceBadges.jsx` | Leistungen: 7 Sticker-Badges mit Popup (Inhalte immer im DOM, für SEO) |
+| `UseCaseSteps.jsx` | **ungenutzt** (durch ServiceBadges ersetzt) |
 | `PhaseFlow.jsx` | Chaos → Sortieren → Klarheit → Vorsprung |
 | `TeamStructure.jsx` | Team & Partnernetzwerk |
 | `ManifestList.jsx` | Manifest-Punkte |
@@ -115,7 +120,21 @@ public/                     fonts/, assets/, Favicons, og-image.png, robots.txt,
 | `SetupCheck.jsx` | Kontaktformular (siehe KRITISCH 2) |
 | `SiteFooter.jsx` | Footer |
 
-**Neue Sektionen bauen immer auf `Section.jsx` + `SectionHeading.jsx` auf** — nicht eigene Wrapper mit eigenem Padding erfinden.
+**Neue Sektionen bauen immer auf `Section.jsx` + `SectionHeading.jsx` auf** — nicht eigene Wrapper mit eigenem Padding erfinden. Inhaltskante ist überall dieselbe (1440px-Viewport: x = 180).
+
+## KRITISCH 3: Prerendering, Hydration, CSP
+
+Weil die Seite vorgerendert und dann hydriert wird, gelten für **jede** Komponente:
+
+- **Kein `window`/`document`/`matchMedia`/`ResizeObserver` im Render oder in `useState`-Initialisierern.** Der erste Render muss auf Server und Client identisch sein. Responsives Layout per CSS-Media-Query, Client-Anpassungen nur in `useEffect`. Für Layout-Effekte: `typeof window !== 'undefined' ? useLayoutEffect : useEffect`.
+- **Keine Runtime-CSS-Injection** (`document.createElement('style')`). Styles liegen als `.css`-Datei neben der Komponente und werden per `import './X.css'` eingebunden.
+- **CSP** (in `netlify.toml`): `script-src 'self'` plus SHA-256-Hash für das eine Inline-Script im `<head>` von `index.html` (setzt die Scroll-Reveal-Klasse vor dem ersten Paint). **Wer ein Inline-Script ändert oder hinzufügt, muss den Hash in `netlify.toml` nachziehen**, sonst blockiert der Browser es. `scripts/prerender.mjs` prüft das und bricht den Build ab. Netlify-Deploy-Previews blenden ihr Feedback-Drawer-Script dadurch nicht ein (Production nicht betroffen).
+- **Endlos-Animationen** (Marquee, Aurora, WebGL, Rotator) pausieren außerhalb des Viewports und respektieren `prefers-reduced-motion`. Laufbänder haben einen Pause-Button (WCAG 2.2.2).
+- **Fokus:** auf dunklen Flächen ist der Fokusring Lime (`.dd-on-dark` bzw. Section `tone="ink"`), sonst Violet.
+
+**Caching:** Vite legt gehashte Bundles unter `/static/` ab (immutable). Dateien aus `public/assets/` sind nicht gehasht und werden nur 1 Tag gecacht. Ein getauschtes Bild unter gleichem Namen ist also spätestens nach einem Tag überall aktuell.
+
+**Teamfotos:** `public/assets/team/<name>.webp` (Original 900px) plus `-400`/`-800` (srcset Team-Karten) und `-avatar` (quadratischer Gesichts-Crop 160px für Hero und Setup-Check).
 
 ## Scripts (`scripts/`)
 
@@ -140,8 +159,8 @@ Beide sind **Einmal-Pipelines**, ihre Outputs sind eingecheckt. Sie laufen **nic
 5. Änderungen am Formular, an Tokens oder an Deploy-Konfiguration (`netlify.toml`, `vite.config.js`) immer kurz begründen und David gegenlesen lassen.
 6. `dist/` ist gitignored — nie committen.
 
-## Offene Punkte (Stand README)
+## Offene Punkte (Stand 02.10.2026)
 
-- Aqmos-Case "+50 % Monatsumsatz" braucht Kundenfreigabe
 - Impressum/Datenschutz mit WKO-Generator gegenchecken (kein Rechtsrat)
-- Netlify: Custom Domain + Forms-Notification einrichten
+- Regionen im Footer sind reiner Text. Echte SEO-Wirkung bräuchte eigene Landingpages pro Begriff
+- Ungenutzt im Repo: `UseCaseSteps.jsx`, `core/Card.jsx`, `core/Highlight.jsx`, `public/assets/team/lina-hoepflinger.webp`

@@ -1,0 +1,27 @@
+/* Kicker: kleine Versal-Zeile über Überschriften (Marken-Element). */
+.dd-kicker {
+  display: inline-block;
+  font: var(--text-kicker);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-kicker);
+}
+
+/* Lime-Textmarker hinter der unteren Schrifthälfte, Ink-Schrift (auf hellen Flächen) */
+.dd-kicker--mark { color: var(--dd-ink); background: linear-gradient(transparent 58%, var(--dd-lime) 58%); }
+.dd-kicker--pill { color: var(--dd-ink); background: var(--surface-accent); padding: 4px 12px; border-radius: var(--radius-pill); }
+.dd-kicker--limeText { color: var(--dd-lime); }
+.dd-kicker--inkPill { color: var(--dd-lime); background: var(--dd-ink); padding: 4px 12px; border-radius: var(--radius-pill); }
+.dd-kicker--plain { color: var(--text-secondary); }
+
+/* Weiße Versalien mit Lime-Strich auf Ink. Der Strich liegt vollständig UNTER der
+   Grundlinie: Versalien haben keine Unterlängen, mit 0.32em Abstand berührt er keinen
+   Buchstaben mehr (vorher lief ein Hintergrund-Balken quer durch die unteren Buchstabenteile). */
+.dd-kicker--underline {
+  color: var(--dd-white);
+  text-decoration-line: underline;
+  text-decoration-color: var(--dd-lime);
+  text-decoration-thickness: 3px;
+  text-underline-offset: 0.32em;
+  text-decoration-skip-ink: none;
+  padding-bottom: 0.4em;
+}

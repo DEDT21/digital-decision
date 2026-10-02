@@ -1,0 +1,157 @@
+/* Team: "Du redest mit denen, die entscheiden."
+   Desktop ab 1024px: drei gleich breite Spalten, [Person][Person][Netzwerk-Karte].
+   720 bis 1023px: Personen zweispaltig, Netzwerk volle Breite darunter.
+   Mobil: gestapelt, Personen als kompakte Querformat-Karten (Bild links, Text rechts). */
+
+.dd-team-grid { display: grid; grid-template-columns: 1fr; gap: var(--gap-grid); }
+
+/* ---------- Personen ---------- */
+.dd-person {
+  display: flex; flex-direction: column; overflow: hidden;
+  background: var(--surface-card); border: var(--border-default); border-radius: var(--radius-xl);
+}
+/* Bild absolut im Medien-Rahmen: Es trägt so nie zur Zeilenhöhe bei (auch nicht in der
+   mobilen Querformat-Karte, wo die Höhe aus dem Text kommt). */
+.dd-person-media { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: var(--surface-dark); }
+.dd-person-media img {
+  position: absolute; inset: 0; width: 100%; height: 100%; display: block;
+  object-fit: cover; object-position: center top;
+  filter: grayscale(1) contrast(1.05);
+  transition: filter var(--dur-slow) var(--ease-out), transform var(--dur-slow) var(--ease-out);
+}
+.dd-person[data-open="1"] .dd-person-media img { filter: none; transform: scale(1.03); }
+.dd-person-media .dd-person-mark { inset: auto; top: 50%; left: 50%; width: 34%; height: auto; transform: translate(-50%, -50%); opacity: 0.3; filter: none; }
+.dd-person-tag {
+  position: absolute; left: var(--space-4); bottom: var(--space-4);
+  font: var(--fw-medium) 13px/1 var(--font-head); text-transform: uppercase; letter-spacing: var(--ls-kicker); color: var(--dd-lime);
+}
+
+.dd-person-body { flex: 1; display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-6); }
+.dd-person-name { margin: 0; font: var(--fw-bold) 25px/var(--lh-title) var(--font-head); letter-spacing: var(--ls-heading); }
+/* Lime-Marker zieht beim Aufklappen unter den Namen */
+.dd-person-name span {
+  background: var(--highlight-mark) no-repeat 0 0 / 0% 100%;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+  transition: background-size var(--dur-slow) var(--ease-out);
+}
+.dd-person[data-open="1"] .dd-person-name span { background-size: 100% 100%; }
+.dd-person-role { margin: 0; font: var(--fw-regular) 14px/var(--lh-body) var(--font-body); color: var(--text-secondary); }
+.dd-person-line { margin: var(--space-2) 0 0; font: var(--text-copy); text-wrap: pretty; }
+.dd-person-bio { margin: var(--space-3) 0 0; font: var(--fw-regular) 14px/var(--lh-body) var(--font-body); color: var(--text-secondary); text-wrap: pretty; }
+
+/* Aufklappbarer Teil. Geschlossen trägt er das hidden-Attribut (nicht fokussierbar, nicht im
+   A11y-Tree); max-height und opacity setzt der Layout-Effect nur während der Animation.
+   Bewusst max-height statt grid-template-rows 0fr: WebKit interpoliert 0fr beim Schließen
+   nicht zurück, die Karte bliebe aufgeklappt stehen. */
+.dd-person-panel { overflow: hidden; transition: max-height var(--dur-slow) var(--ease-out), opacity var(--dur-base) var(--ease-standard); }
+.dd-person-panel-inner { padding-top: var(--space-4); }
+.dd-person-callfor-title {
+  margin: 0 0 var(--space-2);
+  font: var(--text-caption); text-transform: uppercase; letter-spacing: var(--ls-tag); color: var(--text-secondary);
+}
+.dd-person-callfor { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-1); }
+.dd-person-callfor li { display: flex; gap: var(--space-3); font: var(--fw-regular) 14px/var(--lh-body) var(--font-body); }
+.dd-person-callfor li::before {
+  content: ""; flex: 0 0 auto; width: 5px; height: 5px; margin-top: 0.65em;
+  border-radius: var(--radius-round); background: var(--dd-ink);
+}
+.dd-person-mail { margin: var(--space-2) 0 0; }
+.dd-person-mail a { display: inline-flex; align-items: center; min-height: 44px; font: var(--fw-medium) 14px/1.4 var(--font-body); color: var(--text-link); }
+
+.dd-person-toggle {
+  margin-top: auto; align-self: flex-start;
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  min-height: 44px; padding: var(--space-5) 0 0; box-sizing: border-box;
+  background: none; border: 0; cursor: pointer; color: var(--dd-ink);
+  font: var(--fw-medium) 14px/1 var(--font-head); text-transform: uppercase; letter-spacing: var(--ls-kicker);
+}
+.dd-person-toggle-icon {
+  display: inline-grid; place-items: center; width: 24px; height: 24px; flex: 0 0 auto;
+  border-radius: var(--radius-pill); border: var(--border-default);
+  transition: var(--transition-interactive);
+}
+.dd-person-toggle-icon svg { width: 10px; height: 10px; }
+.dd-person-toggle-icon .dd-icon-v { transition: transform var(--dur-base) var(--ease-out); transform-origin: center; }
+.dd-person-toggle[aria-expanded="true"] .dd-icon-v { transform: scaleY(0); }
+.dd-person-toggle[aria-expanded="true"] .dd-person-toggle-icon { background: var(--dd-ink); border-color: var(--dd-ink); color: var(--dd-white); }
+@media (hover: hover) and (pointer: fine) {
+  .dd-person-toggle:hover .dd-person-toggle-icon { border-color: var(--dd-ink); }
+}
+
+/* ---------- Netzwerk-Karte ---------- */
+.dd-network {
+  display: flex; flex-direction: column; gap: var(--space-6);
+  padding: var(--space-8); border-radius: var(--radius-xl);
+  background: var(--surface-dark); color: var(--text-on-dark);
+}
+.dd-network-head, .dd-network-body { min-width: 0; }
+.dd-network-mark { display: block; width: 44px; height: auto; margin-bottom: var(--space-4); }
+.dd-network-hub { margin: 0; font: var(--fw-bold) 25px/var(--lh-title) var(--font-head); letter-spacing: var(--ls-heading); }
+
+/* Logo-Stapel: 44px-Kreise, kaum überlappend, bricht bei Bedarf in eine zweite Reihe.
+   Das padding-left gleicht die negative Überlappung der ersten Kreise jeder Reihe aus. */
+.dd-network-faces { list-style: none; display: flex; flex-wrap: wrap; row-gap: var(--space-2); margin: 0; padding: 0 0 0 6px; }
+.dd-network-face {
+  display: grid; place-items: center; flex: 0 0 auto; width: 44px; height: 44px; margin-left: -6px;
+  box-sizing: border-box; overflow: hidden; border-radius: var(--radius-round);
+  background: var(--dd-white); border: 2px solid var(--surface-dark);
+}
+.dd-network-face img { display: block; }
+.dd-network-face .is-logo { width: 68%; height: 68%; object-fit: contain; filter: grayscale(1) brightness(0); }
+.dd-network-face .is-photo { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1); }
+.dd-network-face .is-initial { font: var(--fw-bold) 13px/1 var(--font-head); color: var(--dd-ink); }
+
+.dd-network-note { margin: var(--space-5) 0 0; font: var(--fw-regular) 14px/var(--lh-body) var(--font-body); color: var(--text-on-dark-secondary); text-wrap: pretty; }
+
+.dd-network-list { list-style: none; margin: auto 0 0; padding: 0; }
+.dd-network-item { display: grid; gap: 2px; padding: var(--space-3) 0; border-top: var(--border-on-dark); }
+.dd-network-item:last-child { padding-bottom: 0; }
+.dd-network-item-name { font: var(--fw-bold) 16px/1.3 var(--font-head); letter-spacing: var(--ls-heading); color: var(--text-on-dark); }
+.dd-network-item-what { font: var(--fw-regular) 14px/1.5 var(--font-body); color: var(--text-on-dark-secondary); text-wrap: pretty; }
+
+/* ---------- Breakpoints ---------- */
+@media (min-width: 721px) {
+  .dd-team-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* Netzwerk volle Breite: links Marke, Logos, Text; rechts die Disziplinen */
+  .dd-network {
+    grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr;
+    grid-template-areas: "head list" "body list"; align-content: start; gap: var(--space-6) var(--space-12);
+  }
+  .dd-network-head { grid-area: head; }
+  .dd-network-body { grid-area: body; }
+  .dd-network-list { grid-area: list; margin: 0; }
+  .dd-network-item:first-child { border-top: 0; padding-top: 0; }
+}
+@media (min-width: 1024px) {
+  .dd-team-grid[data-people="2"],
+  .dd-team-grid[data-people="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  /* Zwei Personen: die Netzwerk-Karte ist die dritte Spalte, gleich hoch wie die Personen */
+  /* drei Gruppen (Marke, Logos + Text, Disziplinen) verteilt über die volle Kartenhöhe */
+  .dd-team-grid[data-people="2"] .dd-network {
+    grid-column: auto; display: flex; flex-direction: column; justify-content: space-between;
+    gap: var(--space-8); padding: var(--space-7);
+  }
+  .dd-team-grid[data-people="2"] .dd-network-list { margin-top: 0; }
+  .dd-team-grid[data-people="2"] .dd-network-item:first-child { border-top: var(--border-on-dark); padding-top: var(--space-3); }
+}
+
+@media (max-width: 720px) {
+  /* Kompakte Querformat-Card: Bild links, Text rechts. Bio erst beim Aufklappen. */
+  .dd-team-grid { gap: var(--space-2); }
+  .dd-person { display: grid; grid-template-columns: 104px 1fr; align-items: stretch; }
+  .dd-person-media { aspect-ratio: auto; min-height: 0; background: var(--surface-inset); }
+  /* Aufgeklappt wird die Karte deutlich höher; das Foto bleibt im Ausschnitt der geschlossenen
+     Karte stehen, statt sich auf die volle Höhe aufzuzoomen. */
+  .dd-person-media img { bottom: auto; max-height: 280px; }
+  .dd-person-body { padding: var(--space-4); gap: var(--space-1); min-height: 0; }
+  .dd-person-name { font-size: 20px; }
+  .dd-person-bio { display: none; }
+  .dd-person[data-open="1"] .dd-person-bio { display: block; }
+  .dd-person-toggle { padding-top: var(--space-2); }
+  .dd-network { margin-top: var(--space-6); padding: var(--space-5); gap: var(--space-5); }
+  .dd-network-hub { font-size: 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dd-person-media img, .dd-person-name span, .dd-person-panel, .dd-person-toggle-icon, .dd-person-toggle-icon .dd-icon-v { transition: none; }
+}

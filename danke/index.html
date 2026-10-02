@@ -1,32 +1,43 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de-AT">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Angekommen — digital decision</title>
+  <title>Angekommen | digital decision</title>
   <meta name="description" content="Deine Setup-Check-Anfrage ist angekommen. Antwort innerhalb von 24 Stunden. Von David oder Thomas persönlich.">
+  <!-- noindex: Bestätigungsseite gehört nicht in den Index. Bewusst NICHT per robots.txt
+       gesperrt, sonst könnten Crawler das noindex gar nicht lesen. -->
   <meta name="robots" content="noindex">
+  <link rel="canonical" href="https://digital-decision.at/danke/">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <script type="module" src="/src/static.js"></script>
 </head>
 <body>
-  <div class="ink-scene">
+  <a class="dd-skip" href="#main">Zum Inhalt springen</a>
+
+  <div class="ink-scene dd-on-dark">
     <header class="page-header">
       <div class="inner">
-        <a href="/" aria-label="digital decision — Startseite"><img src="/assets/dd-mark-lime.svg" alt="digital decision"></a>
+        <a class="logo" href="/" aria-label="digital decision, zur Startseite"><img src="/assets/dd-mark-lime.svg" alt="digital decision" width="42" height="44"></a>
       </div>
     </header>
-    <main class="content">
-      <div class="kicker">Angekommen</div>
+    <main id="main" class="content" tabindex="-1">
+      <p class="kicker">Angekommen</p>
       <h1>Gute Entscheidung.<br><span class="lime">Wir melden uns.</span></h1>
       <p class="lead">Deine Anfrage ist da. Innerhalb von 24 Stunden bekommst du eine Antwort. Von David oder Thomas persönlich, ohne Angebotsroman. Bis dahin: Zahlen bereitlegen.</p>
       <div class="actions">
         <a class="btn-lime" href="/">Zurück zur Startseite</a>
       </div>
     </main>
-    <div class="legal-line">digital decision GmbH · FN 461176a · ATU71568207</div>
+    <footer class="legal-line">
+      <span>digital decision GmbH · FN 461176a · ATU71568207</span>
+      <nav aria-label="Rechtliches">
+        <a href="/impressum/">Impressum</a>
+        <a href="/datenschutz/">Datenschutz</a>
+      </nav>
+    </footer>
   </div>
 </body>
 </html>

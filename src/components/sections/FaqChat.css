@@ -1,0 +1,57 @@
+/* FAQ im Chat-Look: Die Frage ist eine Nachrichten-Blase und gleichzeitig der Button (Plus/Minus
+   sitzt in der Blase), die Antwort kommt als Ink-Blase darunter. Eine eckige Ecke auf der
+   sprechenden Seite, sonst 16px. Geschlossene Antworten tragen hidden (nicht im A11y-Tree). */
+
+.dd-faq { display: flex; flex-direction: column; gap: var(--space-4); }
+.dd-faq-time { margin: 0 0 var(--space-2); font: var(--text-caption); text-transform: uppercase; letter-spacing: var(--ls-tag); color: var(--text-secondary); }
+.dd-faq-q { margin: 0; font: inherit; }
+
+.dd-faq-bubble {
+  display: inline-flex; align-items: center; gap: var(--space-4);
+  max-width: 100%; min-height: 48px; box-sizing: border-box;
+  padding: 12px 12px 12px 20px; margin: 0;
+  text-align: left; cursor: pointer; color: var(--dd-ink);
+  background: var(--surface-card); border: var(--border-default);
+  border-radius: var(--radius-xl) var(--radius-xl) var(--radius-xl) var(--radius-xs);
+  font: var(--fw-medium) 20px/1.35 var(--font-head);
+  transition: var(--transition-interactive);
+}
+.dd-faq-bubble[aria-expanded="true"] { background: var(--surface-accent); border-color: var(--dd-lime); }
+.dd-faq-bubble:active { transform: scale(var(--press-scale)); }
+
+.dd-faq-icon {
+  display: grid; place-items: center; flex: 0 0 auto; width: 32px; height: 32px;
+  border-radius: var(--radius-pill); border: var(--border-default); color: var(--text-secondary);
+  transition: var(--transition-interactive);
+}
+.dd-faq-icon svg { width: 10px; height: 10px; }
+.dd-faq-icon .dd-icon-v { transform-origin: center; transition: transform var(--dur-base) var(--ease-out); }
+.dd-faq-bubble[aria-expanded="true"] .dd-faq-icon { background: var(--dd-ink); border-color: var(--dd-ink); color: var(--dd-white); }
+.dd-faq-bubble[aria-expanded="true"] .dd-icon-v { transform: scaleY(0); }
+
+@media (hover: hover) and (pointer: fine) {
+  .dd-faq-bubble[aria-expanded="false"]:hover { border-color: var(--dd-ink); }
+  .dd-faq-bubble[aria-expanded="false"]:hover .dd-faq-icon { border-color: var(--dd-ink); color: var(--dd-ink); }
+}
+
+/* Höhe und Opacity setzt der Layout-Effect nur während der Animation (max-height, WebKit-sicher) */
+.dd-faq-panel { overflow: hidden; transition: max-height var(--dur-slow) var(--ease-out), opacity var(--dur-base) var(--ease-standard); }
+.dd-faq-panel-inner { padding: var(--space-3) 0 0 var(--space-12); }
+.dd-faq-answer {
+  display: inline-block; max-width: 520px; margin: 0; padding: 14px 20px;
+  background: var(--surface-dark); color: var(--text-on-dark); font: var(--text-copy);
+  border-radius: var(--radius-xl) var(--radius-xl) var(--radius-xs) var(--radius-xl);
+  text-wrap: pretty;
+}
+
+@media (max-width: 720px) {
+  .dd-faq { gap: var(--space-3); }
+  .dd-faq-bubble { gap: var(--space-3); padding: 12px 10px 12px 16px; font-size: 18px; }
+  .dd-faq-panel-inner { padding-left: var(--space-6); }
+  .dd-faq-answer { padding: 14px 18px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dd-faq-bubble, .dd-faq-icon, .dd-faq-icon .dd-icon-v, .dd-faq-panel { transition: none; }
+  .dd-faq-bubble:active { transform: none; }
+}

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de-AT">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>digital decision — E-Commerce-Partner für Shops, die skalieren wollen | Salzburg</title>
-  <meta name="description" content="Wir führen dein E-Commerce-Geschäft wie unser eigenes: Shops, Ads, Content, Systeme. Kostenloser Setup-Check: Wir sagen dir, wo dein Wachstum hängt.">
-  <link rel="canonical" href="https://www.digital-decision.at/">
+  <title>E-Commerce-Agentur Salzburg | digital decision</title>
+  <meta name="description" content="Wir führen dein E-Commerce-Geschäft, als wäre es unser eigenes: Shops, Ads, Content, Systeme. Kostenloser Setup-Check: Wir sagen dir, wo dein Wachstum hängt.">
+  <link rel="canonical" href="https://digital-decision.at/">
 
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
@@ -13,42 +13,146 @@
 
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="digital decision">
-  <meta property="og:title" content="digital decision — E-Commerce-Partner für Shops, die skalieren wollen">
-  <meta property="og:description" content="Wir führen dein E-Commerce-Geschäft wie unser eigenes: Shops, Ads, Content, Systeme. Kostenloser Setup-Check.">
-  <meta property="og:url" content="https://www.digital-decision.at/">
-  <meta property="og:image" content="https://www.digital-decision.at/og-image.png">
+  <meta property="og:title" content="E-Commerce-Agentur Salzburg | digital decision">
+  <meta property="og:description" content="Wir führen dein E-Commerce-Geschäft, als wäre es unser eigenes: Shops, Ads, Content, Systeme. Kostenloser Setup-Check.">
+  <meta property="og:url" content="https://digital-decision.at/">
+  <meta property="og:image" content="https://digital-decision.at/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Logo von digital decision: weiße Wortmarke mit drei limettengrünen Wellen auf schwarzem Grund">
   <meta property="og:locale" content="de_AT">
   <meta name="twitter:card" content="summary_large_image">
 
   <link rel="preload" href="/fonts/space-grotesk-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/space-grotesk-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+
+  <!-- Scroll-Reveal (siehe src/styles/reveal.css und src/main.jsx).
+       Die Klasse dd-reveal muss VOR dem ersten Paint stehen, sonst würde der vorgerenderte,
+       schon sichtbare Inhalt beim Laden des Bundles kurz verschwinden. Ohne JS oder bei
+       prefers-reduced-motion bleibt sie weg und alles ist sofort sichtbar.
+       ACHTUNG: Der Inhalt des Scripts ist per sha256 in der Content-Security-Policy
+       (netlify.toml) freigegeben. Jede Änderung, auch an Leerzeichen, braucht einen neuen
+       Hash. scripts/prerender.mjs bricht den Build ab, wenn Hash und Script nicht passen. -->
+  <script>try{if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('dd-reveal')}catch(e){}</script>
+  <!-- Sicherheitsnetz: Lädt das Modul-JS nicht, blendet CSS nach 3 s alles ein. Sobald
+       src/main.jsx läuft, setzt es dd-reveal-live und übernimmt (oder nimmt dd-reveal
+       wieder weg, wenn es zu spät kommt). Inhalte bleiben so nie dauerhaft unsichtbar. -->
+  <style>@keyframes dd-reveal-failsafe{to{opacity:1;transform:none}}html.dd-reveal:not(.dd-reveal-live) [data-reveal]{animation:dd-reveal-failsafe .4s ease-out 3s forwards}</style>
 
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "digital decision GmbH",
-    "url": "https://www.digital-decision.at/",
-    "logo": "https://www.digital-decision.at/assets/dd-mark-ink.svg",
-    "email": "david@digital-decision.at",
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": "Josef-Weißkind-Straße 14/4",
-      "postalCode": "5083",
-      "addressLocality": "Grödig",
-      "addressCountry": "AT"
-    }
+    "@graph": [
+      {
+        "@type": "ProfessionalService",
+        "@id": "https://digital-decision.at/#organization",
+        "name": "digital decision GmbH",
+        "alternateName": "digital decision",
+        "url": "https://digital-decision.at/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://digital-decision.at/logo-512.png",
+          "width": 512,
+          "height": 512
+        },
+        "image": "https://digital-decision.at/og-image.png",
+        "email": "david@digital-decision.at",
+        "vatID": "ATU71568207",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Josef-Weißkind-Straße 14/4",
+          "postalCode": "5083",
+          "addressLocality": "Grödig",
+          "addressCountry": "AT"
+        },
+        "areaServed": "AT",
+        "founder": [
+          { "@type": "Person", "name": "David Edtmayer", "jobTitle": "Geschäftsführer" },
+          { "@type": "Person", "name": "Thomas Jud", "jobTitle": "Geschäftsführer" }
+        ],
+        "knowsAbout": ["E-Commerce", "Shopify", "Shopware", "Performance Marketing", "E-Mail-Marketing", "SEO"]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://digital-decision.at/#website",
+        "url": "https://digital-decision.at/",
+        "name": "digital decision",
+        "inLanguage": "de-AT",
+        "publisher": { "@id": "https://digital-decision.at/#organization" }
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://digital-decision.at/#faq",
+        "url": "https://digital-decision.at/",
+        "inLanguage": "de-AT",
+        "isPartOf": { "@id": "https://digital-decision.at/#website" },
+        "about": { "@id": "https://digital-decision.at/#organization" },
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Wir haben schon schlechte Erfahrungen mit Agenturen gemacht. Warum sollte es mit euch anders laufen?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Verstehen wir. Ein Teil unserer Kunden kam genau so zu uns. Wir verkaufen keine Stunden, wir übernehmen Verantwortung für Ergebnisse. Deshalb startet alles mit einem kostenlosen Setup-Check statt mit einem Pitch. Danach arbeiten wir in deinem Tagesgeschäft mit und koppeln unser Honorar auf Wunsch an dein Ergebnis. Wenn wir nicht überzeugt sind, dass wir dir helfen können, sagen wir dir das im Check. Dann hast du zumindest eine ehrliche Einschätzung, und die kostet dich nichts."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Bietet ihr erfolgsbasierte Vergütung an?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Ja, wenn es zum Projekt passt. Dann koppeln wir einen Teil unseres Honorars an dein unternehmerisches Ergebnis. Wie das konkret aussieht, legen wir gemeinsam fest."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Entwickelt ihr alles komplett neu?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Nur wenn es sinnvoll ist. Wir nutzen, was schon funktioniert, also bestehende Systeme, Prozesse und Teams, und verbessern gezielt das, was blockiert."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Was passiert, wenn schon ein Team oder andere Agenturen beteiligt sind?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Wir schauen uns an, was funktioniert, und bringen Struktur rein. Sensibel, ohne Politik und ohne alles umzuwerfen."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Übernehmt ihr auch operative Verantwortung?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Ja. Wir steuern strategisch und setzen im Tagesgeschäft um, zum Beispiel im Ads-Konto, im Shop oder bei einer Migration. Das Ziel ist immer messbares Wachstum."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Passt ihr zu jedem Unternehmen?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Nein. Wir passen zu Unternehmen, die echte Zusammenarbeit und klare Entscheidungen wollen. Kein weiteres Agenturfeuerwerk."
+            }
+          }
+        ]
+      }
+    ]
   }
   </script>
 </head>
 <body>
+  <!-- Wird beim Build (scripts/prerender.mjs) mit dem vorgerenderten Markup von <App /> gefüllt
+       und im Browser per hydrateRoot übernommen (src/main.jsx). Im Dev-Server bleibt es leer. -->
   <div id="root"></div>
 
-  <!-- Static mirror of the React form so Netlify's build bot registers it.
-       Field names MUST match src/components/sections/SetupCheck.jsx. -->
-  <form name="setup-check" data-netlify="true" netlify-honeypot="bot-field" action="/danke" hidden>
+  <!-- Statischer Spiegel des React-Formulars, damit Netlifys Build-Bot es registriert.
+       Nur HIER stehen data-netlify und netlify-honeypot. Feldnamen MÜSSEN mit
+       src/components/sections/SetupCheck.jsx und netlify/functions/submission-created.mjs
+       übereinstimmen: name, email, shop, message, Honeypot bot-field. -->
+  <form name="setup-check" data-netlify="true" netlify-honeypot="bot-field" action="/danke/" hidden>
     <input type="text" name="name">
     <input type="email" name="email">
     <input type="text" name="shop">

@@ -1,0 +1,290 @@
+/* ServiceBadges: "Was wir für dich tun" als Sticker-Wolke mit Popup.
+   Ab 721px liegen die Badges absolut um die Mitte (dx/dy aus den Daten, per --kx/--ky gestaucht),
+   bis 720px fließen sie zentriert im flex-wrap. Die Sticker-Schatten sind die einzige erlaubte
+   Schatten-Ausnahme auf der Seite: dezent, mit echtem Versatz und Blur. */
+
+.dd-sb-head {
+  max-width: var(--measure);
+  margin: 0 auto var(--space-8);
+  text-align: center;
+}
+
+.dd-sb-head h2 {
+  margin: 0;
+  font: var(--text-h2);
+  letter-spacing: var(--ls-heading);
+  color: var(--text-primary);
+  text-wrap: balance;
+}
+
+.dd-sb-hint {
+  margin: var(--space-3) 0 0;
+  font: var(--text-caption);
+  color: var(--text-secondary);
+}
+
+/* ---------- Wolke ---------- */
+
+.dd-sb-cloud {
+  --kx: 1;
+  --ky: 1;
+  --sb-shadow:
+    0 1px 2px color-mix(in srgb, var(--dd-ink) 10%, transparent),
+    0 6px 14px -6px color-mix(in srgb, var(--dd-ink) 22%, transparent);
+  --sb-shadow-lift:
+    0 2px 4px color-mix(in srgb, var(--dd-ink) 10%, transparent),
+    0 16px 28px -12px color-mix(in srgb, var(--dd-ink) 30%, transparent);
+  position: relative;
+  height: 340px;
+  margin: 0 auto;
+}
+
+.dd-sb-badge {
+  --pos: translate(-50%, -50%);
+  --lift: 0px;
+  --r: var(--rot, 0deg);
+  --s: 1;
+  position: absolute;
+  left: calc(50% + var(--dx) * var(--kx) * 1px);
+  top: calc(50% + var(--dy) * var(--ky) * 1px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  margin: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  font-family: var(--font-head);
+  font-weight: var(--fw-bold);
+  letter-spacing: -0.01em;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: var(--sb-shadow);
+  transform: var(--pos) translateY(var(--lift)) rotate(var(--r)) scale(var(--s));
+  transition: transform var(--dur-slow) var(--ease-out), box-shadow var(--dur-slow) var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dd-sb-badge.lg { font-size: var(--fs-h3); padding: 22px 38px; }
+.dd-sb-badge.md { font-size: var(--fs-lead); padding: 18px 32px; }
+.dd-sb-badge.sm { font-size: var(--fs-body); padding: 15px 26px; }
+
+.dd-sb-badge.fill-lime { background: var(--surface-accent); color: var(--dd-ink); }
+.dd-sb-badge.fill-violet { background: var(--surface-secondary); color: var(--text-on-dark); }
+.dd-sb-badge.fill-ink { background: var(--surface-dark); color: var(--text-on-dark); }
+.dd-sb-badge.fill-white { background: var(--surface-card); color: var(--text-primary); box-shadow: inset 0 0 0 1px var(--dd-border), var(--sb-shadow); }
+
+.dd-sb-badge:focus { outline: none; }
+.dd-sb-badge:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 4px; }
+
+/* Aufrichten + anheben: offen und Tastaturfokus immer, Hover nur auf Geräten mit echtem Hover.
+   Die Bewegung (Lift, Aufrichten, Skalieren) gibt es nur ohne reduced motion, der Schatten-
+   wechsel als Zustandsanzeige immer. */
+.dd-sb-badge.is-open,
+.dd-sb-badge:focus-visible { z-index: 3; box-shadow: var(--sb-shadow-lift); }
+.dd-sb-badge.fill-white.is-open,
+.dd-sb-badge.fill-white:focus-visible { box-shadow: inset 0 0 0 1px var(--dd-border), var(--sb-shadow-lift); }
+
+@media (hover: hover) {
+  .dd-sb-badge:hover { z-index: 3; box-shadow: var(--sb-shadow-lift); }
+  .dd-sb-badge.fill-white:hover { box-shadow: inset 0 0 0 1px var(--dd-border), var(--sb-shadow-lift); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .dd-sb-badge.is-open,
+  .dd-sb-badge:focus-visible { --lift: -6px; --r: 0deg; --s: 1.06; }
+  .dd-sb-cloud:has(.dd-sb-badge.is-open) .dd-sb-badge:not(.is-open) { --s: 0.96; }
+}
+
+@media (prefers-reduced-motion: no-preference) and (hover: hover) {
+  .dd-sb-badge:hover { --lift: -6px; --r: 0deg; --s: 1.06; }
+  .dd-sb-cloud:has(.dd-sb-badge:hover) .dd-sb-badge:not(:hover):not(.is-open) { --s: 0.96; }
+}
+
+/* ---------- Popup (Desktop: Karte an der Wolke) ---------- */
+
+.dd-sb-popup {
+  position: absolute;
+  left: var(--dd-sb-x, 0px);
+  top: var(--dd-sb-y, 0px);
+  z-index: 10;
+  width: 380px;
+  max-width: 100%;
+  padding: var(--space-8) var(--space-8) var(--space-6);
+  background: var(--surface-card);
+  color: var(--text-primary);
+  border: var(--border-default);
+  border-radius: var(--radius-xl);
+  box-shadow:
+    0 2px 6px color-mix(in srgb, var(--dd-ink) 6%, transparent),
+    0 24px 48px -16px color-mix(in srgb, var(--dd-ink) 28%, transparent);
+  animation: dd-sb-pop 260ms var(--ease-out) both;
+}
+.dd-sb-popup[hidden] { display: none; }
+
+@keyframes dd-sb-pop {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dd-sb-popup h3 {
+  margin: 0 var(--space-10) var(--space-3) 0;
+  font-family: var(--font-head);
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-h3);
+  line-height: 1.2;
+  letter-spacing: var(--ls-heading);
+  color: var(--text-primary);
+  text-wrap: balance;
+}
+/* Der Titel bekommt beim Öffnen programmatisch Fokus (Lesestart für Screenreader). Er ist kein
+   Bedienelement, deshalb ohne Fokusring. */
+.dd-sb-popup h3:focus { outline: none; }
+
+.dd-sb-popup p {
+  margin: 0;
+  font: var(--text-copy);
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+.dd-sb-popup p + p { margin-top: var(--space-3); }
+
+.dd-sb-close {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-pill);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background-color var(--dur-base) var(--ease-standard);
+}
+.dd-sb-close:hover { background: var(--surface-inset); }
+
+.dd-sb-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  margin-top: var(--space-3);
+  font: var(--text-button);
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: color var(--dur-base) var(--ease-standard);
+}
+.dd-sb-cta .dd-sb-arrow { transition: transform var(--dur-base) var(--ease-standard); }
+.dd-sb-cta:hover { color: var(--text-link); }
+.dd-sb-cta:hover .dd-sb-arrow { transform: translateX(4px); }
+.dd-sb-cta:focus-visible { outline-offset: 2px; border-radius: var(--radius-xs); }
+
+.dd-sb-backdrop { display: none; }
+
+.dd-sb-closer {
+  max-width: var(--measure);
+  margin: var(--space-10) auto 0;
+  text-align: center;
+  font: var(--text-lead);
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+/* ---------- Tablet: Wolke enger ---------- */
+
+@media (max-width: 1023px) {
+  .dd-sb-cloud { --kx: 0.78; }
+  .dd-sb-badge.lg { font-size: 22px; padding: 18px 30px; }
+  .dd-sb-badge.md { font-size: 18px; padding: 15px 26px; }
+  .dd-sb-badge.sm { font-size: 15px; padding: 14px 22px; }
+}
+
+/* ---------- Mobil: Badges im Fluss, Popup als Bottom-Sheet ---------- */
+
+@media (max-width: 720px) {
+  .dd-sb-head { margin-bottom: var(--space-6); }
+
+  .dd-sb-cloud {
+    height: auto;
+    max-width: 380px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    row-gap: var(--space-2);
+    padding: var(--space-1) 0;
+  }
+
+  /* Leichte Überlappung nur an den runden Enden (4px pro Seite, weit innerhalb des Paddings),
+     die Rotation bleibt als Sticker-Charakter. Kein Text liegt unter einem Nachbarn. */
+  .dd-sb-badge {
+    --pos: translate(0, 0);
+    position: relative;
+    left: auto;
+    top: auto;
+    margin: 0 -4px;
+  }
+  /* Größen so gewählt, dass ab 360px je zwei Badges pro Zeile liegen (4 Zeilen statt 5) */
+  .dd-sb-badge.lg { font-size: var(--fs-lead); padding: 13px 20px; }
+  .dd-sb-badge.md { font-size: var(--fs-body); padding: 14px 18px; }
+  .dd-sb-badge.sm { font-size: 14px; padding: 15px 16px; }
+
+  .dd-sb-closer { margin-top: var(--space-8); font: var(--text-copy); }
+
+  .dd-sb-backdrop:not([hidden]) {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    background: color-mix(in srgb, var(--dd-ink) 50%, transparent);
+    touch-action: none;
+    animation: dd-sb-fade 240ms var(--ease-out) both;
+  }
+
+  .dd-sb-popup {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: auto;
+    bottom: 0;
+    z-index: 61;
+    width: auto;
+    max-width: none;
+    max-height: 85vh;
+    max-height: 85dvh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--space-8) var(--pad-page-x) calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
+    border-bottom: 0;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    box-shadow: 0 -8px 24px -12px color-mix(in srgb, var(--dd-ink) 30%, transparent);
+    animation: dd-sb-sheet 320ms var(--ease-out) both;
+  }
+  .dd-sb-close { top: var(--space-4); right: var(--space-3); }
+}
+
+@keyframes dd-sb-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes dd-sb-sheet {
+  from { opacity: 0; transform: translateY(32px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- Reduced motion: Zustände ohne Bewegung ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .dd-sb-badge,
+  .dd-sb-cta,
+  .dd-sb-cta .dd-sb-arrow { transition: none; }
+  .dd-sb-cta:hover .dd-sb-arrow { transform: none; }
+  .dd-sb-popup,
+  .dd-sb-backdrop:not([hidden]) { animation: none; }
+}

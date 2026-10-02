@@ -4,3 +4,9 @@ dist/
 *.log
 
 .claude/
+
+# Lokale Ablage, nie committen (Repo ist öffentlich)
+Aus Downloads/
+
+# SSR-Bundle fürs Prerendering (npm run build), nur Build-Zwischenstand
+dist-ssr/
