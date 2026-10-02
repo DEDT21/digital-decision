@@ -1,0 +1,64 @@
+/* Aurora: weiche Lime-Lichtbänder auf Ink. Zwei geblurrte Verlaufsflächen, bewegt
+   ausschließlich per transform (translate3d + rotate), damit nichts pro Frame neu gemalt
+   wird. Eine radiale Maske blendet das Licht zur Gegenecke aus, die Textseite bleibt ruhig.
+   Farbe, Intensität, Blur und Tempo kommen als Custom Properties von der Komponente. */
+
+@keyframes dd-aurora-a {
+  from { transform: translate3d(-8%, -4%, 0) rotate(-4deg); }
+  to { transform: translate3d(8%, 4%, 0) rotate(4deg); }
+}
+@keyframes dd-aurora-b {
+  from { transform: translate3d(6%, 3%, 0) rotate(5deg) scale(1.05); }
+  to { transform: translate3d(-6%, -3%, 0) rotate(-5deg) scale(1.05); }
+}
+
+.dd-aurora {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  overflow: clip; pointer-events: none;
+}
+
+/* Masken-Geometrie: Ursprung, Radius und Stopps sind Prozente derselben Box, der Abfall ist
+   also höhenunabhängig: t am Rand = Abstand / Radius. Jede Variante erreicht an Ober- und
+   Unterkante t > 0.58 (transparenter Stopp), damit overflow:clip nie eine gerade Kante zeigt. */
+.dd-aurora-field {
+  position: absolute; inset: 0;
+  opacity: var(--dd-aurora-intensity, 0.42);
+  -webkit-mask-image: radial-gradient(var(--dd-aurora-shape, ellipse 95% 75% at 96% 46%), black 8%, rgb(0 0 0 / 0.32) 36%, transparent 58%);
+  mask-image: radial-gradient(var(--dd-aurora-shape, ellipse 95% 75% at 96% 46%), black 8%, rgb(0 0 0 / 0.32) 36%, transparent 58%);
+}
+.dd-aurora[data-origin="top-left"] { --dd-aurora-shape: ellipse 95% 75% at 4% 46%; }
+.dd-aurora[data-origin="bottom-right"] { --dd-aurora-shape: ellipse 95% 75% at 96% 54%; }
+.dd-aurora[data-origin="center"] { --dd-aurora-shape: ellipse 95% 80% at 50% 50%; }
+/* Rechts, unterhalb der Mitte: Licht sitzt hinter einem Element in der rechten Spalte
+   (Hero-Karte). Oberkante t = 0.60 / 0.62 = 0.97, Unterkante t = 0.40 / 0.62 = 0.65. */
+.dd-aurora[data-origin="right"] { --dd-aurora-shape: ellipse 62% 62% at 78% 60%; }
+
+.dd-aurora-a, .dd-aurora-b {
+  position: absolute; inset: -25%;
+  filter: blur(var(--dd-aurora-blur, 44px));
+  will-change: transform;
+}
+.dd-aurora-a {
+  opacity: 0.85;
+  background-image: repeating-linear-gradient(100deg,
+    transparent 0%, transparent 6%,
+    var(--dd-aurora-color) 9%, var(--dd-aurora-color) 13%,
+    transparent 17%, transparent 26%);
+  animation: dd-aurora-a var(--dd-aurora-speed, 42s) cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+}
+.dd-aurora-b {
+  opacity: 0.55; mix-blend-mode: screen;
+  background-image: repeating-linear-gradient(72deg,
+    transparent 0%, transparent 10%,
+    var(--dd-aurora-color) 13%, var(--dd-aurora-color) 17%,
+    transparent 21%, transparent 34%);
+  animation: dd-aurora-b calc(var(--dd-aurora-speed, 42s) * 1.45) cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+}
+
+/* Außerhalb des Viewports angehalten (IntersectionObserver in Aurora.jsx) */
+.dd-aurora[data-paused] .dd-aurora-a,
+.dd-aurora[data-paused] .dd-aurora-b { animation-play-state: paused; will-change: auto; }
+
+@media (prefers-reduced-motion: reduce) {
+  .dd-aurora-a, .dd-aurora-b { animation: none; will-change: auto; }
+}

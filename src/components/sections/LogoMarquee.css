@@ -1,0 +1,64 @@
+/* LogoMarquee: endlos laufendes Kundenband. CSS-Keyframe (läuft off-main-thread), linear,
+   weil gleichmäßige Bewegung nicht beschleunigen darf. Die animierte Einheit ist die halbe
+   Spur, die Spur besteht also immer aus zwei identischen Durchläufen. */
+
+@keyframes dd-marquee {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
+.dd-marquee {
+  position: relative; overflow: hidden;
+  --dd-logo-scale: 1;
+  -webkit-mask-image: linear-gradient(to right, transparent, black var(--dd-marquee-fade, 72px), black calc(100% - var(--dd-marquee-fade, 72px)), transparent);
+  mask-image: linear-gradient(to right, transparent, black var(--dd-marquee-fade, 72px), black calc(100% - var(--dd-marquee-fade, 72px)), transparent);
+}
+
+/* padding-right = ein Gap, damit die Spur exakt zwei gleiche Hälften hat und das −50%-
+   Keyframe genau auf der Grenze zum Duplikat landet. */
+.dd-marquee-track {
+  display: flex; align-items: center; width: max-content;
+  gap: var(--dd-marquee-gap); padding-right: var(--dd-marquee-gap);
+  animation: dd-marquee var(--dd-marquee-duration, 32s) linear infinite;
+  will-change: transform;
+}
+
+/* Angehalten: per Pause-Button, außerhalb des Viewports, bei Hover und Fokus */
+.dd-marquee[data-paused] .dd-marquee-track,
+.dd-marquee[data-offscreen] .dd-marquee-track,
+.dd-marquee:focus-within .dd-marquee-track { animation-play-state: paused; }
+.dd-marquee[data-offscreen] .dd-marquee-track { will-change: auto; }
+@media (hover: hover) {
+  .dd-marquee:hover .dd-marquee-track { animation-play-state: paused; }
+}
+
+.dd-marquee-item { flex: 0 0 auto; display: flex; align-items: center; }
+.dd-marquee-logo {
+  display: block; width: auto;
+  height: calc(var(--dd-logo-h) * var(--dd-logo-scale));
+}
+.dd-marquee--dark .dd-marquee-logo { filter: brightness(0) invert(1); opacity: 0.9; }
+.dd-marquee--light .dd-marquee-logo { filter: grayscale(1) brightness(0); opacity: 0.65; }
+.dd-marquee-name {
+  font: var(--fw-medium) var(--fs-h3)/var(--lh-title) var(--font-head);
+  letter-spacing: var(--ls-heading); white-space: nowrap;
+}
+.dd-marquee--dark .dd-marquee-name { color: var(--text-on-dark-secondary); }
+.dd-marquee--light .dd-marquee-name { color: var(--text-secondary); }
+
+@media (max-width: 720px) {
+  .dd-marquee { --dd-logo-scale: 0.82; --dd-marquee-fade: 40px; }
+  .dd-marquee-track { gap: var(--space-10); padding-right: var(--space-10); }
+}
+
+/* Ohne Bewegung: eine statische, zentrierte Reihe, jede Marke genau einmal. */
+@media (prefers-reduced-motion: reduce) {
+  .dd-marquee { -webkit-mask-image: none; mask-image: none; }
+  .dd-marquee-track {
+    animation: none; will-change: auto;
+    width: auto; padding-right: 0;
+    flex-wrap: wrap; justify-content: center;
+    row-gap: var(--space-6);
+  }
+  .dd-marquee-dup { display: none; }
+}

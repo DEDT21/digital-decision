@@ -1,51 +1,65 @@
 import React from 'react';
+import './WordRotator.css';
 
-/* Vertical word flip for the hero headline. The container is locked to the widest word so the
-   line never reflows, and prefers-reduced-motion shows the final word statically.
-   The word list is laid out as ONE continuous sequence (list × loops), so every flip scrolls
-   in the same downward direction — including the hand-over into the second pass — and the
-   rotation rests on the sequence's last word. No animation library; transform + token easing. */
+/* Vertikaler Wortwechsel für die Hero-Headline. Die Wortliste wird als EINE durchgehende
+   Folge (list × loops) angelegt, damit jeder Wechsel in dieselbe Richtung läuft, und die
+   Rotation bleibt auf dem letzten Wort der Folge stehen (holdLast).
 
-export function WordRotator({ words = [], interval = 1600, tone = 'lime', holdLast = true, loops = 2, style }) {
+   SSR/Prerender: Der erste Render zeigt deterministisch Index 0. Erst nach dem Hydrieren
+   startet der Timer, und nur solange der Rotator im Viewport liegt, der Tab sichtbar ist und
+   keine reduzierte Bewegung gewünscht ist. Bei prefers-reduced-motion zeigt das CSS ab dem
+   ersten Frame statisch das letzte Wort. Positionen kommen als data-pos, die Bewegung selbst
+   steht in WordRotator.css (keine Inline-Transforms). Der ganze Rotator ist aria-hidden: Wer
+   ihn einsetzt, liefert den lesbaren Satz separat (siehe Hero in Home.jsx). */
+
+export function WordRotator({ words = [], interval = 1600, tone = 'lime', holdLast = true, loops = 2, style, className }) {
+  const rootRef = React.useRef(null);
   const [step, setStep] = React.useState(0);
-  const [reduced, setReduced] = React.useState(false);
+  const [running, setRunning] = React.useState(false);
 
   const seq = [];
   for (let l = 0; l < Math.max(loops, 1); l++) seq.push(...words);
   const total = Math.max(seq.length - 1, 0);
   const current = seq.length ? (holdLast ? Math.min(step, total) : step % seq.length) : 0;
 
+  /* Läuft nur, wenn sichtbar: Viewport (IntersectionObserver), Tab (visibilitychange)
+     und Bewegungspräferenz werden zu einem Flag zusammengefasst. */
   React.useEffect(() => {
-    const mq = typeof window !== 'undefined' && window.matchMedia
-      ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
-    if (mq && mq.matches) { setReduced(true); setStep(total); }
-  }, [total]);
+    const el = rootRef.current;
+    if (!el) return undefined;
+    const mq = typeof window.matchMedia === 'function' ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+    let inView = true;
+    let reduced = !!(mq && mq.matches);
+    const update = () => setRunning(inView && !reduced && document.visibilityState !== 'hidden');
+
+    const io = typeof IntersectionObserver !== 'undefined'
+      ? new IntersectionObserver((entries) => { inView = entries[entries.length - 1].isIntersecting; update(); })
+      : null;
+    if (io) io.observe(el);
+    const onMq = () => { reduced = mq.matches; update(); };
+    if (mq && mq.addEventListener) mq.addEventListener('change', onMq);
+    document.addEventListener('visibilitychange', update);
+    update();
+
+    return () => {
+      if (io) io.disconnect();
+      if (mq && mq.removeEventListener) mq.removeEventListener('change', onMq);
+      document.removeEventListener('visibilitychange', update);
+    };
+  }, []);
 
   React.useEffect(() => {
-    if (reduced || !seq.length) return;
-    if (holdLast && step >= total) return;
-    const id = setTimeout(() => setStep((s2) => (holdLast ? Math.min(s2 + 1, total) : s2 + 1)), interval);
-    return () => clearTimeout(id);
-  }, [step, total, interval, reduced, seq.length, holdLast]);
-
-  const longest = words.reduce((a, b) => (b.length > a.length ? b : a), '');
-  const colors = { lime: 'var(--dd-lime)', ink: 'var(--dd-ink)', white: 'var(--dd-white)' };
+    if (!running || !seq.length) return undefined;
+    if (holdLast && step >= total) return undefined;
+    const id = window.setTimeout(() => setStep((s) => (holdLast ? Math.min(s + 1, total) : s + 1)), interval);
+    return () => window.clearTimeout(id);
+  }, [running, step, total, interval, seq.length, holdLast]);
 
   return (
-    /* Layout-Properties (position, display, white-space, overflow) liegen in mobile.css unter
-       .dd-rotator*, damit die Media Query sie überschreiben kann: auf schmalen Screens ist das
-       längste Wort breiter als der Viewport und muss umbrechen dürfen, statt die Seite
-       horizontal aufzuziehen. */
-    <span className="dd-rotator" style={{ color: colors[tone] || tone, ...style }}>
-      <span className="dd-rotator-measure" aria-hidden="true">{longest}</span>
+    <span ref={rootRef} className={'dd-rotator dd-rotator--' + tone + (className ? ' ' + className : '')} aria-hidden="true" style={style}>
       {seq.map((word, i) => (
-        <span key={word + '-' + i} className="dd-rotator-word" aria-hidden={i !== current}
-          style={{
-            transform: reduced ? 'none' : (i === current ? 'translateY(0)' : (i < current ? 'translateY(-118%)' : 'translateY(118%)')),
-            opacity: i === current ? 1 : 0,
-            transition: reduced ? 'none' : 'transform 520ms var(--ease-out-strong), opacity 240ms var(--ease-standard)' }}>
-          {word}
-        </span>
+        <span key={word + '-' + i} className="dd-rotator-word" data-word={word}
+              data-pos={i === current ? 'current' : (i < current ? 'before' : 'after')} />
       ))}
     </span>
   );

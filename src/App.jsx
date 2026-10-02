@@ -2,6 +2,7 @@ import React from 'react';
 import { Nav } from './Nav.jsx';
 import { Home } from './Home.jsx';
 import { SiteFooter } from './components/sections/SiteFooter.jsx';
+import './App.css';
 
 const FOOTER_COLUMNS = [
   { title: 'Seite', items: [
@@ -47,20 +48,19 @@ const USPS = [
 
 export function App() {
   const [onHero, setOnHero] = React.useState(true);
+  const headerRef = React.useRef(null);
 
+  /* Header transparent, solange der Hero mehr als 120px unter die Oberkante reicht.
+     Ein IntersectionObserver auf den Hero (Wurzel um 120px oben verkleinert) ersetzt den
+     früheren Scroll-Listener: State ändert sich nur noch beim Überqueren der Grenze. */
   React.useEffect(() => {
-    let frame = 0;
-    const read = () => {
-      frame = 0;
-      const hero = document.getElementById('hero');
-      const h = hero ? hero.offsetHeight : 0;
-      setOnHero(window.scrollY < Math.max(0, h - 120));
-    };
-    const onScroll = () => { if (!frame) frame = requestAnimationFrame(read); };
-    read();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
-    return () => { if (frame) cancelAnimationFrame(frame); window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll); };
+    const hero = document.getElementById('hero');
+    if (!hero || typeof IntersectionObserver === 'undefined') return undefined;
+    const io = new IntersectionObserver((entries) => {
+      setOnHero(entries[entries.length - 1].isIntersecting);
+    }, { rootMargin: '-120px 0px 0px 0px' });
+    io.observe(hero);
+    return () => io.disconnect();
   }, []);
 
   /* Ein Observer für die ganze Seite: Jedes Element mit [data-reveal] blendet beim Eintritt
@@ -106,19 +106,35 @@ export function App() {
     return () => { window.clearTimeout(safety); io.disconnect(); };
   }, []);
 
-  const onNavigate = (page, anchor) => {
-    if (anchor) {
-      const el = document.getElementById(anchor);
-      if (el) { window.scrollTo({ top: el.offsetTop - 60, behavior: 'smooth' }); return; }
+  /* Sprung zu einer Sektion: unter den Sticky-Header scrollen (bei reduzierter Bewegung ohne
+     Smooth-Scroll) und den Fokus aufs Ziel setzen, damit Tastatur und Screenreader dort
+     weitermachen. Nicht fokussierbare Ziele bekommen dafür tabindex=-1. */
+  const onNavigate = React.useCallback((page, anchor) => {
+    const reduce = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const behavior = reduce ? 'auto' : 'smooth';
+    const el = anchor && anchor !== 'hero' ? document.getElementById(anchor) : null;
+    const offset = headerRef.current ? headerRef.current.offsetHeight : 0;
+    const top = el ? el.getBoundingClientRect().top + window.scrollY - offset : 0;
+    window.scrollTo({ top: Math.max(0, top), behavior });
+
+    const target = el || document.getElementById('main');
+    if (!target) return;
+    if (!target.hasAttribute('tabindex')) {
+      target.setAttribute('tabindex', '-1');
+      target.setAttribute('data-dd-focus-target', '');
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+    target.focus({ preventScroll: true });
+  }, []);
+
   return (
     <div>
-      <div style={{ background: onHero ? 'transparent' : 'var(--surface-dark)', position: 'sticky', top: 0, zIndex: 10, transition: 'background-color 200ms cubic-bezier(0.23,1,0.32,1)' }}>
+      <a className="dd-skip" href="#main">Zum Inhalt springen</a>
+      <header ref={headerRef} className="dd-header dd-on-dark" data-solid={onHero ? undefined : ''}>
         <Nav onNavigate={onNavigate} />
-      </div>
-      <Home onNavigate={onNavigate} />
+      </header>
+      <main id="main" tabIndex={-1}>
+        <Home onNavigate={onNavigate} />
+      </main>
       <SiteFooter
         headline={<>Dein Shop läuft solide, aber skaliert nicht?<br />Dann triff <span style={{ color: 'var(--dd-lime)' }}>genau jetzt</span> die <span style={{ color: 'var(--dd-lime)' }}>richtige Entscheidung</span>.</>}
         kicker="Bereit?"

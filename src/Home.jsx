@@ -13,6 +13,8 @@ import { FaqChat } from './components/sections/FaqChat.jsx';
 import { PhaseFlow } from './components/sections/PhaseFlow.jsx';
 import { LogoMarquee } from './components/sections/LogoMarquee.jsx';
 import { TeamStructure } from './components/sections/TeamStructure.jsx';
+import { HeroOffer, HeroFaces } from './components/sections/HeroOffer.jsx';
+import './Home.css';
 
 const ROTATOR = ['deinen Onlineshop.', 'deine Website.', 'deine Ads.', 'deine Marke.', 'deinen Relaunch.', 'dein Amazon-Business.', 'dein Wachstum.'];
 
@@ -31,12 +33,17 @@ const HERO_OFFER = {
   link: 'Zum Formular'
 };
 
+/* Fotos für Karte und mobilen Streifen: quadratische Gesichts-Crops (160×160, Graustufen) */
+const HERO_FACES = ['/assets/team/david-edtmayer-avatar.webp', '/assets/team/thomas-jud-avatar.webp'];
+
+/* height: Anzeigehöhe zur optischen Angleichung (breite Wortmarke kleiner, Hagleitner-Oval
+   mit kleiner Schrift größer), w/h: Pixelmaße der Datei für width/height-Attribute. */
 const TRUST = [
-  { name: 'Aqmos', logo: '/assets/clients/aqmos.webp' },
-  { name: 'Hagleitner', logo: '/assets/clients/hagleitner.webp', height: 38 },
-  { name: 'Gamechangersocks', logo: '/assets/clients/gamechangersocks.webp' },
-  { name: 'BWT', logo: '/assets/clients/bwt.webp', height: 34 },
-  { name: 'Ecosoft', logo: '/assets/clients/ecosoft.webp' }
+  { name: 'Aqmos', logo: '/assets/clients/aqmos.webp', height: 25, w: 450, h: 96 },
+  { name: 'Hagleitner', logo: '/assets/clients/hagleitner.webp', height: 44, w: 165, h: 96 },
+  { name: 'Gamechangersocks', logo: '/assets/clients/gamechangersocks.webp', height: 40, w: 150, h: 96 },
+  { name: 'BWT', logo: '/assets/clients/bwt.webp', height: 32, w: 255, h: 96 },
+  { name: 'Ecosoft', logo: '/assets/clients/ecosoft.webp', height: 30, w: 311, h: 96 }
 ];
 
 /* mark: Teil des Titels, der den Lime-Textmarker bekommt (Brand-Signature, sparsam). */
@@ -50,7 +57,7 @@ const DIFFERENCE = [
 const CASES = [
   { client: 'Aqmos', logo: '/assets/clients/aqmos.webp', industry: 'Wasseraufbereitung · D2C + Marktplätze',
     stat: '+50 %', statLabel: 'Monatsumsatz im Jahresvergleich',
-    result: '+50 % Monatsumsatz. Durch Struktur, nicht durch Budget.',
+    result: 'Gewachsen durch Struktur, nicht durch Budget.',
     body: 'Wir haben Aqmos neu gebrandet und der Marke ein Gesicht gegeben. Seitdem steuern wir das operative E-Commerce-Geschäft über vier Kanäle. Im Jahresvergleich liegen die Monatsumsätze stabil bei +50 %. Gewachsen ist das über Struktur im Marketing und im technischen E-Commerce.',
     tags: ['Rebranding', 'E-Commerce-Steuerung', '4+ Kanäle'] },
   { client: 'Hagi · Hagleitner', logo: '/assets/clients/hagleitner.webp', industry: 'Hygiene · B2B-Konzern',
@@ -124,54 +131,116 @@ export const FAQS = [
   ['Passt ihr zu jedem Unternehmen?', 'Nein. Wir passen zu Unternehmen, die echte Zusammenarbeit und klare Entscheidungen wollen. Kein weiteres Agenturfeuerwerk.']
 ];
 
+/* Sichtbarer, fester Teil der H1. Die H1 liest für Screenreader und Crawler exakt H1_TEXT:
+   Der feste Teil steht als normaler Text darin, der Rest von H1_TEXT als sr-only-Text, und der
+   Rotator ist aria-hidden (seine Wörter sind CSS-Content, also auch nicht im Textinhalt).
+   Passt H1_TEXT irgendwann nicht mehr zum festen Teil, wird die ganze sichtbare Zeile
+   versteckt und H1_TEXT komplett als sr-only gelesen. */
+const H1_VISIBLE = 'Die richtige Entscheidung für';
+
 function Hero({ onNavigate }) {
+  const split = H1_TEXT.startsWith(H1_VISIBLE);
+  const toForm = (e) => { if (e) e.preventDefault(); onNavigate('home', 'setup-check'); };
   return (
-    <div className="dd-hero" style={{ position: 'relative' }}>
-      <div style={{ maxWidth: 'var(--measure-wide)', margin: '0 auto' }}>
-        <div style={{ marginBottom: 'var(--space-5)' }}><Kicker tone="limeText">E-Commerce-Partner · Salzburg</Kicker></div>
-        <h1 style={{ font: 'var(--text-h1)', fontSize: 'var(--fs-h1)', letterSpacing: 'var(--ls-heading)', margin: 0, maxWidth: 'var(--measure-headline)' }}>
-          Die richtige Entscheidung für <WordRotator words={ROTATOR} />
+    <div className="dd-hero">
+      <div className="dd-hero-inner">
+        <div className="dd-hero-eyebrow"><Kicker tone="limeText">E-Commerce-Partner · Salzburg</Kicker></div>
+        <h1 className="dd-hero-title">
+          {split
+            ? <>{H1_VISIBLE}<span className="dd-sr-only">{H1_TEXT.slice(H1_VISIBLE.length)}</span></>
+            : <><span aria-hidden="true">{H1_VISIBLE}</span><span className="dd-sr-only">{H1_TEXT}</span></>}
+          <WordRotator words={ROTATOR} loops={1} className="dd-hero-rotator" />
         </h1>
-        <p style={{ font: 'var(--text-lead)', color: 'var(--text-on-dark-secondary)', maxWidth: 560, margin: 'var(--space-6) 0 var(--space-8)', textWrap: 'pretty' }}>
-          Wir führen dein E-Commerce-Geschäft, als wäre es unser eigenes. Strategie und Umsetzung, ein Team, das entscheidet und dazu steht.
-        </p>
-        <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
-          <Button arrow onClick={() => onNavigate('home', 'setup-check')}>Kostenlosen Setup-Check holen</Button>
-          <Button variant="ghostDark" href="#phasen">Wie wir arbeiten</Button>
-        </div>
-        <div style={{ font: 'var(--text-caption)', color: 'var(--text-on-dark-secondary)', marginTop: 'var(--space-4)' }}>
-          30 Minuten · ehrliche Einschätzung · kein Pitch
+
+        <div className="dd-hero-grid">
+          <div className="dd-hero-copy">
+            <p className="dd-hero-lead">
+              Wir führen dein E-Commerce-Geschäft, als wäre es unser eigenes. Strategie und Umsetzung, ein Team, das entscheidet und dazu steht.
+            </p>
+            <div className="dd-hero-ctas">
+              <Button arrow onClick={toForm}>Kostenlosen Setup-Check holen</Button>
+              <Button variant="ghostDark" href="#phasen" onClick={(e) => { e.preventDefault(); onNavigate('home', 'phasen'); }}>Wie wir arbeiten</Button>
+            </div>
+            <p className="dd-hero-micro">30 Minuten · ehrliche Einschätzung · kein Pitch</p>
+            <div className="dd-hero-strip">
+              <HeroFaces faces={HERO_FACES} />
+              <p className="dd-hero-strip-text">{HERO_OFFER.reply}</p>
+            </div>
+          </div>
+          <HeroOffer offer={HERO_OFFER} faces={HERO_FACES} onNavigate={onNavigate} className="dd-hero-offer" />
         </div>
       </div>
     </div>
   );
 }
 
+function PauseIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+      <rect x="3.5" y="2.5" width="3" height="11" rx="1" fill="currentColor" />
+      <rect x="9.5" y="2.5" width="3" height="11" rx="1" fill="currentColor" />
+    </svg>
+  );
+}
+
+function PlayIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+      <path d="M5 2.9v10.2a.8.8 0 0 0 1.2.7l8-5.1a.8.8 0 0 0 0-1.4l-8-5.1A.8.8 0 0 0 5 2.9z" fill="currentColor" />
+    </svg>
+  );
+}
+
+/* Logo-Band am Fuß des Hero: Zeile mit Einordnung und Pause-Button, darunter das Laufband.
+   Der Button ist ein Toggle (aria-pressed) mit gleichbleibendem Namen; das Icon zeigt den
+   Zustand. Bei reduzierter Bewegung steht das Band still, der Button entfällt (CSS). */
+function TrustBand() {
+  const [paused, setPaused] = React.useState(false);
+  return (
+    <div className="dd-trust">
+      <div className="dd-trust-bar">
+        <div className="dd-trust-head">
+          <p className="dd-trust-copy">
+            <span className="dd-trust-title">Von D2C-Brand bis Konzern.</span>{' '}
+            <span className="dd-trust-sub">Marken, die uns zu dem machen, was wir sind.</span>
+          </p>
+          <button type="button" className="dd-trust-toggle" aria-controls="dd-trust-marquee"
+                  aria-pressed={paused} aria-label="Logo-Laufband pausieren"
+                  onClick={() => setPaused((v) => !v)}>
+            {paused ? <PlayIcon /> : <PauseIcon />}
+          </button>
+        </div>
+      </div>
+      <LogoMarquee id="dd-trust-marquee" tone="dark" items={TRUST} speed={34} paused={paused} />
+    </div>
+  );
+}
+
+/* Titel mit optionalem Lime-Textmarker auf genau dem Teilstring `mark` */
+function MarkedTitle({ title, mark }) {
+  const at = mark ? title.indexOf(mark) : -1;
+  if (at < 0) return title;
+  return <>{title.slice(0, at)}<span className="dd-diff-mark">{mark}</span>{title.slice(at + mark.length)}</>;
+}
+
 export function Home({ onNavigate }) {
   return (
     <div>
-      <div id="hero" style={{ position: 'relative', background: 'var(--surface-dark)', color: 'var(--text-on-dark)' }}>
-        <Aurora origin="top-right" />
+      <div id="hero" className="dd-hero-wrap dd-on-dark">
+        <Aurora origin="right" intensity={0.28} speed={64} />
         <Hero onNavigate={onNavigate} />
-        <div style={{ position: 'relative', padding: 'var(--space-10) 0 var(--space-12)' }}>
-          <div style={{ maxWidth: 'var(--measure)', margin: '0 auto var(--space-8)', padding: '0 var(--pad-page-x)', textAlign: 'center' }}>
-            <div style={{ font: 'var(--text-lead)', color: 'var(--text-on-dark)', textWrap: 'pretty' }}>Von D2C-Brand bis Konzern.</div>
-            <div style={{ font: 'var(--text-copy)', color: 'var(--text-on-dark-secondary)', marginTop: 'var(--space-2)', textWrap: 'pretty' }}>Marken, die uns zu dem machen, was wir sind.</div>
-          </div>
-          <LogoMarquee tone="dark" items={TRUST} speed={34} />
-        </div>
+        <TrustBand />
       </div>
 
       <ServiceBadges id="leistungen" />
 
       <Section tone="white">
         <SectionHeading kicker="Was uns anders macht" title="Substanz statt Show." lead="Klassische Agenturen verkaufen Stunden und Präsentationen. Wir haben das Modell an drei Stellen umgedreht:" />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 'var(--space-10)' }}>
-          {DIFFERENCE.map(([t, b], i) => (
-            <div key={t} data-reveal data-reveal-delay={i * 80}>
-              <div style={{ font: 'var(--text-h2)', fontSize: 'var(--fs-h2)', letterSpacing: 'var(--ls-heading)', marginBottom: 'var(--space-3)', color: i === 2 ? 'var(--dd-lime)' : 'var(--dd-ink)' }}>{'0' + (i + 1)}</div>
-              <div style={{ font: 'var(--text-h3)', fontWeight: 'var(--fw-bold)', fontSize: 20, letterSpacing: 'var(--ls-heading)', marginBottom: 'var(--space-2)' }}>{t}</div>
-              <p style={{ font: 'var(--text-copy)', color: 'var(--text-secondary)', margin: 0, textWrap: 'pretty' }}>{b}</p>
+        <div className="dd-diff">
+          {DIFFERENCE.map((d, i) => (
+            <div key={d.title} className="dd-diff-row" data-reveal data-reveal-delay={i * 80}>
+              <h3 className="dd-diff-title"><MarkedTitle title={d.title} mark={d.mark} /></h3>
+              <p className="dd-diff-body">{d.body}</p>
             </div>
           ))}
         </div>

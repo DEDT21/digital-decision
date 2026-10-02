@@ -14,13 +14,22 @@
   gap:var(--space-8);
 }
 .page-header img{display:block;height:44px;width:auto}
+.page-header a.logo{display:block;border-radius:var(--radius-sm)}
+/* Touch-Target mind. 44 px hoch, ohne das Layout zu verändern */
 .page-header a.back{
+  display:inline-flex;
+  align-items:center;
+  gap:var(--space-2);
+  min-height:44px;
   font:var(--text-copy);
   font-size:14px;
   color:var(--text-on-dark-secondary);
   text-decoration:none;
 }
 .page-header a.back:hover{color:var(--dd-white)}
+
+/* Skip-Link-Ziel: Fokus landet auf <main>, ohne Rahmen um den ganzen Inhalt */
+main[tabindex="-1"]:focus{outline:none}
 
 .legal-main{
   max-width:var(--measure);
@@ -72,10 +81,10 @@
   color:var(--text-secondary);
 }
 .page-footer nav{display:flex;gap:var(--space-5)}
-.page-footer a{color:var(--text-secondary);text-decoration:none}
+.page-footer a{display:inline-flex;align-items:center;min-height:44px;color:var(--text-secondary);text-decoration:none}
 .page-footer a:hover{color:var(--dd-ink)}
 
-/* Regionen-Block: gleiche Keyword-Links wie im React-Footer, im Stil der Meta-Links */
+/* Regionen-Block: dieselben Begriffe wie im React-Footer, als reiner Text (keine Selbstlinks) */
 .page-footer .inner.regions{
   display:block;
   padding-bottom:0;
@@ -86,12 +95,15 @@
   font-weight:var(--fw-medium);
   text-transform:uppercase;
   letter-spacing:var(--ls-kicker);
-  margin-bottom:var(--space-4);
+  margin:0 0 var(--space-4);
 }
 .page-footer .regions-links{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
   gap:var(--space-3) var(--space-6);
+  list-style:none;
+  margin:0;
+  padding:0;
 }
 @media (max-width:720px){
   .page-footer .regions-links{grid-template-columns:repeat(2,1fr);gap:var(--space-2) var(--space-4)}
@@ -117,6 +129,7 @@
   padding:var(--space-16) var(--pad-page-x) var(--space-24);
 }
 .ink-scene .kicker{
+  margin-top:0;
   font:var(--text-kicker);
   font-family:var(--font-head);
   text-transform:uppercase;
@@ -177,8 +190,16 @@
   max-width:var(--measure-wide);
   width:100%;
   margin:0 auto;
-  padding:var(--space-6) var(--pad-page-x);
+  padding:var(--space-4) var(--pad-page-x);
   border-top:1px solid var(--dd-border-dark);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:var(--space-2) var(--space-6);
+  flex-wrap:wrap;
   font:var(--text-caption);
   color:var(--text-on-dark-secondary);
 }
+.ink-scene .legal-line nav{display:flex;gap:var(--space-5)}
+.ink-scene .legal-line a{display:inline-flex;align-items:center;min-height:44px;color:var(--text-on-dark-secondary);text-decoration:none}
+.ink-scene .legal-line a:hover{color:var(--dd-white)}

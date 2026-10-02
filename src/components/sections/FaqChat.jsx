@@ -1,46 +1,106 @@
 import React from 'react';
+import './FaqChat.css';
 
-/* Chat-style FAQ: the question is a message bubble, the answer replies underneath as an Ink
-   bubble. Bubbles use one squared corner on the speaking side, everything else 16px.
-   Open/close animates with grid-template-rows (no dependencies). Emoji stickers from the
-   original reference are deliberately dropped — the brand does not use emoji. */
+/* Chat-style FAQ: the question is a message bubble and the bubble itself is the button
+   (plus/minus inside it); the answer replies underneath as an Ink bubble. Accordion semantics:
+   question heading > button with aria-expanded/aria-controls, answer region hidden when closed.
+   Emoji stickers from the original reference are deliberately dropped; the brand does not use
+   emoji. */
+
+const useIsoLayoutEffect = typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect;
+const REDUCE_QUERY = '(prefers-reduced-motion: reduce)';
+
+/* Collapse with max-height instead of grid-template-rows 0fr (WebKit does not interpolate back
+   to 0fr, closed answers would stay open on iOS). Same mechanism as in TeamStructure.jsx:
+   closed = `hidden`; opening animates from the current height and releases max-height at the
+   end; closing makes the panel inert at once and hides it when the transition is done. */
+function useCollapse(open) {
+  const ref = React.useRef(null);
+  const mounted = React.useRef(false);
+  const [prevOpen, setPrevOpen] = React.useState(open);
+  const [closing, setClosing] = React.useState(false);
+  if (open !== prevOpen) { setPrevOpen(open); setClosing(!open); }
+
+  useIsoLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return undefined;
+    el.inert = !open;
+    if (!mounted.current) {
+      mounted.current = true;
+      if (!open) { el.style.maxHeight = '0px'; el.style.opacity = '0'; }
+      return undefined;
+    }
+    if (window.matchMedia && window.matchMedia(REDUCE_QUERY).matches) {
+      el.style.maxHeight = open ? '' : '0px';
+      el.style.opacity = open ? '' : '0';
+      if (!open) setClosing(false);
+      return undefined;
+    }
+
+    let timer = 0;
+    const finish = () => {
+      window.clearTimeout(timer);
+      el.removeEventListener('transitionend', onEnd);
+      if (open) { el.style.maxHeight = ''; el.style.opacity = ''; } else setClosing(false);
+    };
+    function onEnd(e) { if (e.target === el && e.propertyName === 'max-height') finish(); }
+
+    const fromH = el.getBoundingClientRect().height;
+    el.style.maxHeight = fromH + 'px';
+    el.style.opacity = getComputedStyle(el).opacity;
+    void el.offsetHeight; /* force a style flush so the transition has a start value */
+    el.style.maxHeight = open ? el.scrollHeight + 'px' : '0px';
+    el.style.opacity = open ? '1' : '0';
+    el.addEventListener('transitionend', onEnd);
+    timer = window.setTimeout(finish, 800);
+    return () => { window.clearTimeout(timer); el.removeEventListener('transitionend', onEnd); };
+  }, [open]);
+
+  return { ref, hidden: !open && !closing };
+}
+
+function PlusMinus() {
+  return (
+    <svg viewBox="0 0 10 10" aria-hidden="true" focusable="false">
+      <path d="M0 5h10" stroke="currentColor" strokeWidth="1.5" />
+      <path className="dd-icon-v" d="M5 0v10" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
+  );
+}
+
+function FaqItem({ item, isOpen, onToggle, index }) {
+  const uid = React.useId();
+  const qId = uid + '-q';
+  const aId = uid + '-a';
+  const panel = useCollapse(isOpen);
+  return (
+    <div className="dd-faq-item" data-reveal data-reveal-delay={index * 60}>
+      <h3 className="dd-faq-q">
+        <button type="button" id={qId} className="dd-faq-bubble" onClick={onToggle} aria-expanded={isOpen} aria-controls={aId}>
+          <span>{item.question}</span>
+          <span className="dd-faq-icon" aria-hidden="true"><PlusMinus /></span>
+        </button>
+      </h3>
+      <div ref={panel.ref} id={aId} className="dd-faq-panel" role="region" aria-labelledby={qId} hidden={panel.hidden}>
+        <div className="dd-faq-panel-inner">
+          <p className="dd-faq-answer">{item.answer}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function FaqChat({ items = [], timestamp, defaultOpenId, columnsGap, style }) {
   const [open, setOpen] = React.useState(defaultOpenId != null ? String(defaultOpenId) : null);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: columnsGap || 'var(--space-4)', ...style }}>
-      {timestamp ? (
-        <div style={{ font: 'var(--text-caption)', textTransform: 'uppercase', letterSpacing: 'var(--ls-tag)', color: 'var(--text-secondary)', marginBottom: 'var(--space-2)' }}>{timestamp}</div>
-      ) : null}
-
+    <div className="dd-faq" style={columnsGap ? { gap: columnsGap, ...style } : style}>
+      {timestamp ? <p className="dd-faq-time">{timestamp}</p> : null}
       {items.map((item, i) => {
         const id = String(item.id != null ? item.id : i);
-        const isOpen = open === id;
         return (
-          <div key={id} data-reveal data-reveal-delay={i * 60}>
-            <button
-              onClick={() => setOpen(isOpen ? null : id)}
-              aria-expanded={isOpen}
-              style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)', background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left', width: '100%' }}
-            >
-              <span style={{ display: 'inline-block', font: 'var(--text-copy)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-medium)', fontSize: '20px', lineHeight: 1.35, padding: '12px 20px', borderRadius: 'var(--radius-xl) var(--radius-xl) var(--radius-xl) var(--radius-xs)', background: isOpen ? 'var(--surface-accent)' : 'var(--surface-card)', border: isOpen ? '1px solid var(--dd-lime)' : 'var(--border-default)', color: 'var(--dd-ink)', transition: 'var(--transition-interactive)' }}>
-                {item.question}
-              </span>
-              <span aria-hidden="true" style={{ flex: '0 0 32px', width: 32, height: 32, borderRadius: 'var(--radius-pill)', border: isOpen ? 'none' : 'var(--border-default)', background: isOpen ? 'var(--dd-ink)' : 'transparent', color: isOpen ? 'var(--dd-white)' : 'var(--text-secondary)', display: 'grid', placeItems: 'center', font: 'var(--text-copy)', transition: 'var(--transition-interactive)' }}>
-                {isOpen ? '–' : '+'}
-              </span>
-            </button>
-
-            <div style={{ display: 'grid', gridTemplateRows: isOpen ? '1fr' : '0fr', opacity: isOpen ? 1 : 0, transition: 'grid-template-rows var(--dur-slow) var(--ease-out), opacity var(--dur-base) var(--ease-standard)' }}>
-              <div style={{ overflow: 'hidden' }}>
-                <div style={{ paddingLeft: 'var(--space-12)', paddingTop: 'var(--space-3)' }}>
-                  <div style={{ display: 'inline-block', maxWidth: 520, background: 'var(--surface-dark)', color: 'var(--text-on-dark)', font: 'var(--text-copy)', padding: '14px 20px', borderRadius: 'var(--radius-xl) var(--radius-xl) var(--radius-xs) var(--radius-xl)', textWrap: 'pretty' }}>
-                    {item.answer}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <FaqItem key={id} item={item} index={i} isOpen={open === id}
+            onToggle={() => setOpen((prev) => (prev === id ? null : id))} />
         );
       })}
     </div>

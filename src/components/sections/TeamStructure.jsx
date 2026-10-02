@@ -1,199 +1,188 @@
 import React from 'react';
+import './TeamStructure.css';
 
-/* "Kern & Netz" — the company's actual structure in one component, not a team slideshow.
-   Top: the people who decide (3–4), each a real card with a first-person line, what they are
-   working on right now, and what you'd call them for — expandable, personal, specific.
-   Bottom: the network, deliberately a DIFFERENT object: one Ink hub fanning out via thin
-   connectors into named specialists. No faces there, because they aren't employees — that
-   honesty is the point. Hover/tap a node to light its connector and read what it covers. */
+/* "Kern & Netz": the company's actual structure in one component, not a team slideshow.
+   The people who decide, each a real card with a first-person line and what you'd call them
+   for (expandable), and next to them the network as a deliberately different object: an Ink
+   card with the partner logos and the four disciplines. No faces there, because they aren't
+   employees; that honesty is the point.
+   Layout is pure CSS (TeamStructure.css), so the first render is the same on server and client. */
 
-const REDUCED_MOTION = typeof window !== 'undefined' && typeof window.matchMedia === 'function'
-  ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false;
+const useIsoLayoutEffect = typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect;
+const REDUCE_QUERY = '(prefers-reduced-motion: reduce)';
 
-function PersonCard({ person, open, onToggle, assetBase, index = 0 }) {
-  const panelRef = React.useRef(null);
-  const firstRun = React.useRef(true);
+/* Collapse with max-height (WebKit-safe, see TeamStructure.css). Closed the panel carries the
+   `hidden` attribute, so nothing inside is focusable or in the accessibility tree. Opening
+   removes `hidden` and animates from the current height; closing animates to 0, makes the panel
+   inert right away and sets `hidden` once the transition is done. After opening, max-height is
+   released so later reflow (resize, larger font) never clips the content.
+   Same mechanism as in FaqChat.jsx. */
+function useCollapse(open) {
+  const ref = React.useRef(null);
+  const mounted = React.useRef(false);
+  const [prevOpen, setPrevOpen] = React.useState(open);
+  const [closing, setClosing] = React.useState(false);
+  if (open !== prevOpen) { setPrevOpen(open); setClosing(!open); }
 
-  /* Auf- und Zuklappen über max-height statt über grid-template-rows 1fr ↔ 0fr:
-     WebKit (Safari und damit auch Chrome auf iOS) wendet den Endzustand beim Zurück-
-     Interpolieren auf 0fr nicht an — die Zeile behält die Inhaltshöhe, die Karte blieb
-     aufgeklappt stehen. max-height ist eine gewöhnliche Längen-Interpolation und in allen
-     Engines verlässlich.
-     Aufgeklappt wird nach der Transition auf 'none' zurückgestellt, damit späteres
-     Umbrechen (Resize, größere Schrift) den Inhalt nicht abschneidet; zum Schließen wird
-     der gemessene Wert kurz zurückgeschrieben, weil eine Transition von 'none' aus keinen
-     Startwert hätte. */
-  React.useLayoutEffect(() => {
-    const el = panelRef.current;
+  useIsoLayoutEffect(() => {
+    const el = ref.current;
     if (!el) return undefined;
-
-    if (firstRun.current || REDUCED_MOTION) {
-      firstRun.current = false;
-      el.style.maxHeight = open ? 'none' : '0px';
+    el.inert = !open;
+    if (!mounted.current) {
+      mounted.current = true;
+      if (!open) { el.style.maxHeight = '0px'; el.style.opacity = '0'; }
+      return undefined;
+    }
+    if (window.matchMedia && window.matchMedia(REDUCE_QUERY).matches) {
+      el.style.maxHeight = open ? '' : '0px';
+      el.style.opacity = open ? '' : '0';
+      if (!open) setClosing(false);
       return undefined;
     }
 
-    if (open) {
-      el.style.maxHeight = el.scrollHeight + 'px';
-      const release = (e) => { if (e.target === el && e.propertyName === 'max-height') el.style.maxHeight = 'none'; };
-      el.addEventListener('transitionend', release);
-      return () => el.removeEventListener('transitionend', release);
-    }
+    let timer = 0;
+    const finish = () => {
+      window.clearTimeout(timer);
+      el.removeEventListener('transitionend', onEnd);
+      if (open) { el.style.maxHeight = ''; el.style.opacity = ''; } else setClosing(false);
+    };
+    function onEnd(e) { if (e.target === el && e.propertyName === 'max-height') finish(); }
 
-    el.style.maxHeight = el.scrollHeight + 'px';
-    void el.offsetHeight; /* Reflow erzwingen, sonst fasst der Browser beide Werte zusammen */
-    el.style.maxHeight = '0px';
-    return undefined;
+    const fromH = el.getBoundingClientRect().height;
+    el.style.maxHeight = fromH + 'px';
+    el.style.opacity = getComputedStyle(el).opacity;
+    void el.offsetHeight; /* force a style flush so the transition has a start value */
+    el.style.maxHeight = open ? el.scrollHeight + 'px' : '0px';
+    el.style.opacity = open ? '1' : '0';
+    el.addEventListener('transitionend', onEnd);
+    timer = window.setTimeout(finish, 800);
+    return () => { window.clearTimeout(timer); el.removeEventListener('transitionend', onEnd); };
   }, [open]);
 
+  return { ref, hidden: !open && !closing };
+}
+
+function PlusMinus() {
   return (
-    /* Kartenlayout liegt in mobile.css (.dd-person*): mobil wird aus der hohen Portrait-Card
-       eine kompakte Querformat-Card (Bild links, Text rechts), die Bio klappt erst mit auf. */
-    <div className="dd-person" data-open={open ? '1' : '0'} data-reveal data-reveal-delay={index * 80}>
-      <div className="dd-person-media">
-        {person.photo ? (
-          <img src={person.photo} alt={person.name} loading="lazy" decoding="async"
-               style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', filter: open ? 'none' : 'grayscale(1) contrast(1.05)', transform: open ? 'scale(1.03)' : 'scale(1)', transition: 'filter var(--dur-slow) var(--ease-out), transform var(--dur-slow) var(--ease-out)' }} />
-        ) : (
-          <img src={assetBase + '/dd-mark-white.svg'} alt="" loading="lazy" decoding="async" style={{ width: '34%', opacity: open ? 0.5 : 0.3, transition: 'opacity var(--dur-base) var(--ease-standard)' }} />
-        )}
-        {person.tag ? (
-          <span style={{ position: 'absolute', left: 'var(--space-4)', bottom: 'var(--space-4)', font: 'var(--text-kicker)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-medium)', fontSize: '13px', textTransform: 'uppercase', letterSpacing: 'var(--ls-kicker)', color: 'var(--dd-lime)' }}>{person.tag}</span>
-        ) : null}
-      </div>
-
-      <div className="dd-person-body">
-        <div className="dd-person-name" style={{ letterSpacing: 'var(--ls-heading)' }}>
-          <span style={{ background: open ? 'var(--highlight-mark)' : 'none', transition: 'background var(--dur-base) var(--ease-standard)' }}>{person.name}</span>
-        </div>
-        <div style={{ font: 'var(--text-copy)', fontSize: '14px', color: 'var(--text-secondary)' }}>{person.role}</div>
-        {person.line ? <p style={{ font: 'var(--text-copy)', margin: 'var(--space-2) 0 0', textWrap: 'pretty' }}>„{person.line}“</p> : null}
-        {person.bio ? <p className="dd-person-bio" style={{ font: 'var(--text-copy)', fontSize: '14px', color: 'var(--text-secondary)', margin: 'var(--space-3) 0 0', textWrap: 'pretty' }}>{person.bio}</p> : null}
-
-
-        {/* Höhe steuert der Layout-Effect oben; Optik und Transition stehen in mobile.css */}
-        <div ref={panelRef} className="dd-person-panel">
-          <div>
-            <div style={{ paddingTop: 'var(--space-4)' }}>
-              {person.callFor && person.callFor.length ? (
-                <>
-                  <div style={{ font: 'var(--text-caption)', textTransform: 'uppercase', letterSpacing: 'var(--ls-tag)', color: 'var(--text-secondary)', marginBottom: 'var(--space-2)' }}>Dafür rufst du mich an</div>
-                  <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
-                    {person.callFor.map((c) => (
-                      <li key={c} style={{ font: 'var(--text-copy)', fontSize: '14px', display: 'flex', gap: 'var(--space-2)' }}><span aria-hidden="true" style={{ color: 'var(--dd-ink)' }}>·</span>{c}</li>
-                    ))}
-                  </ul>
-                </>
-              ) : null}
-              {person.mail ? <div style={{ marginTop: 'var(--space-4)', font: 'var(--text-copy)', fontSize: '14px' }}><a href={'mailto:' + person.mail} style={{ color: 'var(--text-link)' }}>{person.mail}</a></div> : null}
-            </div>
-          </div>
-        </div>
-
-        <button onClick={onToggle} aria-expanded={open} className="dd-person-toggle"
-                style={{ marginTop: 'auto', alignSelf: 'flex-start', background: 'none', border: 'none', cursor: 'pointer', font: 'var(--text-copy)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-medium)', fontSize: '14px', textTransform: 'uppercase', letterSpacing: 'var(--ls-kicker)', color: 'var(--dd-ink)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-          {open ? 'Weniger' : 'Mehr über ' + person.name.split(' ')[0]}
-          <span aria-hidden="true" style={{ display: 'inline-grid', placeItems: 'center', width: 24, height: 24, borderRadius: 'var(--radius-pill)', border: 'var(--border-default)', transition: 'var(--transition-interactive)' }}>{open ? '–' : '+'}</span>
-        </button>
-      </div>
-    </div>
+    <svg viewBox="0 0 10 10" aria-hidden="true" focusable="false">
+      <path d="M0 5h10" stroke="currentColor" strokeWidth="1.5" />
+      <path className="dd-icon-v" d="M5 0v10" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
   );
 }
 
-function NetworkFan({ hubLabel, note, nodes, faces, assetBase, stacked }) {
-  const [hot, setHot] = React.useState(0);
-  const count = Math.max(nodes.length, 1);
+/* /assets/team/name.webp → responsive set name-400.webp / name-800.webp (both 4:5) */
+function photoSources(photo) {
+  if (!photo || !/\.webp$/.test(photo)) return { src: photo };
+  const base = photo.replace(/\.webp$/, '');
+  return { src: base + '-800.webp', srcSet: base + '-400.webp 400w, ' + base + '-800.webp 800w' };
+}
+
+function PersonCard({ person, open, onToggle, assetBase, index = 0 }) {
+  const uid = React.useId();
+  const panelId = uid + '-panel';
+  const panel = useCollapse(open);
+  const img = photoSources(person.photo);
+  const first = person.name.split(' ')[0];
+
+  return (
+    <article className="dd-person" data-open={open ? '1' : '0'} data-reveal data-reveal-delay={index * 80}>
+      <div className="dd-person-media">
+        {person.photo ? (
+          <img src={img.src} srcSet={img.srcSet}
+               sizes="(max-width: 720px) 104px, (max-width: 1023px) 50vw, 360px"
+               width="800" height="1000" alt={person.name} loading="lazy" decoding="async" />
+        ) : (
+          <img className="dd-person-mark" src={assetBase + '/dd-mark-white.svg'} alt="" loading="lazy" decoding="async" />
+        )}
+        {person.tag ? <span className="dd-person-tag">{person.tag}</span> : null}
+      </div>
+
+      <div className="dd-person-body">
+        <h3 className="dd-person-name"><span>{person.name}</span></h3>
+        <p className="dd-person-role">{person.role}</p>
+        {person.line ? <p className="dd-person-line">„{person.line}“</p> : null}
+        {person.bio ? <p className="dd-person-bio">{person.bio}</p> : null}
+
+        <div ref={panel.ref} id={panelId} className="dd-person-panel" hidden={panel.hidden}>
+          <div className="dd-person-panel-inner">
+            {person.callFor && person.callFor.length ? (
+              <>
+                <p className="dd-person-callfor-title">Dafür rufst du mich an</p>
+                <ul className="dd-person-callfor">
+                  {person.callFor.map((c) => <li key={c}>{c}</li>)}
+                </ul>
+              </>
+            ) : null}
+            {person.mail ? <p className="dd-person-mail"><a href={'mailto:' + person.mail}>{person.mail}</a></p> : null}
+          </div>
+        </div>
+
+        <button type="button" className="dd-person-toggle" onClick={onToggle} aria-expanded={open} aria-controls={panelId}>
+          {open ? 'Weniger' : 'Mehr über ' + first}
+          <span className="dd-person-toggle-icon" aria-hidden="true"><PlusMinus /></span>
+        </button>
+      </div>
+    </article>
+  );
+}
+
+function NetworkCard({ hubLabel, note, nodes, faces, assetBase, index }) {
   const shown = faces.slice(0, 8);
   const rest = faces.length - shown.length;
-  /* Fixed geometry: the panel and the description box never resize when the selected node
-     changes — a box that grows and shrinks on hover creates exactly the restlessness the
-     brand avoids. */
-  const panelHeight = Math.max(count * 48 + 64, note ? 500 : 380);
   return (
-    <div className="dd-network" data-reveal style={{ background: 'var(--surface-dark)', color: 'var(--text-on-dark)', borderRadius: 'var(--radius-xl)', display: 'grid', gridTemplateColumns: stacked ? '1fr' : 'minmax(240px, 320px) minmax(56px, 96px) 1fr', gap: 'var(--space-6)', alignItems: stacked ? 'start' : 'center', height: stacked ? 'auto' : panelHeight + 'px', boxSizing: 'border-box' }}>
-      <div>
-        <img src={assetBase + '/dd-mark-lime.svg'} alt="" loading="lazy" decoding="async" style={{ width: 44, display: 'block', marginBottom: 'var(--space-4)' }} />
-        <div className="dd-network-hub" style={{ letterSpacing: 'var(--ls-heading)' }}>{hubLabel}</div>
+    <article className="dd-network dd-on-dark" data-reveal data-reveal-delay={index * 80}>
+      <div className="dd-network-head">
+        <img className="dd-network-mark" src={assetBase + '/dd-mark-lime.svg'} alt="" width="44" height="46" loading="lazy" decoding="async" />
+        <h3 className="dd-network-hub">{hubLabel}</h3>
+      </div>
 
+      <div className="dd-network-body">
         {shown.length ? (
-          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', marginTop: 'var(--space-4)', paddingLeft: 10 }}>
-            {/* round avatars as a fanned stack: each circle tucks 10px under its left neighbour,
-                the Ink border keeps every logo readable — left-most sits on top */}
-            {shown.map((face, fi) => (
-              <span key={face.name} title={face.name}
-                    style={{ width: 44, height: 44, borderRadius: 'var(--radius-round)', overflow: 'hidden', background: face.dark ? 'var(--dd-lime)' : 'var(--dd-white)', border: '2px solid var(--surface-dark)', display: 'grid', placeItems: 'center', flex: '0 0 auto', boxSizing: 'border-box', marginLeft: -10, position: 'relative', zIndex: shown.length - fi }}>
+          <ul className="dd-network-faces" aria-label="Partner aus dem Netzwerk">
+            {shown.map((face) => (
+              <li key={face.name} className="dd-network-face" title={face.name}>
                 {face.logo
-                  ? <img src={face.logo} alt={face.name} loading="lazy" decoding="async"
-                      style={{ width: '66%', height: '66%', objectFit: 'contain', display: 'block', filter: 'grayscale(1) brightness(0)' }} />
+                  ? <img className="is-logo" src={face.logo} alt={face.name} loading="lazy" decoding="async" />
                   : face.photo
-                    ? <img src={face.photo} alt={face.name} loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', filter: 'grayscale(1)' }} />
-                    : <span style={{ font: 'var(--text-caption)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-bold)', fontSize: '12px', color: 'var(--dd-muted)' }}>{face.name.trim().charAt(0).toUpperCase()}</span>}
-              </span>
+                    ? <img className="is-photo" src={face.photo} alt={face.name} loading="lazy" decoding="async" />
+                    : <span className="is-initial" role="img" aria-label={face.name}>{face.name.trim().charAt(0).toUpperCase()}</span>}
+              </li>
             ))}
-            {rest > 0 ? (
-              <span style={{ width: 44, height: 44, borderRadius: 'var(--radius-round)', border: '2px solid var(--surface-dark)', background: 'var(--dd-lime)', boxSizing: 'border-box', color: 'var(--dd-ink)', display: 'grid', placeItems: 'center', font: 'var(--text-caption)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-bold)', fontSize: '12px', flex: '0 0 auto', marginLeft: -10, position: 'relative' }}>+{rest}</span>
-            ) : null}
-          </div>
+            {rest > 0 ? <li className="dd-network-face"><span className="is-initial">+{rest}</span></li> : null}
+          </ul>
         ) : null}
-
-        {note ? <p style={{ font: 'var(--text-copy)', fontSize: '14px', color: 'var(--text-on-dark-secondary)', margin: 'var(--space-4) 0 0', textWrap: 'pretty' }}>{note}</p> : null}
-        <p style={{ font: 'var(--text-copy)', fontSize: '14px', color: 'var(--dd-lime)', margin: 'var(--space-3) 0 0', height: stacked ? 'auto' : 76, overflow: 'hidden', textWrap: 'pretty' }}>{nodes[hot] ? nodes[hot].what : ''}</p>
+        {note ? <p className="dd-network-note">{note}</p> : null}
       </div>
 
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: '100%', height: 40 * count, display: stacked ? 'none' : 'block' }} aria-hidden="true">
-        {nodes.map((node, i) => {
-          const y = ((i + 0.5) / count) * 100;
-          const on = i === hot;
-          return (
-            <path key={node.name} d={'M0 50 C 55 50, 45 ' + y + ', 100 ' + y}
-                  fill="none" stroke={on ? 'var(--dd-lime)' : 'var(--dd-border-dark)'} strokeWidth={on ? 2 : 1}
-                  vectorEffect="non-scaling-stroke" style={{ transition: 'stroke var(--dur-base) var(--ease-standard)' }} />
-          );
-        })}
-      </svg>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-        {nodes.map((node, i) => {
-          const on = i === hot;
-          return (
-            <button key={node.name} onMouseEnter={() => setHot(i)} onFocus={() => setHot(i)} onClick={() => setHot(i)}
-                    className="dd-network-node"
-                    style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', textAlign: 'left', cursor: 'pointer', background: on ? 'var(--dd-lime)' : 'transparent', color: on ? 'var(--dd-ink)' : 'var(--text-on-dark)', border: on ? '1px solid var(--dd-lime)' : 'var(--border-on-dark)', borderRadius: 'var(--radius-pill)', padding: '0 var(--space-5)', font: 'var(--text-copy)', fontFamily: 'var(--font-head)', fontWeight: 'var(--fw-medium)', fontSize: '15px', transition: 'var(--transition-interactive)' }}>
-              {node.name}
-            </button>
-          );
-        })}
-      </div>
-    </div>
+      {nodes.length ? (
+        <ul className="dd-network-list">
+          {nodes.map((node) => (
+            <li key={node.name} className="dd-network-item">
+              <span className="dd-network-item-name">{node.name}</span>
+              {node.what ? <span className="dd-network-item-what">{node.what}</span> : null}
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </article>
   );
 }
 
 export function TeamStructure({ people = [], network = [], networkFaces = [], hubLabel = 'Netzwerk aus Spezialisten', networkNote, assetBase = '/assets', style }) {
   const [open, setOpen] = React.useState(-1);
-  const [stacked, setStacked] = React.useState(false);
-  const ref = React.useRef(null);
-
-  React.useEffect(() => {
-    const el = ref.current;
-    if (!el || typeof ResizeObserver === 'undefined') return;
-    const ro = new ResizeObserver(() => setStacked(el.clientWidth < 720));
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
 
   return (
-    <div ref={ref} className="dd-team-stack" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-12)', ...style }}>
-      {/* Spaltenmaß hängt an der Personenzahl: bei zwei Karten würde 1fr sie auf halbe
-          Containerbreite aufblasen (Portrait 4:5 = über 600px hoch). 380px deckelt das. */}
-      <div className="dd-team-grid" style={{ display: 'grid', gridTemplateColumns: stacked ? '1fr' : (people.length < 3 ? 'repeat(auto-fit, minmax(260px, 380px))' : 'repeat(auto-fit, minmax(260px, 1fr))'), gap: 'var(--gap-grid)' }}>
-        {people.map((p, i) => (
-          /* Funktionales setState: Auf Touch feuern touchend und der nachgelagerte Click
-             gelegentlich beide im selben React-Batch. Mit `open` aus der Render-Closure liest
-             der zweite Aufruf den alten Wert — auf/zu/auf, die Karte bliebe offen. */
-          <PersonCard key={p.name} person={p} open={open === i} onToggle={() => setOpen((prev) => (prev === i ? -1 : i))} assetBase={assetBase} index={i} />
-        ))}
-      </div>
-      {network.length ? <NetworkFan hubLabel={hubLabel} note={networkNote} nodes={network} faces={networkFaces} assetBase={assetBase} stacked={stacked} /> : null}
+    <div className="dd-team-grid" data-people={people.length} style={style}>
+      {people.map((p, i) => (
+        /* Funktionales setState: Auf Touch feuern touchend und der nachgelagerte Click
+           gelegentlich beide im selben React-Batch. Mit `open` aus der Render-Closure liest
+           der zweite Aufruf den alten Wert, auf/zu/auf, die Karte bliebe offen. */
+        <PersonCard key={p.name} person={p} open={open === i} onToggle={() => setOpen((prev) => (prev === i ? -1 : i))} assetBase={assetBase} index={i} />
+      ))}
+      {network.length || networkFaces.length
+        ? <NetworkCard hubLabel={hubLabel} note={networkNote} nodes={network} faces={networkFaces} assetBase={assetBase} index={people.length} />
+        : null}
     </div>
   );
 }

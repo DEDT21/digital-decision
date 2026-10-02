@@ -1,5 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /danke/
 
-Sitemap: https://www.digital-decision.at/sitemap.xml
+Sitemap: https://digital-decision.at/sitemap.xml

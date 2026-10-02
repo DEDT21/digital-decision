@@ -1,19 +1,8 @@
 import React from 'react';
+import './Kicker.css';
 
-export function Kicker({ tone = 'mark', children, style }) {
-  const shared = {
-    display: 'inline-block', font: 'var(--text-kicker)', fontFamily: 'var(--font-head)',
-    fontWeight: 'var(--fw-medium)', fontSize: 'var(--fs-kicker)', textTransform: 'uppercase',
-    letterSpacing: 'var(--ls-kicker)'
-  };
-  const tones = {
-    mark: { background: 'linear-gradient(transparent 58%, var(--dd-lime) 58%)', color: 'var(--dd-ink)' },
-    pill: { background: 'var(--surface-accent)', color: 'var(--dd-ink)', padding: '4px 12px', borderRadius: 'var(--radius-pill)' },
-    limeText: { color: 'var(--dd-lime)' },
-    inkPill: { background: 'var(--dd-ink)', color: 'var(--dd-lime)', padding: '4px 12px', borderRadius: 'var(--radius-pill)' },
-    plain: { color: 'var(--text-secondary)' },
-    /* white type with the Lime marker under it — the brand's underline treatment on Ink */
-    underline: { color: 'var(--dd-white)', background: 'linear-gradient(transparent 68%, var(--dd-lime) 68%, var(--dd-lime) 92%, transparent 92%)' }
-  };
-  return <span style={{ ...shared, ...tones[tone], ...style }}>{children}</span>;
+/* Tones: mark (Lime-Marker, hell) · pill · limeText (auf Ink) · inkPill · plain ·
+   underline (weiß mit Lime-Strich unter der Grundlinie, auf Ink). Styles in Kicker.css. */
+export function Kicker({ tone = 'mark', children, style, className }) {
+  return <span className={'dd-kicker dd-kicker--' + tone + (className ? ' ' + className : '')} style={style}>{children}</span>;
 }

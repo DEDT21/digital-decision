@@ -3,31 +3,80 @@ import { Aurora } from './Aurora.jsx';
 import { Button } from '../core/Button.jsx';
 import { Logo } from '../core/Logo.jsx';
 import { Kicker } from '../core/Kicker.jsx';
+import './SiteFooter.css';
 
 /* Closing CTA and footer as one Ink scene: aurora light, a giant outlined wordmark behind
    everything, the USP band running through, then the link columns and the legal line.
    Deliberately NOT taken from the reference: no glass/backdrop-blur pills (the brand has no
-   frosted surfaces), no emoji badge, no GSAP — reveals are one-shot IntersectionObserver
-   transitions and the band is a CSS keyframe, both off the main thread. */
+   frosted surfaces), no emoji badge, no GSAP. Reveals use the page-wide [data-reveal] observer,
+   the band is a CSS keyframe with a pause button; it also pauses while off screen and stands
+   still for reduced motion. All styles live in SiteFooter.css. */
 
-const STYLE_ID = 'dd-site-footer-styles';
+const REDUCE_QUERY = '(prefers-reduced-motion: reduce)';
 
-function ensureStyles() {
-  if (typeof document === 'undefined' || document.getElementById(STYLE_ID)) return;
-  const el = document.createElement('style');
-  el.id = STYLE_ID;
-  el.textContent =
-    '@keyframes dd-usp{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}'
-    + '.dd-usp-track{animation:dd-usp var(--dd-usp-duration,38s) linear infinite;will-change:transform}'
-    + '.dd-footer-reveal{opacity:0;transform:translateY(14px);transition:opacity 420ms cubic-bezier(0.23,1,0.32,1),transform 420ms cubic-bezier(0.23,1,0.32,1)}'
-    + '.dd-footer-reveal[data-shown="1"]{opacity:1;transform:translateY(0)}'
-    + '.dd-footer-link{color:var(--dd-on-ink-muted);text-decoration:none;transition:color 160ms cubic-bezier(0.23,1,0.32,1)}'
-    + '.dd-footer-link:hover{color:var(--dd-white)}'
-    + '.dd-top{transition:transform 160ms cubic-bezier(0.23,1,0.32,1),border-color 160ms cubic-bezier(0.23,1,0.32,1),color 160ms cubic-bezier(0.23,1,0.32,1)}'
-    + '.dd-top:active{transform:scale(0.97)}'
-    + '@media (hover:hover) and (pointer:fine){.dd-top:hover{border-color:var(--dd-white);color:var(--dd-white)}}'
-    + '@media (prefers-reduced-motion: reduce){.dd-usp-track{animation:none}.dd-footer-reveal{opacity:1;transform:none;transition:none}}';
-  document.head.appendChild(el);
+function PauseIcon() {
+  return (
+    <svg viewBox="0 0 14 14" aria-hidden="true" focusable="false">
+      <rect x="2.5" y="1.5" width="3" height="11" rx="1" fill="currentColor" />
+      <rect x="8.5" y="1.5" width="3" height="11" rx="1" fill="currentColor" />
+    </svg>
+  );
+}
+
+function PlayIcon() {
+  return (
+    <svg viewBox="0 0 14 14" aria-hidden="true" focusable="false">
+      <path d="M3.5 1.8v10.4a.6.6 0 0 0 .9.5l8.2-5.2a.6.6 0 0 0 0-1L4.4 1.3a.6.6 0 0 0-.9.5Z" fill="currentColor" />
+    </svg>
+  );
+}
+
+function ArrowUp() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+      <path d="M12 19V5" />
+      <path d="m5 12 7-7 7 7" />
+    </svg>
+  );
+}
+
+function UspBand({ usps, assetBase }) {
+  const ref = React.useRef(null);
+  const bandId = React.useId() + '-usp';
+  const [paused, setPaused] = React.useState(false);
+
+  /* Off screen the band stops (written straight to the DOM, no re-render) */
+  React.useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return undefined;
+    const io = new IntersectionObserver(([entry]) => { el.dataset.offscreen = entry.isIntersecting ? '0' : '1'; });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  const run = usps.concat(usps);
+  return (
+    <div ref={ref} className="dd-usp" data-paused={paused ? '1' : '0'}>
+      <div className="dd-usp-bar">
+        <div className="dd-usp-head">
+          <button type="button" className="dd-usp-toggle" aria-controls={bandId} aria-label="Laufband anhalten" aria-pressed={paused}
+            onClick={() => setPaused((v) => !v)}>
+            {paused ? <PlayIcon /> : <PauseIcon />}
+          </button>
+        </div>
+      </div>
+      <div className="dd-usp-band" id={bandId}>
+        <ul className="dd-usp-track">
+          {run.map((usp, i) => (
+            <li key={usp + '-' + i} className="dd-usp-item" aria-hidden={i >= usps.length ? 'true' : undefined}>
+              <span className="dd-usp-text">{usp}</span>
+              <img src={assetBase + '/dd-mark-lime.svg'} alt="" width="13" height="14" loading="lazy" decoding="async" />
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
 }
 
 export function SiteFooter({
@@ -48,105 +97,73 @@ export function SiteFooter({
   onNavigate,
   style
 }) {
-  const revealRefs = React.useRef([]);
-
-  React.useEffect(ensureStyles, []);
-
-  React.useEffect(() => {
-    const nodes = revealRefs.current.filter(Boolean);
-    if (!nodes.length) return;
-    if (typeof IntersectionObserver === 'undefined') { nodes.forEach((n) => n.setAttribute('data-shown', '1')); return; }
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        const i = nodes.indexOf(entry.target);
-        setTimeout(() => entry.target.setAttribute('data-shown', '1'), Math.max(0, i) * 70);
-        io.unobserve(entry.target);
-      });
-    }, { threshold: 0.2 });
-    nodes.forEach((n) => io.observe(n));
-    return () => io.disconnect();
-  }, []);
-
-  const run = usps.concat(usps);
+  const toTop = () => {
+    const reduce = window.matchMedia && window.matchMedia(REDUCE_QUERY).matches;
+    window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+  };
 
   return (
-    <footer style={{ position: 'relative', background: 'var(--surface-dark)', color: 'var(--text-on-dark)', overflow: 'hidden', ...style }}>
+    <footer className="dd-footer dd-on-dark" style={style}>
       <Aurora origin="bottom-right" intensity={0.32} bleed={0} />
 
       {/* giant outlined wordmark, pinned to the bottom edge */}
-      <div aria-hidden="true" style={{ position: 'absolute', left: '50%', bottom: '-2.5vw', transform: 'translateX(-50%)', whiteSpace: 'nowrap', pointerEvents: 'none', userSelect: 'none', font: 'var(--fw-bold) 17vw/0.78 var(--font-head)', letterSpacing: '-0.04em', color: 'transparent', WebkitTextStroke: '1px rgba(255,255,255,0.07)' }}>
-        {wordmark}
-      </div>
+      <div className="dd-footer-wordmark" aria-hidden="true">{wordmark}</div>
 
-      <div style={{ position: 'relative' }}>
+      <div className="dd-footer-content">
         {/* closing CTA */}
-        <div className="dd-footer-reveal dd-footer-cta" ref={(el) => { revealRefs.current[0] = el; }}
-          style={{ maxWidth: 'var(--measure-wide)', margin: '0 auto', textAlign: 'center' }}>
-          {kicker ? <div style={{ marginBottom: 'var(--space-5)' }}><Kicker tone="limeText">{kicker}</Kicker></div> : null}
-          <h2 style={{ font: 'var(--text-h2)', letterSpacing: 'var(--ls-heading)', margin: '0 auto var(--space-5)', maxWidth: 880 }}>{headline}</h2>
-          {sub ? <p style={{ font: 'var(--text-lead)', color: 'var(--text-on-dark-secondary)', maxWidth: 'var(--measure)', margin: '0 auto var(--space-8)', textWrap: 'pretty' }}>{sub}</p> : null}
+        <div className="dd-footer-cta" data-reveal>
+          {kicker ? <div className="dd-footer-kicker"><Kicker tone="limeText">{kicker}</Kicker></div> : null}
+          <h2 className="dd-footer-headline">{headline}</h2>
+          {sub ? <p className="dd-footer-sub">{sub}</p> : null}
           <Button size="lg" arrow onClick={onCta}>{ctaLabel}</Button>
         </div>
 
-        {/* USP band */}
-        {usps.length ? (
-          <div className="dd-usp-band" style={{ overflow: 'hidden', maskImage: 'linear-gradient(to right, transparent, #000 80px, #000 calc(100% - 80px), transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, #000 80px, #000 calc(100% - 80px), transparent)' }}>
-            <div className="dd-usp-track" style={{ display: 'flex', alignItems: 'center', width: 'max-content' }}>
-              {run.map((usp, i) => (
-                <span key={usp + '-' + i} className="dd-usp-item" aria-hidden={i >= usps.length} style={{ display: 'flex', alignItems: 'center', flex: '0 0 auto' }}>
-                  <span className="dd-usp-text" style={{ letterSpacing: 'var(--ls-heading)', color: 'var(--text-on-dark)', whiteSpace: 'nowrap' }}>{usp}</span>
-                  <img src={assetBase + '/dd-mark-lime.svg'} alt="" loading="lazy" decoding="async" style={{ height: 14, width: 'auto', display: 'block', opacity: 0.9 }} />
-                </span>
-              ))}
-            </div>
-          </div>
-        ) : null}
+        {usps.length ? <UspBand usps={usps} assetBase={assetBase} /> : null}
 
         {/* columns */}
-        <div className="dd-footer-reveal dd-footer-cols" ref={(el) => { revealRefs.current[1] = el; }}
-          style={{ maxWidth: 'var(--measure-wide)', margin: '0 auto', display: 'grid' }}>
+        <div className="dd-footer-cols" data-reveal data-reveal-delay={70}>
           <div className="dd-footer-brand">
             <span className="dd-footer-logo"><Logo variant="wordmark" tone="lime" height={72} assetBase={assetBase} /></span>
-            {claim ? <p style={{ font: 'var(--text-copy)', color: 'var(--text-on-dark-secondary)', maxWidth: 300, margin: 'var(--space-6) 0 0', textWrap: 'pretty' }}>{claim}</p> : null}
+            {claim ? <p className="dd-footer-claim">{claim}</p> : null}
           </div>
           {columns.map((col) => (
-            <div key={col.title}>
-              <div className="dd-footer-col-title" style={{ marginBottom: 'var(--space-5)' }}><Kicker tone="limeText">{col.title}</Kicker></div>
-              <div className="dd-footer-col-links" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+            /* long entries (mail, address) get the full row on phones instead of breaking mid-word */
+            <div key={col.title} data-wide={col.items.some((it) => it.label.length > 22) ? '1' : undefined}>
+              <div className="dd-footer-col-title"><Kicker tone="limeText">{col.title}</Kicker></div>
+              <ul className="dd-footer-col-links">
                 {col.items.map((item) => (
-                  item.anchor || item.href ? (
-                    <a key={item.label} className="dd-footer-link" href={item.anchor ? '#' + item.anchor : item.href}
-                      onClick={(e) => { if (item.anchor && onNavigate) { e.preventDefault(); onNavigate('home', item.anchor); } }}
-                      style={{ font: 'var(--text-copy)', fontSize: 14 }}>{item.label}</a>
-                  ) : (
-                    <span key={item.label} style={{ font: 'var(--text-copy)', fontSize: 14, color: 'var(--dd-on-ink-muted)' }}>{item.label}</span>
-                  )
+                  <li key={item.label}>
+                    {item.anchor || item.href ? (
+                      <a className="dd-footer-link" href={item.anchor ? '#' + item.anchor : item.href}
+                        onClick={(e) => { if (item.anchor && onNavigate) { e.preventDefault(); onNavigate('home', item.anchor); } }}>
+                        {item.label}
+                      </a>
+                    ) : (
+                      <span className="dd-footer-text">{item.label}</span>
+                    )}
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
           ))}
         </div>
 
-        {/* Regionen: SEO-Keyword-Links, dezent im Footer-Stil wie die übrigen Meta-Links */}
+        {/* Regionen: reine Keyword-Liste als Text, keine Links */}
         {regions.length ? (
-          <div className="dd-footer-regions" style={{ maxWidth: 'var(--measure-wide)', margin: '0 auto' }}>
-            <div className="dd-footer-col-title" style={{ marginBottom: 'var(--space-4)' }}><Kicker tone="limeText">{regionsTitle}</Kicker></div>
-            <div className="dd-footer-regions-links">
-              {regions.map((region) => (
-                <a key={region.label} className="dd-footer-link" href={region.href}>{region.label}</a>
-              ))}
-            </div>
+          <div className="dd-footer-regions">
+            <div className="dd-footer-col-title"><Kicker tone="limeText">{regionsTitle}</Kicker></div>
+            <ul className="dd-footer-regions-list">
+              {regions.map((region) => <li key={region.label}>{region.label}</li>)}
+            </ul>
           </div>
         ) : null}
 
         {/* bottom bar */}
-        <div className="dd-footer-bottom" style={{ maxWidth: 'var(--measure-wide)', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-6)', flexWrap: 'wrap' }}>
-          <span style={{ font: 'var(--text-caption)', color: 'var(--text-on-dark-secondary)' }}>{legal}</span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-5)' }}>
-            <span style={{ font: 'var(--text-caption)', color: 'var(--text-on-dark-secondary)' }}>{copyright}</span>
-            <button className="dd-top" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} aria-label="Nach oben"
-              style={{ width: 44, height: 44, borderRadius: 'var(--radius-pill)', background: 'transparent', border: 'var(--border-on-dark)', color: 'var(--dd-on-ink-muted)', cursor: 'pointer', font: 'var(--text-copy)', fontSize: 18, lineHeight: 1 }}>↑</button>
+        <div className="dd-footer-bottom">
+          <span className="dd-footer-legal">{legal}</span>
+          <span className="dd-footer-bottom-end">
+            <span className="dd-footer-legal">{copyright}</span>
+            <button type="button" className="dd-top" onClick={toTop} aria-label="Nach oben"><ArrowUp /></button>
           </span>
         </div>
       </div>

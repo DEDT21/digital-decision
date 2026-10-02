@@ -1,14 +1,19 @@
 import React from 'react';
 import { Section } from './Section.jsx';
+import './ServiceBadges.css';
 
-/* "Was wir für dich tun" als Sticker-Haufen: sieben Pill-Badges liegen dicht überlappend um die
-   Mitte, leicht rotiert. Hover/Fokus richtet ein Badge auf und hebt es an, die Geschwister nehmen
-   sich minimal zurück. Ein Klick öffnet genau eine Popup-Karte (Titel, Copy, Arrow-CTA zum
-   Setup-Check) — Desktop als Karte an der Wolke, unter 720px als Bottom-Sheet mit Backdrop.
-   Badges sind <button>, Escape und Klick außerhalb schließen.
-   Nur Palette-Farben, keine Gradients, keine Dependencies. */
+/* "Was wir für dich tun" als Sticker-Haufen: sieben Pill-Badges, leicht rotiert und überlappend.
+   Ein Klick (oder Enter/Leertaste) öffnet genau eine Popup-Karte mit Titel, Copy und Arrow-CTA zum
+   Setup-Check. Ab 721px liegt die Karte als nicht-modaler Dialog an der Wolke, bis 720px als
+   modales Bottom-Sheet mit Backdrop, Fokus-Falle, inertem Hintergrund und Scroll-Sperre.
 
-const STYLE_ID = 'dd-servicebadges-styles';
+   SSR/Prerender: Alle sieben Popup-Inhalte stehen dauerhaft im DOM, geschlossene tragen `hidden`.
+   Der erste Render ist deterministisch (alles zu, Popover-Modus). Ob Sheet oder Popover gilt,
+   entscheidet das CSS; JS liest die Media Query erst nach dem Mount, nur für aria-modal, Inert
+   und Scroll-Sperre. Styles kommen statisch aus ServiceBadges.css. */
+
+const useIsoLayoutEffect = typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect;
+const SHEET_QUERY = '(max-width: 720px)';
 
 const SERVICES = [
   { id: 'shops', label: 'Onlineshops', size: 'lg', fill: 'lime', rot: -3, dx: -150, dy: -95,
@@ -34,181 +39,324 @@ const SERVICES = [
     body: ['Wir lernen dein Unternehmen kennen, als wäre es unseres, und bringen alles ein, was wir haben: Wissen, Netzwerk und die Erfahrung aus unseren eigenen Marken. Was dabei herauskommt, passt nur zu dir. Beratung von der Stange gibt es bei uns nicht.'] }
 ];
 
-function ensureStyles() {
-  if (typeof document === 'undefined' || document.getElementById(STYLE_ID)) return;
-  const el = document.createElement('style');
-  el.id = STYLE_ID;
-  el.textContent =
-    '.dd-sb-head{text-align:center;margin-bottom:var(--space-12)}'
-    + '.dd-sb-head h2{margin:0;font-family:var(--font-head);font-weight:var(--fw-bold);font-size:var(--fs-h2-sm);line-height:var(--lh-heading);text-transform:uppercase;letter-spacing:var(--ls-tag);color:var(--text-primary)}'
-    + '.dd-sb-cloud{position:relative;height:380px;margin:0 auto;--kx:1;--ky:1}'
-    + '.dd-sb-badge{position:absolute;left:calc(50% + (var(--dx) * var(--kx)) * 1px);top:calc(50% + (var(--dy) * var(--ky)) * 1px);margin:0;border:0;cursor:pointer;font-family:var(--font-head);font-weight:var(--fw-bold);letter-spacing:-0.01em;line-height:1;white-space:nowrap;border-radius:var(--radius-pill);box-shadow:0 10px 24px rgba(10,10,10,0.13);transform:translate(-50%,-50%) rotate(var(--rot));transition:transform 400ms var(--ease-out),box-shadow 400ms var(--ease-out);will-change:transform}'
-    + '.dd-sb-badge:focus{outline:none}'
-    + '.dd-sb-badge:focus-visible{outline:2px solid var(--focus-ring);outline-offset:4px}'
-    + '.dd-sb-badge.lg{font-size:var(--fs-h3);padding:22px 38px}'
-    + '.dd-sb-badge.md{font-size:var(--fs-lead);padding:18px 32px}'
-    + '.dd-sb-badge.sm{font-size:var(--fs-body);padding:15px 26px}'
-    + '.dd-sb-badge.fill-lime{background:var(--surface-accent);color:var(--dd-ink)}'
-    + '.dd-sb-badge.fill-violet{background:var(--surface-secondary);color:var(--text-on-dark)}'
-    + '.dd-sb-badge.fill-ink{background:var(--surface-dark);color:var(--text-on-dark)}'
-    + '.dd-sb-badge.fill-white{background:var(--surface-card);color:var(--text-primary);border:var(--border-default)}'
-    + '.dd-sb-badge:hover,.dd-sb-badge:focus-visible,.dd-sb-badge.is-open{transform:translate(-50%,-50%) translateY(-6px) rotate(0deg) scale(1.06);box-shadow:0 18px 40px rgba(10,10,10,0.22);z-index:3}'
-    + '.dd-sb-cloud:has(.dd-sb-badge:hover) .dd-sb-badge:not(:hover),.dd-sb-cloud:has(.dd-sb-badge.is-open) .dd-sb-badge:not(.is-open){transform:translate(-50%,-50%) rotate(var(--rot)) scale(0.96)}'
-    + '.dd-sb-backdrop{display:none}'
-    + '.dd-sb-popup{position:absolute;left:var(--dd-sb-x,0px);top:var(--dd-sb-y,0px);z-index:10;width:360px;max-width:100%;background:var(--surface-card);border:var(--border-default);border-radius:var(--radius-xl);box-shadow:0 24px 60px rgba(10,10,10,0.22);padding:var(--pad-card);animation:dd-sb-pop 260ms var(--ease-out) both}'
-    + '@keyframes dd-sb-pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}'
-    + '.dd-sb-popup h3{font-family:var(--font-head);font-weight:var(--fw-bold);font-size:var(--fs-lead);line-height:var(--lh-title);letter-spacing:var(--ls-heading);margin:0 var(--space-8) var(--space-3) 0;text-wrap:pretty}'
-    + '.dd-sb-popup p{margin:0;font:var(--text-copy);color:var(--text-secondary);text-wrap:pretty}'
-    + '.dd-sb-popup p + p{margin-top:var(--space-3)}'
-    + '.dd-sb-close{position:absolute;top:14px;right:14px;width:32px;height:32px;display:grid;place-items:center;background:transparent;border:0;border-radius:var(--radius-pill);color:var(--text-primary);cursor:pointer;font-size:18px;line-height:1;font-family:var(--font-body);transition:background-color var(--dur-base) var(--ease-standard)}'
-    + '.dd-sb-close:hover{background:var(--surface-page)}'
-    + '.dd-sb-close:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}'
-    + '.dd-sb-cta{display:inline-flex;align-items:center;gap:var(--space-2);margin-top:var(--space-5);font-family:var(--font-head);font-weight:var(--fw-bold);font-size:var(--fs-body);line-height:1;color:var(--text-primary);text-decoration:none;transition:color var(--dur-base) var(--ease-standard)}'
-    + '.dd-sb-cta .dd-sb-arrow{transition:transform var(--dur-base) var(--ease-standard)}'
-    + '.dd-sb-cta:hover{color:var(--text-link)}'
-    + '.dd-sb-cta:hover .dd-sb-arrow{transform:translateX(4px)}'
-    + '.dd-sb-cta:focus-visible{outline:2px solid var(--focus-ring);outline-offset:4px;border-radius:var(--radius-xs)}'
-    + '.dd-sb-closer{margin:var(--space-12) auto 0;max-width:var(--measure);text-align:center;color:var(--text-secondary);font-size:var(--fs-lead);line-height:var(--lh-body);text-wrap:pretty}'
-    + '@media (max-width:980px){'
-    + '.dd-sb-cloud{--kx:0.8;--ky:1}'
-    + '.dd-sb-badge.lg{font-size:22px;padding:18px 30px}'
-    + '.dd-sb-badge.md{font-size:18px;padding:15px 26px}'
-    + '.dd-sb-badge.sm{font-size:15px;padding:13px 22px}}'
-    + '@media (max-width:720px){'
-    + '.dd-sb-head h2{font-size:var(--fs-h3)}'
-    + '.dd-sb-cloud{height:360px;--kx:0.27;--ky:1.35}'
-    + '.dd-sb-badge.lg{font-size:16px;padding:15px 20px}'
-    + '.dd-sb-badge.md{font-size:15px;padding:15px 18px}'
-    + '.dd-sb-badge.sm{font-size:13px;padding:16px 15px}'
-    + '.dd-sb-closer{font-size:var(--fs-body)}'
-    + '.dd-sb-backdrop{display:block;position:fixed;inset:0;z-index:20;background:rgba(10,10,10,0.45);animation:dd-sb-fade 240ms var(--ease-out) both}'
-    + '@keyframes dd-sb-fade{from{opacity:0}to{opacity:1}}'
-    + '.dd-sb-popup{position:fixed;left:0;right:0;bottom:0;top:auto;width:auto;z-index:21;border-radius:var(--radius-xl) var(--radius-xl) 0 0;border-bottom:0;padding:var(--space-6) var(--space-5) var(--space-8);animation:dd-sb-sheet 300ms var(--ease-out) both}'
-    + '@keyframes dd-sb-sheet{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}}'
-    + '@media (max-width:400px){'
-    + '.dd-sb-cloud{height:340px;--kx:0.20;--ky:1.25}'
-    + '.dd-sb-badge.lg{font-size:15px;padding:15px 17px}'
-    + '.dd-sb-badge.md{font-size:14px;padding:15px 15px}'
-    + '.dd-sb-badge.sm{font-size:12px;padding:16px 13px}}'
-    + '@media (prefers-reduced-motion: reduce){.dd-sb-badge,.dd-sb-popup,.dd-sb-backdrop{transition:none;animation:none}}';
-  document.head.appendChild(el);
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+function CloseIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+      <path d="M6 6l12 12" />
+      <path d="M18 6 6 18" />
+    </svg>
+  );
+}
+
+function ArrowIcon() {
+  return (
+    <svg className="dd-sb-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+      <path d="M5 12h14" />
+      <path d="m13 6 6 6-6 6" />
+    </svg>
+  );
+}
+
+/* Alles außerhalb des Sheets inert setzen: vom Panel bis hoch zum <body> jede Geschwister-Ebene.
+   Nur Elemente, die wir selbst umgestellt haben, werden später zurückgesetzt. Der Backdrop bleibt
+   bedienbar (data-sb-keep), er ist der "Klick außerhalb". */
+function inertOutside(node) {
+  const changed = [];
+  let el = node;
+  while (el && el.parentElement && el !== document.body) {
+    const parent = el.parentElement;
+    for (const sib of Array.from(parent.children)) {
+      if (sib === el || sib.hasAttribute('inert') || sib.hasAttribute('data-sb-keep')) continue;
+      if (sib.tagName === 'SCRIPT' || sib.tagName === 'STYLE' || sib.tagName === 'LINK') continue;
+      sib.setAttribute('inert', '');
+      changed.push(sib);
+    }
+    el = parent;
+  }
+  return () => changed.forEach((n) => n.removeAttribute('inert'));
+}
+
+/* Scroll-Sperre ohne position:fixed am Body: das würde die Scrollposition auf 0 setzen, die
+   Navigation (abhängig von scrollY) umschalten und die Seite beim Schließen springen lassen.
+   Stattdessen overflow:hidden am <html> (Desktop-Browser, iOS ab 16) und für ältere iOS-Versionen
+   ein nicht-passiver touchmove-Filter: Scrollen ist nur innerhalb des Sheets erlaubt, und auch
+   dort nicht über die Ränder hinaus (sonst kettet iOS den Scroll an die Seite weiter). */
+function lockScroll(scroller) {
+  const html = document.documentElement;
+  const body = document.body;
+  const prevOverflow = html.style.overflow;
+  const prevPad = body.style.paddingRight;
+  const gutter = window.innerWidth - html.clientWidth;
+  html.style.overflow = 'hidden';
+  if (gutter > 0) body.style.paddingRight = gutter + 'px';
+
+  let startY = 0;
+  const onStart = (e) => { if (e.touches.length === 1) startY = e.touches[0].clientY; };
+  const onMove = (e) => {
+    if (e.touches.length !== 1) return; /* Pinch-Zoom nicht blockieren */
+    const inside = scroller && e.target instanceof Node && scroller.contains(e.target);
+    if (!inside || scroller.scrollHeight <= scroller.clientHeight) { if (e.cancelable) e.preventDefault(); return; }
+    const dy = e.touches[0].clientY - startY;
+    const atTop = scroller.scrollTop <= 0;
+    const atBottom = scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 1;
+    if (((atTop && dy > 0) || (atBottom && dy < 0)) && e.cancelable) e.preventDefault();
+  };
+  document.addEventListener('touchstart', onStart, { passive: true });
+  document.addEventListener('touchmove', onMove, { passive: false });
+
+  return () => {
+    document.removeEventListener('touchstart', onStart);
+    document.removeEventListener('touchmove', onMove);
+    html.style.overflow = prevOverflow;
+    body.style.paddingRight = prevPad;
+  };
 }
 
 export function ServiceBadges({
   id = 'leistungen',
-  headline = 'Was wir für dich tun',
+  headline = 'Was wir für dich tun.',
+  hint = 'Wähl ein Thema für die Details.',
   closer = 'Egal, wo du startest: Du bekommst einen Ansprechpartner, der mitdenkt und liefert.',
   ctaLabel = 'Kostenloser Setup-Check',
   ctaHref = '#setup-check',
   items = SERVICES,
   style
 }) {
-  ensureStyles();
   const [openId, setOpenId] = React.useState(null);
+  /* 'popover' ist der deterministische Startwert (SSR); der Client gleicht nach dem Mount ab */
+  const [mode, setMode] = React.useState('popover');
+
   const cloudRef = React.useRef(null);
-  const popupRef = React.useRef(null);
   const badgeRefs = React.useRef({});
+  const panelRefs = React.useRef({});
+  const titleRefs = React.useRef({});
   const openIdRef = React.useRef(null);
+  const modeRef = React.useRef('popover');
+  const releaseRef = React.useRef(null);
   openIdRef.current = openId;
+  modeRef.current = mode;
 
-  const active = items.find((item) => item.id === openId) || null;
+  const panelId = (itemId) => id + '-panel-' + itemId;
+  const titleId = (itemId) => id + '-title-' + itemId;
 
-  const close = React.useCallback(() => {
-    const btn = openIdRef.current ? badgeRefs.current[openIdRef.current] : null;
+  React.useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return undefined;
+    const mql = window.matchMedia(SHEET_QUERY);
+    const sync = () => setMode(mql.matches ? 'sheet' : 'popover');
+    sync();
+    if (mql.addEventListener) mql.addEventListener('change', sync); else mql.addListener(sync);
+    return () => { if (mql.removeEventListener) mql.removeEventListener('change', sync); else mql.removeListener(sync); };
+  }, []);
+
+  const release = React.useCallback(() => {
+    const fn = releaseRef.current;
+    releaseRef.current = null;
+    if (fn) fn();
+  }, []);
+
+  /* Schließt das offene Popup. Inert und Scroll-Sperre werden SYNCHRON aufgehoben, bevor der
+     Fokus zurück aufs Badge geht: ein inertes Badge könnte ihn sonst nicht annehmen. */
+  const close = React.useCallback((returnFocus) => {
+    const current = openIdRef.current;
+    if (!current) return;
+    release();
+    openIdRef.current = null;
     setOpenId(null);
-    if (btn) btn.focus({ preventScroll: true });
-  }, []);
+    const btn = badgeRefs.current[current];
+    if (returnFocus && btn) btn.focus({ preventScroll: true });
+  }, [release]);
 
-  const toggle = React.useCallback((itemId) => {
-    setOpenId((current) => (current === itemId ? null : itemId));
-  }, []);
+  const onBadgeClick = (itemId) => {
+    if (openIdRef.current === itemId) { close(true); return; }
+    release();
+    openIdRef.current = itemId;
+    setOpenId(itemId);
+  };
 
-  /* Karte unter (oder über) dem Badge platzieren, innerhalb der Wolke geklemmt. Die Position
-     landet als CSS-Variable am Element, nicht als inline left/top: so kann die Media Query
-     unter 720px sie mit dem Bottom-Sheet-Layout überschreiben. Kein JS-Breakpoint, damit
-     JS und CSS nie auseinanderlaufen können. */
+  /* Popover-Karte neben das Badge legen (Seite mit mehr Platz), damit der Auslöser sichtbar
+     bleibt. Reicht die Breite dafür nicht (Tablet), kommt sie darunter oder darüber, je nachdem
+     wo sie weniger über die Wolke hinausragt. Die Position landet als CSS-Variable am Panel;
+     im Sheet-Layout ignoriert das CSS sie. */
   const place = React.useCallback(() => {
+    const itemId = openIdRef.current;
     const cloud = cloudRef.current;
-    const popup = popupRef.current;
-    const btn = openIdRef.current ? badgeRefs.current[openIdRef.current] : null;
+    const popup = itemId ? panelRefs.current[itemId] : null;
+    const btn = itemId ? badgeRefs.current[itemId] : null;
     if (!cloud || !popup || !btn) return;
+    const gap = 16;
     const cb = cloud.getBoundingClientRect();
     const bb = btn.getBoundingClientRect();
     const pw = popup.offsetWidth;
     const ph = popup.offsetHeight;
-    const cx = bb.left - cb.left + bb.width / 2;
-    const below = bb.bottom - cb.top + 14;
-    const above = bb.top - cb.top - ph - 14;
-    let top = (below + ph <= cb.height || above < 0) ? below : above;
-    top = Math.max(0, Math.min(top, Math.max(0, cb.height - ph)));
-    const left = Math.max(0, Math.min(cx - pw / 2, Math.max(0, cb.width - pw)));
-    popup.style.setProperty('--dd-sb-x', left + 'px');
-    popup.style.setProperty('--dd-sb-y', top + 'px');
+    const clamp = (v, lo, hi) => Math.max(lo, Math.min(v, Math.max(lo, hi)));
+    const bLeft = bb.left - cb.left;
+    const bRight = bb.right - cb.left;
+    const bTop = bb.top - cb.top;
+    const bBottom = bb.bottom - cb.top;
+    const spaceLeft = bLeft - gap;
+    const spaceRight = cb.width - bRight - gap;
+    let left;
+    let top;
+    if (Math.max(spaceLeft, spaceRight) >= pw) {
+      left = spaceRight >= pw && (spaceRight >= spaceLeft || spaceLeft < pw) ? bRight + gap : bLeft - gap - pw;
+      top = clamp(bTop + bb.height / 2 - ph / 2, 0, cb.height - ph);
+    } else {
+      left = clamp(bLeft + bb.width / 2 - pw / 2, 0, cb.width - pw);
+      const below = bBottom + gap;
+      const above = bTop - gap - ph;
+      const overBelow = Math.max(0, below + ph - cb.height);
+      const overAbove = Math.max(0, -above);
+      top = overBelow <= overAbove ? below : above;
+    }
+    popup.style.setProperty('--dd-sb-x', Math.round(left) + 'px');
+    popup.style.setProperty('--dd-sb-y', Math.round(top) + 'px');
   }, []);
 
-  React.useLayoutEffect(() => { if (active) place(); }, [active, place]);
+  useIsoLayoutEffect(() => { if (openId && mode === 'popover') place(); }, [openId, mode, place]);
 
   React.useEffect(() => {
-    if (!active) return undefined;
-    const onReflow = () => place();
-    window.addEventListener('resize', onReflow);
-    return () => window.removeEventListener('resize', onReflow);
-  }, [active, place]);
+    if (!openId || mode !== 'popover') return undefined;
+    window.addEventListener('resize', place);
+    return () => window.removeEventListener('resize', place);
+  }, [openId, mode, place]);
 
-  /* Schließen bei Klick außerhalb: Klicks auf IRGENDEIN Badge oder in die Karte werden
-     ignoriert — das Badge toggelt selbst. Sonst würde der öffnende Klick, der nach dem
-     State-Update noch weiterläuft, die Karte sofort wieder zumachen. */
+  /* Beim Öffnen Fokus auf den Titel des Popups (tabIndex -1): Screenreader lesen ab dort vor,
+     Tab führt weiter zum CTA. preventScroll, damit das Sheet die Seite nicht verschiebt. */
   React.useEffect(() => {
-    if (!active) return undefined;
-    const inside = (target) => {
-      if (!(target instanceof Element)) return false;
-      if (target.closest('.dd-sb-badge')) return true;
-      if (target.closest('.dd-sb-popup')) return true;
-      const popup = popupRef.current;
-      return !!(popup && popup.contains(target));
+    if (!openId) return;
+    const title = titleRefs.current[openId];
+    if (title) title.focus({ preventScroll: true });
+  }, [openId]);
+
+  /* Sheet-Modus: Hintergrund inert, Scroll gesperrt. Wechselt der Modus bei offenem Popup
+     (Drehen des Geräts), räumt der Cleanup auf und der Effekt setzt passend neu auf. */
+  React.useEffect(() => {
+    if (!openId || mode !== 'sheet') return undefined;
+    const panel = panelRefs.current[openId];
+    if (!panel) return undefined;
+    const undoInert = inertOutside(panel);
+    const unlock = lockScroll(panel);
+    releaseRef.current = () => { undoInert(); unlock(); };
+    return release;
+  }, [openId, mode, release]);
+
+  /* Escape schließt, Tab bleibt im Sheet gefangen, Klick außerhalb schließt. Klicks auf Badges
+     und in die Karte zählen nicht als außerhalb: das Badge toggelt selbst, und der öffnende Klick
+     läuft nach dem synchronen Commit noch bis zum document weiter. */
+  React.useEffect(() => {
+    if (!openId) return undefined;
+    const onKey = (e) => {
+      if (e.key === 'Escape') { e.preventDefault(); close(true); return; }
+      if (e.key !== 'Tab' || modeRef.current !== 'sheet') return;
+      const panel = panelRefs.current[openIdRef.current];
+      if (!panel) return;
+      /* Tab komplett selbst führen: unabhängig davon, ob der Browser Links per Tab anspringt
+         (Safari ohne "Alle Steuerelemente"), bleibt der Fokus im Sheet. */
+      e.preventDefault();
+      const nodes = Array.from(panel.querySelectorAll(FOCUSABLE));
+      if (!nodes.length) return;
+      const idx = nodes.indexOf(document.activeElement);
+      const next = e.shiftKey
+        ? nodes[idx <= 0 ? nodes.length - 1 : idx - 1]
+        : nodes[idx === -1 || idx === nodes.length - 1 ? 0 : idx + 1];
+      next.focus();
     };
-    const onPointerDown = (e) => { if (!inside(e.target)) close(); };
-    const onKey = (e) => { if (e.key === 'Escape') close(); };
-    document.addEventListener('pointerdown', onPointerDown);
+    const onClick = (e) => {
+      const target = e.target;
+      if (!(target instanceof Element)) return;
+      if (target.closest('.dd-sb-badge') || target.closest('.dd-sb-popup')) return;
+      const activeEl = document.activeElement;
+      const focusLost = !activeEl || activeEl === document.body || !!activeEl.closest('.dd-sb-popup');
+      close(focusLost);
+    };
     document.addEventListener('keydown', onKey);
+    document.addEventListener('click', onClick);
     return () => {
-      document.removeEventListener('pointerdown', onPointerDown);
       document.removeEventListener('keydown', onKey);
+      document.removeEventListener('click', onClick);
     };
-  }, [active, close]);
+  }, [openId, close]);
 
-  const popup = active ? (
-    <div ref={popupRef} className="dd-sb-popup" role="dialog" aria-label={active.label}>
-      <button type="button" className="dd-sb-close" aria-label="Schließen" onClick={close}>&#10005;</button>
-      <h3>{active.title}</h3>
-      {active.body.map((text) => <p key={text.slice(0, 24)}>{text}</p>)}
-      <a className="dd-sb-cta" href={ctaHref}>
-        <span>{ctaLabel}</span><span className="dd-sb-arrow" aria-hidden="true">&rarr;</span>
-      </a>
-    </div>
-  ) : null;
+  /* Popover (Desktop): Verlässt der Tastaturfokus Karte und Auslöser, schließt die Karte, damit
+     nie eine offene Karte an einem Badge hängt, das gerade nicht gemeint ist. */
+  const onPanelBlur = (e, itemId) => {
+    if (modeRef.current !== 'popover') return;
+    const next = e.relatedTarget;
+    if (!next || e.currentTarget.contains(next) || next === badgeRefs.current[itemId]) return;
+    close(false);
+  };
+
+  /* Arrow-CTA: Popup zu, dann zum Setup-Check scrollen (bei reduced motion ohne Smooth-Scroll).
+     Per Tastatur ausgelöst (detail 0) landet der Fokus im ersten Formularfeld. */
+  const onCta = (e) => {
+    if (!ctaHref || ctaHref.charAt(0) !== '#') { close(false); return; }
+    const target = document.getElementById(ctaHref.slice(1));
+    if (!target) { close(false); return; }
+    e.preventDefault();
+    const viaKeyboard = e.detail === 0;
+    close(false);
+    const reduce = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const nav = document.querySelector('nav');
+    const offset = nav ? Math.max(0, Math.round(nav.getBoundingClientRect().bottom)) : 0;
+    const top = target.getBoundingClientRect().top + window.scrollY - offset;
+    window.scrollTo({ top: Math.max(0, top), behavior: reduce ? 'auto' : 'smooth' });
+    if (viaKeyboard) {
+      const field = target.querySelector('input:not([type="hidden"]):not([tabindex="-1"]), textarea, select');
+      if (field) field.focus({ preventScroll: true });
+    }
+  };
 
   return (
     <Section id={id} tone="paper" style={style}>
-      <div className="dd-sb-head" data-reveal><h2>{headline}</h2></div>
+      <header className="dd-sb-head" data-reveal>
+        <h2>{headline}</h2>
+        {hint ? <p className="dd-sb-hint">{hint}</p> : null}
+      </header>
 
       <div className="dd-sb-cloud" ref={cloudRef}>
-        {items.map((item) => (
-          <button key={item.id} type="button"
-            ref={(node) => { badgeRefs.current[item.id] = node; }}
-            className={'dd-sb-badge ' + item.size + ' fill-' + item.fill + (openId === item.id ? ' is-open' : '')}
-            style={{ '--dx': String(item.dx), '--dy': String(item.dy), '--rot': item.rot + 'deg' }}
-            aria-expanded={openId === item.id}
-            onPointerDown={(e) => e.stopPropagation()}
-            onClick={(e) => { e.stopPropagation(); toggle(item.id); }}>
-            {item.label}
-          </button>
-        ))}
-        {popup}
+        {items.map((item) => {
+          const open = openId === item.id;
+          return (
+            <React.Fragment key={item.id}>
+              <button type="button"
+                ref={(node) => { badgeRefs.current[item.id] = node; }}
+                className={'dd-sb-badge ' + item.size + ' fill-' + item.fill + (open ? ' is-open' : '')}
+                style={{ '--dx': String(item.dx), '--dy': String(item.dy), '--rot': item.rot + 'deg' }}
+                aria-haspopup="dialog"
+                aria-expanded={open}
+                aria-controls={panelId(item.id)}
+                onClick={() => onBadgeClick(item.id)}>
+                {item.label}
+              </button>
+              <div id={panelId(item.id)}
+                ref={(node) => { panelRefs.current[item.id] = node; }}
+                className="dd-sb-popup"
+                role="dialog"
+                aria-modal={open && mode === 'sheet' ? 'true' : undefined}
+                aria-labelledby={titleId(item.id)}
+                hidden={!open}
+                onBlur={(e) => onPanelBlur(e, item.id)}>
+                <h3 id={titleId(item.id)} tabIndex={-1} ref={(node) => { titleRefs.current[item.id] = node; }}>{item.title}</h3>
+                {item.body.map((text) => <p key={text.slice(0, 24)}>{text}</p>)}
+                <a className="dd-sb-cta" href={ctaHref} onClick={onCta}>
+                  <span>{ctaLabel}</span><ArrowIcon />
+                </a>
+                {/* Im DOM nach dem CTA (Tab-Reihenfolge Titel, CTA, Schließen), visuell oben rechts */}
+                <button type="button" className="dd-sb-close" aria-label="Details schließen" onClick={() => close(true)}>
+                  <CloseIcon />
+                </button>
+              </div>
+            </React.Fragment>
+          );
+        })}
       </div>
 
-      {/* Backdrop gehört zum Bottom-Sheet und ist per CSS nur unter 720px sichtbar */}
-      {active ? <div className="dd-sb-backdrop" onClick={close} /> : null}
+      {/* Backdrop gehört zum Bottom-Sheet und ist per CSS nur bis 720px sichtbar */}
+      <div className="dd-sb-backdrop" data-sb-keep="" aria-hidden="true" hidden={!openId} onClick={() => close(true)} />
 
       <p className="dd-sb-closer" data-reveal>{closer}</p>
     </Section>

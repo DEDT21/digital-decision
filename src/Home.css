@@ -1,0 +1,129 @@
+/* Startseite: Hero (inkl. Logo-Band) und "Was uns anders macht".
+   Breakpoints: >= 1024px zweispaltiger Hero mit gedrehter Karte, 721–1023px Karte gerade
+   unter dem Text, <= 720px kompakter Streifen statt Karte. Alles per CSS, kein JS. */
+
+/* ---------- Hero ---------- */
+.dd-hero-wrap { position: relative; background: var(--surface-dark); color: var(--text-on-dark); }
+
+.dd-hero { position: relative; padding: var(--space-10) var(--pad-page-x); }
+.dd-hero-inner { max-width: var(--measure-wide); margin: 0 auto; }
+.dd-hero-eyebrow { margin-bottom: var(--space-5); }
+
+.dd-hero-title {
+  margin: 0;
+  font: var(--text-h1);
+  letter-spacing: var(--ls-heading);
+  text-wrap: balance;
+}
+/* Rotator auf eigener Zeile, links bündig */
+.dd-hero-title .dd-hero-rotator { display: grid; justify-items: start; }
+
+.dd-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 400px;
+  column-gap: var(--space-16);
+  align-items: start;
+  margin-top: var(--space-8);
+}
+.dd-hero-lead {
+  margin: 0 0 var(--space-8);
+  max-width: 560px;
+  font: var(--text-lead);
+  color: var(--text-on-dark-secondary);
+  text-wrap: pretty;
+}
+.dd-hero-ctas { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+.dd-hero-micro { margin: var(--space-4) 0 0; font: var(--text-caption); color: var(--text-on-dark-secondary); }
+
+/* Kompakter Streifen (nur mobil) */
+.dd-hero-strip { display: none; }
+
+@media (max-width: 1023px) {
+  .dd-hero-title { font-size: var(--fs-h1-sm); }
+  .dd-hero-grid { grid-template-columns: minmax(0, 1fr); row-gap: var(--space-12); }
+  .dd-hero-offer { max-width: 480px; }
+}
+
+@media (max-width: 720px) {
+  .dd-hero { padding: var(--space-10) var(--pad-page-x) var(--space-12); }
+  .dd-hero-eyebrow { margin-bottom: var(--space-4); }
+  .dd-hero-title { font-size: var(--fs-h1); }
+  .dd-hero-grid { margin-top: var(--space-6); }
+  .dd-hero-lead { margin-bottom: var(--space-6); }
+  .dd-hero-offer { display: none; }
+  .dd-hero-ctas > .dd-btn { width: 100%; }
+  .dd-hero-strip {
+    display: flex; align-items: center; gap: var(--space-3);
+    margin-top: var(--space-6);
+    --dd-face-ring: var(--surface-dark);
+  }
+  .dd-hero-strip-text { margin: 0; font: var(--text-caption); color: var(--text-on-dark-secondary); text-wrap: pretty; }
+}
+
+/* ---------- Logo-Band (Fuß des Hero) ---------- */
+.dd-trust { position: relative; padding-bottom: var(--space-12); }
+.dd-trust-bar { padding: 0 var(--pad-page-x); }
+.dd-trust-head {
+  max-width: var(--measure-wide); margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-6);
+  padding: var(--space-4) 0 var(--space-6);
+  border-top: 1px solid var(--dd-border-dark);
+}
+.dd-trust-copy { margin: 0; font: var(--text-copy); text-wrap: pretty; }
+.dd-trust-title { font-family: var(--font-head); font-weight: var(--fw-medium); color: var(--text-on-dark); }
+.dd-trust-sub { color: var(--text-on-dark-secondary); }
+
+.dd-trust-toggle {
+  flex: 0 0 auto; display: grid; place-items: center;
+  width: 44px; height: 44px; padding: 0;
+  border-radius: var(--radius-round);
+  background: transparent; color: var(--text-on-dark);
+  border: 1px solid var(--dd-border-dark);
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-standard);
+}
+.dd-trust-toggle svg { display: block; }
+@media (hover: hover) {
+  .dd-trust-toggle:hover { border-color: var(--text-on-dark-secondary); }
+}
+/* Ohne Bewegung steht das Band still: kein Pause-Button nötig */
+@media (prefers-reduced-motion: reduce) {
+  .dd-trust-toggle { display: none; }
+}
+
+@media (max-width: 720px) {
+  .dd-trust { padding-bottom: var(--space-10); }
+  .dd-trust-head { padding: var(--space-4) 0 var(--space-6); align-items: flex-start; }
+  .dd-trust-copy { font-size: 15px; }
+  .dd-trust-sub { display: block; }
+}
+
+/* ---------- Was uns anders macht ---------- */
+.dd-diff { border-bottom: 1px solid var(--dd-border); }
+.dd-diff-row {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  column-gap: var(--space-12);
+  align-items: baseline;
+  padding: var(--space-10) 0;
+  border-top: 1px solid var(--dd-border);
+}
+.dd-diff-title {
+  margin: 0;
+  font: var(--fw-bold) var(--fs-h3)/1.25 var(--font-head);
+  letter-spacing: var(--ls-heading);
+  color: var(--text-primary);
+  text-wrap: balance;
+}
+.dd-diff-body { margin: 0; max-width: 62ch; font: var(--text-copy); color: var(--text-secondary); text-wrap: pretty; }
+.dd-diff-mark {
+  background: var(--highlight-mark);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  padding: 0 0.06em;
+}
+
+@media (max-width: 720px) {
+  .dd-diff-row { grid-template-columns: minmax(0, 1fr); row-gap: var(--space-3); padding: var(--space-7) 0; }
+  .dd-diff-title { font-size: var(--fs-lead); }
+}

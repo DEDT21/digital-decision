@@ -1,25 +1,27 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de-AT">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Datenschutzerklärung — digital decision GmbH</title>
+  <title>Datenschutzerklärung | digital decision GmbH</title>
   <meta name="description" content="Datenschutzerklärung der digital decision GmbH: keine Tracking-Cookies, keine Analyse-Tools, self-gehostete Fonts. So wenig Daten wie möglich, so klar wie möglich.">
-  <link rel="canonical" href="https://www.digital-decision.at/datenschutz/">
+  <link rel="canonical" href="https://digital-decision.at/datenschutz/">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <script type="module" src="/src/static.js"></script>
 </head>
 <body>
-  <header class="page-header">
+  <a class="dd-skip" href="#main">Zum Inhalt springen</a>
+
+  <header class="page-header dd-on-dark">
     <div class="inner">
-      <a href="/" aria-label="digital decision — Startseite"><img src="/assets/dd-mark-lime.svg" alt="digital decision"></a>
-      <a class="back" href="/">← Zurück zur Startseite</a>
+      <a class="logo" href="/" aria-label="digital decision, zur Startseite"><img src="/assets/dd-mark-lime.svg" alt="digital decision" width="42" height="44"></a>
+      <a class="back" href="/"><span aria-hidden="true">←</span> Zurück zur Startseite</a>
     </div>
   </header>
 
-  <main class="legal-main">
+  <main id="main" class="legal-main" tabindex="-1">
     <h1><span class="mark">Datenschutzerklärung</span></h1>
     <p class="stand">Stand: Juli 2026</p>
 
@@ -51,22 +53,24 @@
   </main>
 
   <footer class="page-footer">
+    <!-- Regionen als reiner Text wie im React-Footer (src/App.jsx): acht Selbstlinks auf die
+         Startseite bringen nichts und wirken wie Keyword-Stuffing. -->
     <div class="inner regions">
-      <span class="regions-title">Regionen</span>
-      <nav class="regions-links">
-        <a href="https://digital-decision.at/">Marketing Agentur Salzburg</a>
-        <a href="https://digital-decision.at/">Werbeagentur Salzburg</a>
-        <a href="https://digital-decision.at/">Branding Agentur Salzburg</a>
-        <a href="https://digital-decision.at/">Online Marketing Agentur Oberösterreich</a>
-        <a href="https://digital-decision.at/">E-Commerce Agentur Salzburg</a>
-        <a href="https://digital-decision.at/">Shopify Agentur Salzburg</a>
-        <a href="https://digital-decision.at/">Performance Marketing Salzburg</a>
-        <a href="https://digital-decision.at/">Klaviyo Agentur Österreich</a>
-      </nav>
+      <p class="regions-title" id="regionen">Regionen</p>
+      <ul class="regions-links" aria-labelledby="regionen">
+        <li>Marketing Agentur Salzburg</li>
+        <li>Werbeagentur Salzburg</li>
+        <li>Branding Agentur Salzburg</li>
+        <li>Online Marketing Agentur Oberösterreich</li>
+        <li>E-Commerce Agentur Salzburg</li>
+        <li>Shopify Agentur Salzburg</li>
+        <li>Performance Marketing Salzburg</li>
+        <li>Klaviyo Agentur Österreich</li>
+      </ul>
     </div>
     <div class="inner">
       <span>digital decision GmbH · FN 461176a · ATU71568207</span>
-      <nav>
+      <nav aria-label="Rechtliches">
         <a href="/impressum/">Impressum</a>
         <a href="/datenschutz/">Datenschutz</a>
       </nav>

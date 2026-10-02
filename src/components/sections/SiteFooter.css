@@ -1,0 +1,127 @@
+/* Schluss-CTA und Footer als eine Ink-Szene: Aurora-Licht, eine riesige Outline-Wortmarke im
+   Hintergrund, das USP-Laufband, dann Link-Spalten, Regionen und die Rechtszeile.
+   Statische Datei statt Runtime-Injection (kein CLS im ersten Frame, prerender- und CSP-tauglich). */
+
+.dd-footer { position: relative; overflow: hidden; background: var(--surface-dark); color: var(--text-on-dark); }
+.dd-footer-content { position: relative; }
+/* Alle Blöcke tragen ihr Seiten-Padding selbst: max-width um das Padding erweitert, damit der
+   Inhalt auf derselben Containerkante steht wie die übrigen Sektionen (1080px, x=180 bei 1440) */
+.dd-footer-cta, .dd-footer-cols, .dd-footer-regions, .dd-footer-bottom { max-width: calc(var(--measure-wide) + 2 * var(--pad-page-x)); }
+
+/* Riesige Outline-Wortmarke an der Unterkante, rein dekorativ */
+.dd-footer-wordmark {
+  position: absolute; left: 50%; bottom: -2.5vw; transform: translateX(-50%);
+  white-space: nowrap; pointer-events: none; user-select: none;
+  font: var(--fw-bold) 17vw/0.78 var(--font-head); letter-spacing: -0.04em;
+  color: transparent; -webkit-text-stroke: 1px color-mix(in srgb, var(--dd-white) 7%, transparent);
+}
+
+/* ---------- Schluss-CTA ---------- */
+.dd-footer-cta { margin: 0 auto; text-align: center; padding: var(--pad-section-y) var(--pad-page-x) var(--space-16); }
+.dd-footer-kicker { margin-bottom: var(--space-5); }
+.dd-footer-headline { font: var(--text-h2); letter-spacing: var(--ls-heading); margin: 0 auto var(--space-5); max-width: 880px; text-wrap: balance; }
+.dd-footer-sub { font: var(--text-lead); color: var(--text-on-dark-secondary); max-width: var(--measure); margin: 0 auto var(--space-8); text-wrap: pretty; }
+
+/* ---------- USP-Laufband ---------- */
+@keyframes dd-usp { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(-50%, 0, 0); } }
+/* Wie das Logo-Band im Hero: Zeile mit Pause-Button rechts (containerbündig), darunter das Band.
+   So liegt nie Text unter dem Button. */
+.dd-usp-bar { padding: 0 var(--pad-page-x); }
+.dd-usp-head {
+  max-width: var(--measure-wide); margin: 0 auto;
+  display: flex; justify-content: flex-end;
+  padding-top: var(--space-4); border-top: 1px solid var(--dd-border-dark);
+}
+.dd-usp-band {
+  overflow: hidden; padding: var(--space-6) 0;
+  -webkit-mask-image: linear-gradient(to right, transparent, black 80px, black calc(100% - 80px), transparent);
+  mask-image: linear-gradient(to right, transparent, black 80px, black calc(100% - 80px), transparent);
+}
+/* Zwei identische Hälften, gap und padding-right gleich groß: -50% ist exakt eine Hälfte */
+.dd-usp-track {
+  display: flex; align-items: center; width: max-content;
+  list-style: none; margin: 0; padding: 0 var(--space-10) 0 0; gap: var(--space-10);
+  animation: dd-usp var(--dd-usp-duration, 38s) linear infinite;
+}
+/* angehalten per Button oder solange das Band nicht im Bild ist */
+.dd-usp[data-paused="1"] .dd-usp-track,
+.dd-usp[data-offscreen="1"] .dd-usp-track { animation-play-state: paused; }
+.dd-usp-item { display: flex; align-items: center; gap: var(--space-10); flex: 0 0 auto; }
+.dd-usp-text { font: var(--fw-medium) 25px/var(--lh-title) var(--font-head); letter-spacing: var(--ls-heading); color: var(--text-on-dark); white-space: nowrap; }
+.dd-usp-item img { display: block; height: 14px; width: auto; }
+
+.dd-usp-toggle {
+  flex: 0 0 auto; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; cursor: pointer;
+  border-radius: var(--radius-pill); background: var(--surface-dark); border: var(--border-on-dark); color: var(--dd-on-ink-muted);
+  transition: border-color 160ms var(--ease-out-strong), color 160ms var(--ease-out-strong);
+}
+.dd-usp-toggle svg { width: 14px; height: 14px; }
+
+/* ---------- Spalten ---------- */
+.dd-footer-cols {
+  margin: 0 auto; display: grid;
+  padding: var(--space-16) var(--pad-page-x) 0;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: var(--space-10);
+}
+.dd-footer-claim { font: var(--text-copy); color: var(--text-on-dark-secondary); max-width: 300px; margin: var(--space-6) 0 0; text-wrap: pretty; }
+.dd-footer-col-title { margin-bottom: var(--space-5); }
+.dd-footer-col-links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-3); }
+.dd-footer-link, .dd-footer-text { font: var(--fw-regular) 14px/1.5 var(--font-body); color: var(--dd-on-ink-muted); }
+.dd-footer-link { text-decoration: none; transition: color 160ms var(--ease-out-strong); }
+.dd-footer-link:hover { color: var(--dd-white); }
+
+/* ---------- Regionen: reiner Text, keine Links ---------- */
+.dd-footer-regions { margin: 0 auto; padding: var(--space-12) var(--pad-page-x) 0; }
+.dd-footer-regions-list {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-3) var(--space-6);
+  font: var(--fw-regular) 14px/1.5 var(--font-body); color: var(--dd-on-ink-muted);
+}
+
+/* ---------- Rechtszeile ---------- */
+.dd-footer-bottom {
+  margin: 0 auto; padding: var(--space-16) var(--pad-page-x) var(--space-10);
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-6); flex-wrap: wrap;
+}
+.dd-footer-legal { font: var(--text-caption); color: var(--text-on-dark-secondary); }
+.dd-footer-bottom-end { display: flex; align-items: center; gap: var(--space-5); }
+.dd-top {
+  display: grid; place-items: center; width: 44px; height: 44px; padding: 0; cursor: pointer;
+  border-radius: var(--radius-pill); background: transparent; border: var(--border-on-dark); color: var(--dd-on-ink-muted);
+  transition: transform 160ms var(--ease-out-strong), border-color 160ms var(--ease-out-strong), color 160ms var(--ease-out-strong);
+}
+.dd-top svg { width: 18px; height: 18px; }
+.dd-top:active { transform: scale(0.97); }
+
+@media (hover: hover) and (pointer: fine) {
+  .dd-top:hover, .dd-usp-toggle:hover { border-color: var(--dd-white); color: var(--dd-white); }
+}
+
+@media (max-width: 720px) {
+  .dd-footer-cta { padding: var(--space-12) var(--pad-page-x) var(--space-8); }
+  .dd-usp-band { padding: var(--space-4) 0; }
+  .dd-usp-head { padding-top: var(--space-3); }
+  .dd-usp-track { gap: var(--space-6); padding-right: var(--space-6); }
+  .dd-usp-item { gap: var(--space-6); }
+  .dd-usp-text { font-size: 18px; }
+  .dd-footer-cols { padding: var(--space-10) var(--pad-page-x) 0; grid-template-columns: repeat(2, 1fr); gap: var(--space-6) var(--space-5); }
+  .dd-footer-cols { grid-auto-flow: row dense; }
+  .dd-footer-brand, .dd-footer-cols > [data-wide] { grid-column: 1 / -1; }
+  .dd-footer-logo img { height: 48px !important; }
+  .dd-footer-col-title { margin-bottom: var(--space-1); }
+  /* Ziele mindestens 44px hoch: die Höhe kommt aus dem Element, nicht aus dem Abstand */
+  .dd-footer-col-links { gap: 0; }
+  .dd-footer-link, .dd-footer-text { display: flex; align-items: center; min-height: 44px; }
+  /* Regionen zweispaltig in Caption-Größe, sonst wächst der Footer um eine halbe Bildschirmhöhe */
+  .dd-footer-regions { padding: var(--space-8) var(--pad-page-x) 0; }
+  .dd-footer-regions-list { grid-template-columns: repeat(2, 1fr); gap: var(--space-2) var(--space-4); font: var(--fw-regular) 13px/1.45 var(--font-body); }
+  .dd-footer-bottom { padding: var(--space-8) var(--pad-page-x); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* statisches Band, nichts zu pausieren */
+  .dd-usp-track { animation: none; }
+  .dd-usp-toggle { display: none; }
+  .dd-top, .dd-footer-link { transition: none; }
+  .dd-top:active { transform: none; }
+}

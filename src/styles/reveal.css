@@ -3,7 +3,7 @@
    und transform, also kein Layout-Shift und keine Reflows während der Animation.
 
    Die Startwerte hängen an der Klasse `dd-reveal` am <html>, die ausschließlich per JS
-   gesetzt wird (siehe src/main.jsx). Ohne JS — und bei prefers-reduced-motion, wo die Klasse
+   gesetzt wird (Inline-Script im <head> von index.html, Live-Schaltung in src/main.jsx). Ohne JS — und bei prefers-reduced-motion, wo die Klasse
    gar nicht erst gesetzt wird — bleibt jeder Inhalt normal sichtbar. */
 
 html.dd-reveal [data-reveal] {
