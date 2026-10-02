@@ -14,7 +14,22 @@ import { PhaseFlow } from './components/sections/PhaseFlow.jsx';
 import { LogoMarquee } from './components/sections/LogoMarquee.jsx';
 import { TeamStructure } from './components/sections/TeamStructure.jsx';
 
-const ROTATOR = ['deinen Online Shop.', 'deine Website.', 'deine Ads.', 'deine Marke.', 'deinen Relaunch.', 'dein Amazon-Business.', 'dein Wachstum.'];
+const ROTATOR = ['deinen Onlineshop.', 'deine Website.', 'deine Ads.', 'deine Marke.', 'deinen Relaunch.', 'dein Amazon-Business.', 'dein Wachstum.'];
+
+/* Was Screenreader und Suchmaschinen als H1 lesen: der Kernclaim, unabhängig vom Rotator. */
+const H1_TEXT = 'Die richtige Entscheidung für dein Wachstum.';
+
+/* Setup-Check-Karte im Hero: was du nach den 30 Minuten weißt (aus SETUP_STEPS[1]). */
+const HERO_OFFER = {
+  title: 'Der Setup-Check',
+  meta: ['Kostenlos', '30 Minuten'],
+  outcomesLabel: 'Danach weißt du:',
+  outcomes: ['Wo dein Wachstum hängt.', 'Was zuerst dran ist.', 'Was du dir sparen kannst.'],
+  people: 'David & Thomas',
+  peopleRole: 'Geschäftsführer',
+  reply: 'Antwort innerhalb von 24 Stunden. Von David oder Thomas persönlich.',
+  link: 'Zum Formular'
+};
 
 const TRUST = [
   { name: 'Aqmos', logo: '/assets/clients/aqmos.webp' },
@@ -24,24 +39,27 @@ const TRUST = [
   { name: 'Ecosoft', logo: '/assets/clients/ecosoft.webp' }
 ];
 
+/* mark: Teil des Titels, der den Lime-Textmarker bekommt (Brand-Signature, sparsam). */
 const DIFFERENCE = [
-  ['Wir arbeiten in deinem Geschäft, nicht daneben.', 'Wir tauchen in Produkt, Zahlen und Abläufe ein und übernehmen auf Wunsch operative Rollen, vom Ads-Konto bis zur Shop-Migration. Nicht beraten und verschwinden, sondern machen und dableiben.'],
-  ['Wir bauen auf, was funktioniert.', 'Dein Team, deine Systeme, deine bisherige Arbeit haben Wert. Wir reißen nichts ein, um uns wichtig zu machen. Wir verbessern gezielt das, was Wachstum blockiert.'],
-  ['Wir gehen mit ins Risiko.', 'Wenn es zum Projekt passt, koppeln wir einen Teil unseres Honorars an dein Ergebnis. Erfolg wird geteilt: im Risiko wie im Gewinn. Frag uns danach.']
+  { title: 'Wir arbeiten in deinem Geschäft, nicht daneben.', body: 'Wir arbeiten uns in Produkt, Zahlen und Abläufe ein und übernehmen auf Wunsch operative Rollen, vom Ads-Konto bis zur Shop-Migration. Beraten und dann verschwinden ist nicht unser Modell.' },
+  { title: 'Wir bauen auf, was funktioniert.', body: 'Dein Team, deine Systeme, deine bisherige Arbeit haben Wert. Wir reißen nichts ein, um uns wichtig zu machen. Wir verbessern gezielt das, was Wachstum blockiert.' },
+  { title: 'Wir gehen mit ins Risiko.', mark: 'mit ins Risiko', body: 'Wenn es zum Projekt passt, koppeln wir einen Teil unseres Honorars an dein Ergebnis. Läuft es gut, verdienen wir mit. Läuft es schlecht, verdienen wir weniger. Frag uns im Setup-Check danach.' }
 ];
 
+/* stat/statLabel: optionale Kennzahl für die hervorgehobene Case-Karte. Nur freigegebene Zahlen. */
 const CASES = [
-  { client: 'Aqmos', industry: 'Wasseraufbereitung · D2C + Marktplätze',
+  { client: 'Aqmos', logo: '/assets/clients/aqmos.webp', industry: 'Wasseraufbereitung · D2C + Marktplätze',
+    stat: '+50 %', statLabel: 'Monatsumsatz im Jahresvergleich',
     result: '+50 % Monatsumsatz. Durch Struktur, nicht durch Budget.',
-    body: 'Wir haben Aqmos neu gebrandet und der Marke ein Gesicht gegeben. Seitdem steuern wir das operative E-Commerce-Geschäft über vier Kanäle. Die Monatsumsätze liegen im Jahresvergleich stabil bei +50 %, gewachsen durch Struktur im Marketing und im technischen E-Commerce.',
+    body: 'Wir haben Aqmos neu gebrandet und der Marke ein Gesicht gegeben. Seitdem steuern wir das operative E-Commerce-Geschäft über vier Kanäle. Im Jahresvergleich liegen die Monatsumsätze stabil bei +50 %. Gewachsen ist das über Struktur im Marketing und im technischen E-Commerce.',
     tags: ['Rebranding', 'E-Commerce-Steuerung', '4+ Kanäle'] },
-  { client: 'Hagi (Hagleitner)', industry: 'Hygiene · B2B-Konzern',
-    result: 'Vom B2B-Marktführer zur D2C-Marke.',
-    body: 'Hagleitner ist seit 50 Jahren Profi-Hygiene im B2B. Der erste Schritt zum Endkunden blieb unter den Möglichkeiten. Jetzt bauen wir ihn neu: Shopify-Migration, neues Creative-Konzept, Relaunch von Google & Meta Ads. Aus einem B2B-Player wird eine D2C-Plattform.',
+  { client: 'Hagi · Hagleitner', logo: '/assets/clients/hagleitner.webp', industry: 'Hygiene · B2B-Konzern',
+    result: 'Vom B2B-Hygieneprofi zur D2C-Marke.',
+    body: 'Hagleitner macht seit über 50 Jahren Profi-Hygiene im B2B. Der erste Schritt zum Endkunden blieb unter seinen Möglichkeiten. Jetzt bauen wir ihn neu auf: Shopify-Migration, neues Creative-Konzept, Relaunch von Google und Meta Ads.',
     tags: ['Shop-Migration', 'Ads-Relaunch', 'D2C-Strategie'] },
-  { client: 'Gamechangersocks', industry: 'Fashion · D2C',
+  { client: 'Gamechangersocks', logo: '/assets/clients/gamechangersocks.webp', industry: 'Fashion · D2C',
     result: 'Technischer E-Commerce, der Conversion bringt.',
-    body: 'Hier arbeiten wir dort, wo Umsatz technisch entsteht: Conversion-Optimierung, Shop-Strategie und Planung. Weniger laut, dafür messbar. Jede Änderung muss sich in der Conversion Rate zeigen.',
+    body: 'Bei Gamechangersocks arbeiten wir dort, wo Umsatz technisch entsteht: Conversion-Optimierung, Shop-Strategie und Planung. Jede Änderung muss sich in der Conversion Rate zeigen.',
     tags: ['CRO', 'Shop-Strategie', 'Planung'] }
 ];
 
@@ -65,12 +83,12 @@ const TEAM = [
     callFor: ['Shop- & Systemarchitektur', 'Prozesse im operativen Geschäft', 'Agentur-Landschaften aufräumen'] },
   { name: 'David Edtmayer', role: 'Geschäftsführer · Co-Founder', mail: 'david@digital-decision.at', photo: '/assets/team/david-edtmayer.webp',
     line: 'Ich schaue mir zuerst die Zahlen an. Dann suche ich den Weg, den noch keiner geht.',
-    bio: 'Baut seit seinem 15. Lebensjahr E-Commerce. Heute baut er die Systeme dahinter: AI-first, immer auf der Suche nach der besseren Lösung statt der gewohnten.',
+    bio: 'Baut seit seinem 15. Lebensjahr E-Commerce. Heute baut er die Systeme dahinter: AI-first und immer auf der Suche nach der besseren Lösung statt der gewohnten.',
     callFor: ['Wachstumsentscheidungen', 'Performance & Funnels', 'AI-gestützte Prozesse & neue Wege'] }
 ];
 
 const NETWORK = [
-  { name: 'Paid', what: 'Paid Search, Paid Social, Feeds. Geführt von uns, nicht blind ausgelagert.' },
+  { name: 'Paid', what: 'Paid Search, Paid Social, Produkt-Feeds.' },
   { name: 'Tech', what: 'Entwicklung an bestehenden Systemen, Schnittstellen, Migrationen.' },
   { name: 'Logistik', what: 'Fulfillment, Versandkosten, Retourenprozesse.' },
   { name: 'Creative', what: 'Foto, Video, Ads-Assets. Nach unserem Briefing, mit euren Produkten.' }
@@ -81,7 +99,7 @@ const NETWORK_FACES = [
   { name: 'Otago', logo: '/assets/network/otago.svg' },
   { name: 'Spreadfilms', logo: '/assets/network/spreadfilms.svg', dark: true },
   { name: 'WBFK', logo: '/assets/network/wbfk.svg', dark: true },
-  /* tile-style logo (black square, white W) — rendered like a profile photo, not filtered to a glyph */
+  /* tile-style logo (black square, white W): rendered like a profile photo, not filtered to a glyph */
   { name: 'Wipplinger', photo: '/assets/network/wipplinger.svg' },
   { name: 'Partner', logo: '/assets/network/partner-1c.svg', dark: true },
   { name: 'Huber', logo: '/assets/network/huber.webp' }
@@ -96,12 +114,13 @@ const MANIFEST = [
   'Partnerschaft. Auch finanziell.'
 ];
 
-const FAQS = [
-  ['Wir haben schon schlechte Erfahrungen mit Agenturen gemacht. Warum sollte es mit euch anders laufen?', 'Verstehen wir. Ein Teil unserer Kunden kam genau so zu uns. Der Unterschied: Wir verkaufen keine Stunden, sondern übernehmen Verantwortung für Ergebnisse. Deshalb starten wir mit einem kostenlosen Setup-Check statt einem Pitch, arbeiten in deinem operativen Geschäft statt daneben und koppeln unser Honorar auf Wunsch an dein Ergebnis. Wenn wir nicht überzeugt sind, dass wir dir helfen können, sagen wir das im Check. Dann hast du eine ehrliche Einschätzung. Gratis.'],
-  ['Bietet ihr erfolgsbasierte Vergütung an?', 'Ja, wenn es zum Projekt passt. Wir sind bereit, unser Honorar teilweise an unternehmerische Ergebnisse zu koppeln. Erfolg wird geteilt: im Risiko wie im Gewinn.'],
-  ['Entwickelt ihr alles komplett neu?', 'Nur wenn es sinnvoll ist. Wir nutzen, was bereits funktioniert: bestehende Systeme, Prozesse, Teams. Und verbessern gezielt das, was blockiert.'],
-  ['Was passiert, wenn schon ein Team oder andere Agenturen beteiligt sind?', 'Wir sortieren sensibel, nicht brachial. Wir schauen respektvoll, was funktioniert, und bringen Struktur rein. Ohne Chaos, ohne Politik.'],
-  ['Übernehmt ihr auch operative Verantwortung?', 'Ja. Von strategischer Steuerung bis zur Umsetzung im Tagesgeschäft. Immer mit klarem Ziel: Wachstum, Effizienz, messbare Ergebnisse.'],
+/* Wird zusätzlich als FAQPage-JSON-LD in index.html gespiegelt. Bei Änderungen beide Stellen pflegen. */
+export const FAQS = [
+  ['Wir haben schon schlechte Erfahrungen mit Agenturen gemacht. Warum sollte es mit euch anders laufen?', 'Verstehen wir. Ein Teil unserer Kunden kam genau so zu uns. Wir verkaufen keine Stunden, wir übernehmen Verantwortung für Ergebnisse. Deshalb startet alles mit einem kostenlosen Setup-Check statt mit einem Pitch. Danach arbeiten wir in deinem Tagesgeschäft mit und koppeln unser Honorar auf Wunsch an dein Ergebnis. Wenn wir nicht überzeugt sind, dass wir dir helfen können, sagen wir dir das im Check. Dann hast du zumindest eine ehrliche Einschätzung, und die kostet dich nichts.'],
+  ['Bietet ihr erfolgsbasierte Vergütung an?', 'Ja, wenn es zum Projekt passt. Dann koppeln wir einen Teil unseres Honorars an dein unternehmerisches Ergebnis. Wie das konkret aussieht, legen wir gemeinsam fest.'],
+  ['Entwickelt ihr alles komplett neu?', 'Nur wenn es sinnvoll ist. Wir nutzen, was schon funktioniert, also bestehende Systeme, Prozesse und Teams, und verbessern gezielt das, was blockiert.'],
+  ['Was passiert, wenn schon ein Team oder andere Agenturen beteiligt sind?', 'Wir schauen uns an, was funktioniert, und bringen Struktur rein. Sensibel, ohne Politik und ohne alles umzuwerfen.'],
+  ['Übernehmt ihr auch operative Verantwortung?', 'Ja. Wir steuern strategisch und setzen im Tagesgeschäft um, zum Beispiel im Ads-Konto, im Shop oder bei einer Migration. Das Ziel ist immer messbares Wachstum.'],
   ['Passt ihr zu jedem Unternehmen?', 'Nein. Wir passen zu Unternehmen, die echte Zusammenarbeit und klare Entscheidungen wollen. Kein weiteres Agenturfeuerwerk.']
 ];
 
@@ -109,7 +128,7 @@ function Hero({ onNavigate }) {
   return (
     <div className="dd-hero" style={{ position: 'relative' }}>
       <div style={{ maxWidth: 'var(--measure-wide)', margin: '0 auto' }}>
-        <div style={{ marginBottom: 'var(--space-5)' }}><Kicker tone="limeText">digital decision · E-Commerce-Partner</Kicker></div>
+        <div style={{ marginBottom: 'var(--space-5)' }}><Kicker tone="limeText">E-Commerce-Partner · Salzburg</Kicker></div>
         <h1 style={{ font: 'var(--text-h1)', fontSize: 'var(--fs-h1)', letterSpacing: 'var(--ls-heading)', margin: 0, maxWidth: 'var(--measure-headline)' }}>
           Die richtige Entscheidung für <WordRotator words={ROTATOR} />
         </h1>
@@ -175,10 +194,10 @@ export function Home({ onNavigate }) {
         reassurance="Antwort innerhalb von 24 Stunden. Von David oder Thomas persönlich." />
 
       <Section id="team" tone="white">
-        <SectionHeading kicker="Wer entscheidet" title="Du redest mit denen, die entscheiden." lead="Alles andere holen wir gezielt dazu. Benannt, nicht anonym." />
+        <SectionHeading kicker="Wer entscheidet" title="Du redest mit denen, die entscheiden." lead="Alles andere holen wir gezielt dazu." />
         <TeamStructure people={TEAM} network={NETWORK} networkFaces={NETWORK_FACES}
           hubLabel="Netzwerk aus Spezialisten"
-          networkNote="Benannt, nicht anonym: Für Paid, Tech, Logistik und Creative holen wir Spezialisten dazu, die wir seit Jahren kennen. Geführt von uns, nicht blind ausgelagert."
+          networkNote="Für Paid, Tech, Logistik und Creative holen wir Spezialisten dazu, die wir seit Jahren kennen. Benannt, nicht anonym, und geführt von uns."
           assetBase="/assets" />
       </Section>
 

@@ -4,3 +4,6 @@ dist/
 *.log
 
 .claude/
+
+# Lokale Ablage, nie committen (Repo ist öffentlich)
+Aus Downloads/

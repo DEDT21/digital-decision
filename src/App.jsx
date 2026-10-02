@@ -22,7 +22,9 @@ const FOOTER_COLUMNS = [
   ] }
 ];
 
-/* SEO-Regionen im Footer: acht Keyword-Links auf die Startseite, auf jeder Seite sichtbar. */
+/* SEO-Regionen im Footer: acht Keyword-Begriffe als reiner Text. Bewusst keine Links mehr –
+   acht Selbstlinks auf die Startseite bringen nichts und wirken wie Keyword-Stuffing.
+   Echte Wirkung hätten eigene Landingpages pro Begriff (offener Punkt). */
 const REGION_LINKS = [
   'Marketing Agentur Salzburg',
   'Werbeagentur Salzburg',
@@ -32,7 +34,7 @@ const REGION_LINKS = [
   'Shopify Agentur Salzburg',
   'Performance Marketing Salzburg',
   'Klaviyo Agentur Österreich'
-].map((label) => ({ label, href: 'https://digital-decision.at/' }));
+].map((label) => ({ label }));
 
 const USPS = [
   'Zahlen lügen nicht. Wir auch nicht.',

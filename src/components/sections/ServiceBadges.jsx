@@ -13,26 +13,25 @@ const STYLE_ID = 'dd-servicebadges-styles';
 const SERVICES = [
   { id: 'shops', label: 'Onlineshops', size: 'lg', fill: 'lime', rot: -3, dx: -150, dy: -95,
     title: 'Gebaut, um zu verkaufen.',
-    body: ['Wir bauen Shops, die verkaufen. Nicht Shops, die nur gut aussehen. Shopify oder Shopware, neu aufgesetzt oder relauncht – von Startseite bis Checkout ein Verkaufssystem. Fertig ist dein Shop nicht, wenn er schön ist. Fertig ist er, wenn er verkauft.'] },
+    body: ['Shopify oder Shopware, neu aufgesetzt oder relauncht: Wir bauen deinen Shop von der Startseite bis zum Checkout als Verkaufssystem. Fertig ist er für uns, wenn er verkauft. Schön aussehen allein reicht nicht.'] },
   { id: 'ads', label: 'Performance Ads', size: 'md', fill: 'violet', rot: -1, dx: 80, dy: -110,
     title: 'Werbebudget. Richtig entschieden.',
-    body: ['Wir behandeln dein Budget so, als käme es aus unserer Tasche. Meta und Google Ads: Jeder Euro geht dorthin, wo er effizient verkauft.'] },
+    body: ['Wir behandeln dein Budget, als käme es aus unserer Tasche. Bei Meta und Google Ads geht jeder Euro dorthin, wo er verkauft. Und wenn er außerhalb der Ads mehr bringt, sagen wir dir das.'] },
   { id: 'websites', label: 'Websites', size: 'md', fill: 'white', rot: 2, dx: 235, dy: -45,
     title: 'Damit dich jeder so gut sieht, wie du bist.',
-    body: ['Deine Arbeit ist stark. Deine Website muss es auch sein. Wir bauen Websites, die dich so gut zeigen, wie du wirklich bist – und aus Besuchern Anfragen machen.'] },
+    body: ['Deine Arbeit ist stark. Deine Website muss es auch sein. Wir bauen Websites, die dich so gut zeigen, wie du wirklich bist, und aus Besuchern Anfragen machen.'] },
   { id: 'seo', label: 'Content & SEO', size: 'lg', fill: 'white', rot: 2, dx: -190, dy: -20,
     title: 'Texte, mit denen du gefunden wirst.',
-    body: ['Gute Texte sind kein Bauchgefühl. Hinter jedem Wort stehen Marktrecherche, Suchdaten und der Blick auf deine Mitbewerber.',
-           'Das Ergebnis: Texte, die gefunden werden und verkaufen.'] },
+    body: ['Gute Texte entstehen nicht aus dem Bauch. Wir schreiben auf Basis von Marktrecherche, Suchdaten und dem, was deine Mitbewerber machen. So werden deine Texte gefunden und verkaufen.'] },
   { id: 'crm', label: 'E-Mail & CRM', size: 'md', fill: 'ink', rot: 1, dx: 20, dy: 5,
     title: 'Aus Käufern Stammkunden machen.',
-    body: ['Der günstigste Umsatz kommt von Leuten, die schon bei dir gekauft haben. Wir bauen die Systeme, die im Hintergrund Umsatz bringen, und Newsletter, die man freiwillig aufmacht.'] },
+    body: ['Der günstigste Umsatz kommt von Leuten, die schon bei dir gekauft haben. Wir bauen Automationen, die im Hintergrund verkaufen, und Newsletter, die man freiwillig aufmacht.'] },
   { id: 'systeme', label: 'Systeme & Integrationen', size: 'sm', fill: 'violet', rot: 3, dx: 215, dy: 45,
-    title: 'Womit dein Wachstum skalierbar wird.',
-    body: ['Wachstum scheitert selten am Marketing. Meistens am Chaos dahinter. Wir bauen das Gerüst, auf dem du wachsen kannst: Shop, Warenwirtschaft, Lager und Buchhaltung, sauber verbunden.'] },
+    title: 'Ein Unterbau, der mitwächst.',
+    body: ['Wachstum scheitert selten am Marketing, meistens am Chaos dahinter. Wir verbinden Shop, Warenwirtschaft, Lager und Buchhaltung sauber miteinander, damit du wachsen kannst.'] },
   { id: 'strategie', label: 'Strategie & Klartext', size: 'lg', fill: 'lime', rot: -2, dx: -80, dy: 90,
-    title: 'Dein Unternehmen. Unser Wissen.',
-    body: ['Wir verstehen dein Unternehmen, als wäre es unseres – und bringen alles ein, was wir haben: Wissen, Netzwerk, Erfahrung. Die Lösung, die dabei entsteht, gibt es nur für dich. Keine Grenzen, keine Beratung von der Stange.'] }
+    title: 'Dein Unternehmen. Unser ganzes Wissen.',
+    body: ['Wir lernen dein Unternehmen kennen, als wäre es unseres, und bringen alles ein, was wir haben: Wissen, Netzwerk und die Erfahrung aus unseren eigenen Marken. Was dabei herauskommt, passt nur zu dir. Beratung von der Stange gibt es bei uns nicht.'] }
 ];
 
 function ensureStyles() {
@@ -98,7 +97,7 @@ function ensureStyles() {
 export function ServiceBadges({
   id = 'leistungen',
   headline = 'Was wir für dich tun',
-  closer = 'Egal wo du startest: Du bekommst einen Ansprechpartner, der mitdenkt – und liefert.',
+  closer = 'Egal, wo du startest: Du bekommst einen Ansprechpartner, der mitdenkt und liefert.',
   ctaLabel = 'Kostenloser Setup-Check',
   ctaHref = '#setup-check',
   items = SERVICES,
