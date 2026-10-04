@@ -1,7 +1,9 @@
 /* CaseGrid: Referenzen auf Ink.
    ≥1024px: Feature-Karte (Case mit Kennzahl) über die volle Breite, zweispaltig innen; darunter
-   die übrigen Cases nebeneinander. 721–1023px: Feature-Karte einspaltig, Rest zweispaltig.
-   ≤720px: alles gestapelt. Karten ohne Schatten, 1px-Rand, Radius 16px. */
+   die übrigen Cases nebeneinander. Mit Film: links das Film-Panel (1/3, volle Kartenhöhe),
+   rechts Kopf, Kennzahl und Inhalt. 721–1023px: Film-Panel schmaler links (5:7), ohne Film
+   einspaltig; Rest zweispaltig. ≤720px: alles gestapelt, Film-Panel zuerst im 4:5-Format.
+   Karten ohne Schatten, 1px-Rand, Radius 16px. */
 
 .dd-cases {
   display: grid;
@@ -162,6 +164,34 @@
 
 .dd-case--feature .dd-case-result { font-size: var(--fs-h2-sm); }
 
+/* ---------- Feature-Karte mit Film ---------- */
+
+/* DOM: erst Inhalt, dann Panel. Visuell Panel links (bzw. mobil oben). */
+.dd-case--film .dd-film { grid-column: 1; grid-row: 1; }
+.dd-case--film .dd-case-main { grid-column: 2; grid-row: 1; }
+
+/* Kennzahl in der rechten Spalte: "bis zu" klein, Zahl groß in Lime, Beschreibung darunter */
+.dd-case-kpi {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: var(--space-8) 0 0;
+}
+
+.dd-case-statprefix {
+  display: block;
+  font-family: var(--font-head);
+  font-weight: var(--fw-medium);
+  font-size: var(--fs-body);
+  line-height: var(--lh-title);
+  letter-spacing: var(--ls-heading);
+  color: var(--text-on-dark-secondary);
+}
+
+.dd-case-kpi .dd-case-statnum { margin-top: var(--space-1); }
+.dd-case-kpi .dd-case-statlabel { margin-top: var(--space-3); max-width: none; }
+.dd-case--film .dd-case-result { margin-top: var(--space-8); }
+
 /* ---------- Tablet ---------- */
 
 @media (max-width: 1023px) {
@@ -173,6 +203,11 @@
   }
   .dd-case-main { padding: var(--space-6) var(--space-8) var(--space-8); }
   .dd-case--feature .dd-case-result { font-size: var(--fs-h3); }
+
+  .dd-case--feature.dd-case--film { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); }
+  .dd-case--film .dd-case-main { padding: var(--space-8) var(--space-8) var(--space-8) var(--space-6); }
+  .dd-case--film .dd-case-statnum { font-size: clamp(56px, 7.6vw, 72px); }
+  .dd-case--film .dd-case-result { margin-top: var(--space-6); }
 }
 
 /* ---------- Mobil ---------- */
@@ -198,4 +233,13 @@
   .dd-case-industry { text-align: left; }
   .dd-case-result,
   .dd-case--feature .dd-case-result { font-size: calc(var(--fs-body) * 1.25); line-height: 1.25; }
+
+  /* Mit Film: Panel zuerst über die volle Breite im 4:5-Format, dann der Inhalt */
+  .dd-case--feature.dd-case--film { grid-template-columns: minmax(0, 1fr); }
+  .dd-case--film .dd-film { grid-column: 1; grid-row: 1; }
+  .dd-case--film .dd-case-main { grid-column: 1; grid-row: 2; padding: var(--space-4) var(--pad-card) var(--pad-card); }
+  .dd-case--film .dd-film-trigger { aspect-ratio: 4 / 5; min-height: 0; }
+  .dd-case-kpi { margin-top: var(--space-6); }
+  .dd-case--film .dd-case-statnum { font-size: clamp(56px, 17vw, 72px); }
+  .dd-case--film .dd-case-result { margin-top: var(--space-6); }
 }

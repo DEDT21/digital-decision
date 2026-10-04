@@ -1,13 +1,15 @@
 import React from 'react';
+import { CaseFilm } from './CaseFilm.jsx';
 import './CaseGrid.css';
 
-/* Referenzen auf Ink. Der Case mit Kennzahl (stat) wird zur Feature-Karte über die volle Breite:
-   links die Zahl groß in Lime, rechts Logo, Branche, Ergebnis, Text und Tags. Die übrigen Cases
-   stehen darunter zweispaltig. Lime ist auf dieser Fläche nur noch die Kennzahl; die Ergebnis-
-   Headlines sind weiß.
+/* Referenzen auf Ink. Der Case mit Kennzahl (stat) wird zur Feature-Karte über die volle Breite.
+   Mit Film (film): links das Film-Panel (Teaser im Hochformat, Klick öffnet den Case-Study-Film,
+   siehe CaseFilm.jsx), rechts Logo, Branche, die Kennzahl groß in Lime, Ergebnis, Text und Tags.
+   Ohne Film: links die Kennzahl, rechts der Rest. Die übrigen Cases stehen darunter zweispaltig.
+   Lime ist auf dieser Fläche nur die Kennzahl; die Ergebnis-Headlines sind weiß.
    Layout komplett per CSS-Media-Queries (CaseGrid.css), kein JS-Messen, SSR-sicher. Eingeblendet
-   wird über das globale Scroll-Reveal ([data-reveal]). Kein Hover-Effekt: die Karten sind keine
-   Links, ein Hover würde Klickbarkeit versprechen. */
+   wird über das globale Scroll-Reveal ([data-reveal]). Kein Hover-Effekt auf den Karten: sie
+   sind keine Links. Klickbar ist nur das Film-Panel, und das ist ein echter Button. */
 
 /* Intrinsische Logo-Maße (für width/height gegen Layout-Shift) und die optische Darstellhöhe:
    breite Wortmarken wirken bei gleicher Höhe deutlich größer als kompakte Bildmarken.
@@ -27,7 +29,7 @@ function logoProps(c) {
   };
 }
 
-/* Typografie, keine Copy-Änderung: Zahl und Einheit nie trennen ("+50 %" nicht über zwei Zeilen) */
+/* Typografie, keine Copy-Änderung: Zahl und Einheit nie trennen ("+110 %" nicht über zwei Zeilen) */
 function keepUnits(text) {
   return typeof text === 'string' ? text.replace(/(\d) (%|€)/g, '$1\u00A0$2') : text;
 }
@@ -47,6 +49,18 @@ function CaseHead({ c, headingId }) {
       ) : null}
       {c.industry ? <p className="dd-case-industry">{c.industry}</p> : null}
     </header>
+  );
+}
+
+/* Kennzahl: optionaler Vorsatz ("bis zu"), Zahl groß in Lime, Beschreibung darunter.
+   Als ein <p>, damit Screenreader den Satz am Stück lesen ("bis zu +110 % Monatsumsatz …"). */
+function CaseStat({ c, className }) {
+  return (
+    <p className={className}>
+      {c.statPrefix ? <span className="dd-case-statprefix">{c.statPrefix}</span> : null}
+      <span className="dd-case-statnum">{keepUnits(c.stat)}</span>
+      {c.statLabel ? <span className="dd-case-statlabel">{c.statLabel}</span> : null}
+    </p>
   );
 }
 
@@ -72,15 +86,17 @@ export function CaseGrid({ cases = [], style }) {
   return (
     <div className={'dd-cases' + (feature ? '' : ' dd-cases--plain')} style={style}>
       {feature ? (
-        <article className="dd-case dd-case--feature" aria-labelledby={'case-' + slug(feature.client)} data-reveal>
-          <p className="dd-case-stat">
-            <span className="dd-case-statnum">{keepUnits(feature.stat)}</span>
-            {feature.statLabel ? <span className="dd-case-statlabel">{feature.statLabel}</span> : null}
-          </p>
+        /* Mit Film: im DOM erst der Inhalt (Überschrift eröffnet die Karte), dann das Panel.
+           Visuell steht das Panel links bzw. oben (Grid-Platzierung in CaseGrid.css). */
+        <article className={'dd-case dd-case--feature' + (feature.film ? ' dd-case--film' : '')}
+          aria-labelledby={'case-' + slug(feature.client)} data-reveal>
+          {feature.film ? null : <CaseStat c={feature} className="dd-case-stat" />}
           <div className="dd-case-main">
             <CaseHead c={feature} headingId={'case-' + slug(feature.client)} />
+            {feature.film ? <CaseStat c={feature} className="dd-case-kpi" /> : null}
             <CaseContent c={feature} />
           </div>
+          {feature.film ? <CaseFilm film={feature.film} client={feature.client} /> : null}
         </article>
       ) : null}
 

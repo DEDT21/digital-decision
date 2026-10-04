@@ -1,0 +1,225 @@
+/* CaseFilm: Film-Panel in der Feature-Case-Karte + Vollbild-Dialog ("Portal").
+   Panel: Hochformat-Teaser, object-fit: cover, innen mit --film-inset Abstand zum Kartenrand und
+   konzentrischem Radius (Kartenradius minus Abstand). Play-Pill weiß mit Ink-Text, kein Lime
+   (Lime ist auf der Karte die Kennzahl). Layout der Spalten liegt in CaseGrid.css. */
+
+.dd-film {
+  --film-inset: var(--space-2);
+  position: relative;
+  min-width: 0;
+  display: flex;
+  padding: var(--film-inset);
+}
+
+/* ---------- Panel (der ganze Bereich ist der Button) ---------- */
+
+.dd-film-trigger {
+  position: relative;
+  display: block;
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 440px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: calc(var(--radius-xl) - var(--film-inset));
+  background: var(--surface-dark);
+  color: var(--text-on-dark);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  /* Safari: Radius-Clipping auch beim skalierten Video halten */
+  isolation: isolate;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dd-film-media {
+  position: absolute;
+  inset: 0;
+  display: block;
+  transform-origin: 50% 40%;
+  transition: transform 700ms var(--ease-out-strong);
+}
+
+.dd-film-teaser,
+.dd-film-still {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Headlines im Teaser sitzen oben, die Welle unten ist Deko: beim Beschneiden oben mehr behalten */
+  object-position: 50% 20%;
+  background: var(--surface-dark);
+}
+
+/* Poster liegt über dem Video und blendet aus, sobald der Teaser wirklich läuft */
+.dd-film-still { transition: opacity 600ms var(--ease-out); }
+.dd-film-trigger.is-live .dd-film-still { opacity: 0; }
+
+/* ---------- Play-Pill ---------- */
+
+.dd-film-pill {
+  position: absolute;
+  left: var(--space-4);
+  bottom: var(--space-4);
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 44px;
+  padding: 6px var(--space-4) 6px 6px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-card);
+  color: var(--text-primary);
+  font: var(--text-button);
+  white-space: nowrap;
+  pointer-events: none;
+  transform-origin: 50% 50%;
+  will-change: transform;
+  transition: opacity 320ms var(--ease-out);
+}
+/* Unter dem offenen Film ausgeblendet; nach dem Schließen blendet die Pill weich wieder ein,
+   statt nach dem Portal-Rücklauf aufzuploppen */
+.dd-film-trigger.is-open .dd-film-pill { opacity: 0; transition: none; }
+
+.dd-film-pill-icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-round);
+  background: var(--surface-dark);
+  color: var(--text-on-dark);
+}
+/* Dreieck optisch zentrieren (Schwerpunkt liegt links der Mitte) */
+.dd-film-pill-icon svg { transform: translateX(1px); }
+
+.dd-film-pill-time {
+  padding-left: var(--space-3);
+  border-left: var(--border-default);
+  font-family: var(--font-body);
+  font-weight: var(--fw-medium);
+  font-size: var(--fs-caption);
+  line-height: 1;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Tablet: Das Panel ist hier schmaler als 9:16. Die Headlines im Teaser stehen linksbündig,
+   deshalb links weniger wegschneiden als rechts. */
+@media (min-width: 721px) and (max-width: 1023px) {
+  .dd-film-teaser,
+  .dd-film-still { object-position: 30% 20%; }
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .dd-film-trigger:hover .dd-film-media { transform: scale(1.03); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dd-film-media,
+  .dd-film-still,
+  .dd-film-pill { transition: none; }
+}
+
+/* ---------- Dialog ---------- */
+
+.dd-film-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: var(--surface-dark);
+  color: var(--text-on-dark);
+  overscroll-behavior: contain;
+}
+.dd-film-overlay[hidden] { display: none; }
+.dd-film-overlay[data-state="closing"] { pointer-events: none; }
+
+.dd-film-stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Querformat-Viewport: 16:9-Fassung, max. 92vw breit und 82vh hoch */
+.dd-film-frame {
+  position: relative;
+  width: min(92vw, calc(82vh * 16 / 9));
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--surface-dark);
+  transform-origin: 50% 50%;
+}
+
+.dd-film-video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: var(--surface-dark);
+}
+
+/* Hochformat-Viewport: 9:16-Fassung, so groß wie möglich */
+@media (orientation: portrait) {
+  .dd-film-frame {
+    width: min(100vw, calc(100vh * 9 / 16));
+    aspect-ratio: 9 / 16;
+    border-radius: 0;
+  }
+  @supports (height: 100svh) {
+    .dd-film-frame { width: min(100vw, calc(100svh * 9 / 16)); }
+  }
+}
+
+.dd-film-close {
+  position: absolute;
+  top: max(var(--space-4), env(safe-area-inset-top));
+  right: max(var(--space-4), env(safe-area-inset-right));
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-round);
+  background: var(--surface-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: var(--transition-interactive);
+  -webkit-tap-highlight-color: transparent;
+}
+.dd-film-close:active { transform: scale(var(--press-scale)); }
+
+@media (min-width: 721px) {
+  .dd-film-close { top: var(--space-6); right: var(--space-6); }
+}
+
+/* Fokus-Wächter: unsichtbar, nur für die Tab-Schleife */
+.dd-film-guard {
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Ghost: Panelbild im Overlay für den Übergang. Ruhezustand unsichtbar, Position und Größe
+   setzt das Script beim Öffnen und Schließen. */
+.dd-film-ghost {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+  opacity: 0;
+  pointer-events: none;
+  transform-origin: 50% 50%;
+}

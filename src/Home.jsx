@@ -56,9 +56,17 @@ const DIFFERENCE = [
 /* stat/statLabel: optionale Kennzahl für die hervorgehobene Case-Karte. Nur freigegebene Zahlen. */
 const CASES = [
   { client: 'Aqmos', logo: '/assets/clients/aqmos.webp', industry: 'Wasseraufbereitung · D2C + Marktplätze',
-    stat: '+50 %', statLabel: 'Monatsumsatz im Jahresvergleich',
+    statPrefix: 'bis zu', stat: '+110 %', statLabel: 'Monatsumsatz im Jahresvergleich',
     result: 'Gewachsen durch Struktur, nicht durch Budget.',
-    body: 'Wir haben Aqmos neu gebrandet und der Marke ein Gesicht gegeben. Seitdem steuern wir das operative E-Commerce-Geschäft über vier Kanäle. Im Jahresvergleich liegen die Monatsumsätze stabil bei +50 %. Gewachsen ist das über Struktur im Marketing und im technischen E-Commerce.',
+    body: 'Wir haben Aqmos neu gebrandet und der Marke ein Gesicht gegeben. Seitdem steuern wir das operative E-Commerce-Geschäft über vier Kanäle. Im Jahresvergleich liegen die Monatsumsätze bei bis zu +110 %. Gewachsen ist das über Struktur im Marketing und im technischen E-Commerce.',
+    /* Case-Study-Film (Quelle: Vault 07 Anhänge/Case Study Video Aqmos, v5). Neue Version = neue Dateinamen (Cache). */
+    film: {
+      label: 'Case-Study-Film ansehen', duration: '0:45', durationIso: 'PT45S',
+      teaser: '/assets/video/aqmos-case-teaser-9x16-v5.mp4', teaserPoster: '/assets/video/aqmos-case-poster-9x16-v5.webp',
+      src: '/assets/video/aqmos-case-16x9-v5.mp4', poster: '/assets/video/aqmos-case-poster-v5.webp',
+      srcPortrait: '/assets/video/aqmos-case-9x16-v5.mp4', posterPortrait: '/assets/video/aqmos-case-poster-9x16-v5.webp',
+      captions: '/assets/video/aqmos-case-v5.de.vtt'
+    },
     tags: ['Rebranding', 'E-Commerce-Steuerung', '4+ Kanäle'] },
   { client: 'Hagi · Hagleitner', logo: '/assets/clients/hagi.webp', industry: 'Hygiene · B2B-Konzern',
     result: 'Vom B2B-Hygieneprofi zur D2C-Marke.',
