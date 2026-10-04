@@ -42,8 +42,8 @@ const TRUST = [
   { name: 'Aqmos', logo: '/assets/clients/aqmos.webp', height: 25, w: 450, h: 96 },
   { name: 'Hagi', logo: '/assets/clients/hagi.webp', height: 48, w: 99, h: 96 },
   { name: 'Gamechangersocks', logo: '/assets/clients/gamechangersocks.webp', height: 40, w: 150, h: 96 },
-  { name: 'BWT', logo: '/assets/clients/bwt.webp', height: 34, w: 222, h: 96 },
-  { name: 'Ecosoft', logo: '/assets/clients/ecosoft.webp', height: 30, w: 290, h: 96 }
+  { name: 'BWT', logo: '/assets/clients/bwt-weiss.webp', height: 34, w: 222, h: 96 },
+  { name: 'Ecosoft', logo: '/assets/clients/ecosoft-weiss.webp', height: 30, w: 290, h: 96 }
 ];
 
 /* mark: Teil des Titels, der den Lime-Textmarker bekommt (Brand-Signature, sparsam). */

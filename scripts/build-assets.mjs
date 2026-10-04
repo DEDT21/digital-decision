@@ -33,9 +33,11 @@ const LOGOS = [
   { src: 'BAM LOGO.png', out: 'public/assets/network/bam-creative.webp' },
   { src: 'Black_Huber_Logo.png', out: 'public/assets/network/huber.webp' }
 ];
-/* hagi.webp, bwt.webp und ecosoft.webp (Stand 04.10.2026) kamen bereits weiß auf transparentem
+/* hagi.webp, bwt-weiss.webp und ecosoft-weiss.webp (Stand 04.10.2026) kamen bereits weiß auf transparentem
    Grund und sind direkt als 96px-WebP eingecheckt. NICHT über diese Pipeline neu erzeugen:
-   whiteToAlpha würde die weißen Logos komplett transparent machen. */
+   whiteToAlpha würde die weißen Logos komplett transparent machen.
+   Getauschte Bilder immer unter NEUEM Dateinamen ablegen: bis 02.10.2026 lagen /assets/*
+   mit einjährigem immutable-Cache aus, alte Besucher sähen sonst weiter die alte Datei. */
 /* Wipplinger ships as SVG: public/assets/network/wipplinger.svg is the source
    wipplinger-logo.svg with the viewBox cropped to the W mark (0 0 78 80). */
 
