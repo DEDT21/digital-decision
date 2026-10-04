@@ -14,8 +14,8 @@ const FOOTER_COLUMNS = [
   ] },
   { title: 'Kontakt', items: [
     { label: 'david@digital-decision.at', href: 'mailto:david@digital-decision.at' },
-    { label: 'Josef-Weißkind-Straße 14/4' },
-    { label: '5083 Grödig bei Salzburg' }
+    { label: 'Karolingerstraße 1' },
+    { label: '5020 Salzburg' }
   ] },
   { title: 'Rechtliches', items: [
     { label: 'Impressum', href: '/impressum/' },

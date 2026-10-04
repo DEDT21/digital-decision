@@ -40,10 +40,10 @@ const HERO_FACES = ['/assets/team/david-edtmayer-avatar.webp', '/assets/team/tho
    mit kleiner Schrift größer), w/h: Pixelmaße der Datei für width/height-Attribute. */
 const TRUST = [
   { name: 'Aqmos', logo: '/assets/clients/aqmos.webp', height: 25, w: 450, h: 96 },
-  { name: 'Hagleitner', logo: '/assets/clients/hagleitner.webp', height: 44, w: 165, h: 96 },
+  { name: 'Hagi', logo: '/assets/clients/hagi.webp', height: 48, w: 99, h: 96 },
   { name: 'Gamechangersocks', logo: '/assets/clients/gamechangersocks.webp', height: 40, w: 150, h: 96 },
-  { name: 'BWT', logo: '/assets/clients/bwt.webp', height: 32, w: 255, h: 96 },
-  { name: 'Ecosoft', logo: '/assets/clients/ecosoft.webp', height: 30, w: 311, h: 96 }
+  { name: 'BWT', logo: '/assets/clients/bwt.webp', height: 34, w: 222, h: 96 },
+  { name: 'Ecosoft', logo: '/assets/clients/ecosoft.webp', height: 30, w: 290, h: 96 }
 ];
 
 /* mark: Teil des Titels, der den Lime-Textmarker bekommt (Brand-Signature, sparsam). */
@@ -60,7 +60,7 @@ const CASES = [
     result: 'Gewachsen durch Struktur, nicht durch Budget.',
     body: 'Wir haben Aqmos neu gebrandet und der Marke ein Gesicht gegeben. Seitdem steuern wir das operative E-Commerce-Geschäft über vier Kanäle. Im Jahresvergleich liegen die Monatsumsätze stabil bei +50 %. Gewachsen ist das über Struktur im Marketing und im technischen E-Commerce.',
     tags: ['Rebranding', 'E-Commerce-Steuerung', '4+ Kanäle'] },
-  { client: 'Hagi · Hagleitner', logo: '/assets/clients/hagleitner.webp', industry: 'Hygiene · B2B-Konzern',
+  { client: 'Hagi · Hagleitner', logo: '/assets/clients/hagi.webp', industry: 'Hygiene · B2B-Konzern',
     result: 'Vom B2B-Hygieneprofi zur D2C-Marke.',
     body: 'Hagleitner macht seit über 50 Jahren Profi-Hygiene im B2B. Der erste Schritt zum Endkunden blieb unter seinen Möglichkeiten. Jetzt bauen wir ihn neu auf: Shopify-Migration, neues Creative-Konzept, Relaunch von Google und Meta Ads.',
     tags: ['Shop-Migration', 'Ads-Relaunch', 'D2C-Strategie'] },
@@ -84,11 +84,11 @@ const SETUP_STEPS = [
 ];
 
 const TEAM = [
-  { name: 'Thomas Jud', role: 'Geschäftsführer · Co-Founder', mail: 'thomas@digital-decision.at', photo: '/assets/team/thomas-jud.webp',
+  { name: 'Thomas Jud', role: 'Geschäftsführer', mail: 'thomas@digital-decision.at', photo: '/assets/team/thomas-jud.webp',
     line: 'Ein gutes Setup erkennst du daran, dass niemand mehr darüber reden muss.',
     bio: 'Denkt in Systemen, nicht in Kampagnen. Thomas sortiert seit Jahren Shops, Prozesse und Agentur-Landschaften und migriert Systeme, ohne die funktionierenden Teile anzufassen.',
     callFor: ['Shop- & Systemarchitektur', 'Prozesse im operativen Geschäft', 'Agentur-Landschaften aufräumen'] },
-  { name: 'David Edtmayer', role: 'Geschäftsführer · Co-Founder', mail: 'david@digital-decision.at', photo: '/assets/team/david-edtmayer.webp',
+  { name: 'David Edtmayer', role: 'Geschäftsführer', mail: 'david@digital-decision.at', photo: '/assets/team/david-edtmayer.webp',
     line: 'Ich schaue mir zuerst die Zahlen an. Dann suche ich den Weg, den noch keiner geht.',
     bio: 'Baut seit seinem 15. Lebensjahr E-Commerce. Heute baut er die Systeme dahinter: AI-first und immer auf der Suche nach der besseren Lösung statt der gewohnten.',
     callFor: ['Wachstumsentscheidungen', 'Performance & Funnels', 'AI-gestützte Prozesse & neue Wege'] }

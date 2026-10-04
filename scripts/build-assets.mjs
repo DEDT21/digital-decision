@@ -29,13 +29,13 @@ const PHOTO_VARIANTS = [160, 400, 800];
 
 const LOGOS = [
   { src: 'Logo_Aqmos.png', out: 'public/assets/clients/aqmos.webp' },
-  { src: 'Hagleitner.png', out: 'public/assets/clients/hagleitner.webp' },
   { src: 'GCS-LOGO-SHOP.png', out: 'public/assets/clients/gamechangersocks.webp' },
-  { src: 'BWT.png', out: 'public/assets/clients/bwt.webp' },
-  { src: 'Ecosoft.png', out: 'public/assets/clients/ecosoft.webp' },
   { src: 'BAM LOGO.png', out: 'public/assets/network/bam-creative.webp' },
   { src: 'Black_Huber_Logo.png', out: 'public/assets/network/huber.webp' }
 ];
+/* hagi.webp, bwt.webp und ecosoft.webp (Stand 04.10.2026) kamen bereits weiß auf transparentem
+   Grund und sind direkt als 96px-WebP eingecheckt. NICHT über diese Pipeline neu erzeugen:
+   whiteToAlpha würde die weißen Logos komplett transparent machen. */
 /* Wipplinger ships as SVG: public/assets/network/wipplinger.svg is the source
    wipplinger-logo.svg with the viewBox cropped to the W mark (0 0 78 80). */
 

@@ -14,7 +14,7 @@ import './CaseGrid.css';
    Ein Case kann das über `logoSize: { width, height, display }` überschreiben. */
 const LOGO_SIZES = {
   '/assets/clients/aqmos.webp': { width: 600, height: 128, display: 24 },
-  '/assets/clients/hagleitner.webp': { width: 519, height: 302, display: 40 },
+  '/assets/clients/hagi.webp': { width: 99, height: 96, display: 40 },
   '/assets/clients/gamechangersocks.webp': { width: 600, height: 385, display: 34 }
 };
 

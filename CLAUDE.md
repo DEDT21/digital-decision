@@ -4,7 +4,7 @@ Onboarding-Dokument für die Arbeit an diesem Repo. Lies das zuerst, bevor du Ä
 
 ## Projekt
 
-Produktions-Website **digital-decision.at** der **Digital Decision GmbH** (Geschäftsführer: David Edtmayer & Thomas Jud, Sitz Grödig bei Salzburg).
+Produktions-Website **digital-decision.at** der **Digital Decision GmbH** (Geschäftsführer: David Edtmayer & Thomas Jud, Firmensitz laut Firmenbuch Grödig, öffentliche Adresse auf der Website: Karolingerstraße 1, 5020 Salzburg. Die Grödiger Geschäftsanschrift ist eine Privatadresse und gehört nicht auf die Website).
 
 Digital Decision ist eine E-Commerce-Agentur: Shops & Relaunches, Performance Marketing, Content & SEO, E-Mail/CRM, Systeme & Integrationen. Die Website ist eine einseitige Landingpage plus statische Unterseiten, Hauptziel ist der kostenlose **Setup-Check** (Kontaktformular).
 
